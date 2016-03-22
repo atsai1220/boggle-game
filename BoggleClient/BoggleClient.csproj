@@ -46,6 +46,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="IBoggleView.cs" />
     <Compile Include="IBoggleAPI.cs" />
     <Compile Include="Model.cs" />
     <Compile Include="Controller.cs" />
