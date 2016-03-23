@@ -15,7 +15,7 @@ namespace BoggleClient
         public BoggleGUI()
         {
             InitializeComponent();
-            programStartEvent("startPanel", true);
+            
         }
 
         public event Action AboutEvent;

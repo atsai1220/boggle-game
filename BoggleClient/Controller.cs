@@ -91,14 +91,13 @@ namespace BoggleClient
                 if (response.IsSuccessStatusCode)
                 {
                     // The deserialized response value is an object that describes the user token
+                    // TODO get and set user token to player
                     String result = response.Content.ReadAsStringAsync().Result;
                     dynamic serverResponse = JsonConvert.DeserializeObject(result);
-                    Console.WriteLine("New repository: ");
                     Console.WriteLine(serverResponse);
                 }
                 else
                 {
-                    Console.WriteLine("Error creating repo: " + response.StatusCode);
                     Console.WriteLine(response.ReasonPhrase);
                 }
             }
