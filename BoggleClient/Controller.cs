@@ -6,6 +6,8 @@ using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using System.Net;
+
 
 
 namespace BoggleClient
@@ -31,6 +33,7 @@ namespace BoggleClient
             boggleWindow.joinCanceledEvent += cancelJoinRequest;
             boggleWindow.closeEvent += HandleCloseEvent;
             boggleWindow.programStartEvent += handleProgramStartEvent;
+            registerPlayer("Andrew");
         }
 
         /// <summary>
@@ -54,11 +57,15 @@ namespace BoggleClient
 
             // Tell the server that the client will accept this particular type of response data
             client.DefaultRequestHeaders.Accept.Clear();
-            client.DefaultRequestHeaders.Add("Content-Type", "application/json");
+            client.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
+            
+
 
             // There is more client configuration to do, depending on the request.
             return client;
         }
+
+        
 
         /// <summary>
         /// Registers the player with the boggle server.
@@ -81,7 +88,8 @@ namespace BoggleClient
                 // is a JSON object with various properties of the new repo expressed as
                 // properties.
                 dynamic player = new ExpandoObject();
-                player.Nickname = boggleModel.GetName();
+                //player.Nickname = boggleModel.GetName();
+                player.Nickname = nickName;
 
                 // To send a POST request, we must include the serialized parameter object
                 // in the body of the request.

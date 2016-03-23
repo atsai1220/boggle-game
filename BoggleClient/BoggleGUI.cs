@@ -58,6 +58,9 @@ namespace BoggleClient
 
         }
 
+        private void startPanel_Paint(object sender, PaintEventArgs e)
+        {
 
+        }
     }
 }
