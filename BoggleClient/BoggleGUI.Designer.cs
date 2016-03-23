@@ -38,7 +38,7 @@
             this.howToPlayToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
-            this.panel1 = new System.Windows.Forms.Panel();
+            this.gamePanel = new System.Windows.Forms.Panel();
             this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.cubeLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
             this.box1 = new System.Windows.Forms.Button();
@@ -57,8 +57,9 @@
             this.box14 = new System.Windows.Forms.Button();
             this.box15 = new System.Windows.Forms.Button();
             this.box16 = new System.Windows.Forms.Button();
+            this.startPanel = new System.Windows.Forms.Panel();
             this.menuStrip1.SuspendLayout();
-            this.panel1.SuspendLayout();
+            this.gamePanel.SuspendLayout();
             this.cubeLayoutPanel.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -131,14 +132,15 @@
             this.statusStrip1.TabIndex = 1;
             this.statusStrip1.Text = "statusStrip1";
             // 
-            // panel1
+            // gamePanel
             // 
-            this.panel1.Controls.Add(this.cubeLayoutPanel);
-            this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panel1.Location = new System.Drawing.Point(0, 24);
-            this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(584, 416);
-            this.panel1.TabIndex = 2;
+            this.gamePanel.Controls.Add(this.cubeLayoutPanel);
+            this.gamePanel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.gamePanel.Location = new System.Drawing.Point(0, 0);
+            this.gamePanel.Name = "gamePanel";
+            this.gamePanel.Size = new System.Drawing.Size(584, 462);
+            this.gamePanel.TabIndex = 2;
+            this.gamePanel.Visible = false;
             // 
             // contextMenuStrip1
             // 
@@ -340,21 +342,30 @@
             this.box16.Text = "box16";
             this.box16.UseVisualStyleBackColor = true;
             // 
+            // startPanel
+            // 
+            this.startPanel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.startPanel.Location = new System.Drawing.Point(0, 0);
+            this.startPanel.Name = "startPanel";
+            this.startPanel.Size = new System.Drawing.Size(584, 462);
+            this.startPanel.TabIndex = 1;
+            // 
             // BoggleGUI
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(584, 462);
-            this.Controls.Add(this.panel1);
             this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.menuStrip1);
+            this.Controls.Add(this.gamePanel);
+            this.Controls.Add(this.startPanel);
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "BoggleGUI";
             this.Text = "Form1";
             this.Load += new System.EventHandler(this.BoggleGUI_Load);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
-            this.panel1.ResumeLayout(false);
+            this.gamePanel.ResumeLayout(false);
             this.cubeLayoutPanel.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -372,7 +383,7 @@
         private System.Windows.Forms.ToolStripMenuItem joinNewGameToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem cancelGameToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem quitToolStripMenuItem;
-        private System.Windows.Forms.Panel panel1;
+        private System.Windows.Forms.Panel gamePanel;
         private System.Windows.Forms.ContextMenuStrip contextMenuStrip1;
         private System.Windows.Forms.TableLayoutPanel cubeLayoutPanel;
         private System.Windows.Forms.Button box16;
@@ -391,6 +402,7 @@
         private System.Windows.Forms.Button box3;
         private System.Windows.Forms.Button box2;
         private System.Windows.Forms.Button box1;
+        private System.Windows.Forms.Panel startPanel;
     }
 }
 

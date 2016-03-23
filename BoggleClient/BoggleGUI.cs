@@ -15,12 +15,16 @@ namespace BoggleClient
         public BoggleGUI()
         {
             InitializeComponent();
-            
+            programStartEvent("startPanel", true);
         }
 
+        public event Action AboutEvent;
         public event Action closeEvent;
+        public event Action gameStartEvent;
+        public event Action helpEvent;
         public event Action joinCanceledEvent;
         public event Action joinGameEvent;
+        public event Action<string, bool> programStartEvent;
         public event Action<string> registerPlayerEvent;
 
         /// <summary>
@@ -48,5 +52,12 @@ namespace BoggleClient
                 closeEvent();
             }
         }
+
+        private void gameStartPanel()
+        {
+
+        }
+
+
     }
 }

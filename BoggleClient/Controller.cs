@@ -30,6 +30,15 @@ namespace BoggleClient
             boggleWindow.joinGameEvent += joinGame;
             boggleWindow.joinCanceledEvent += cancelJoinRequest;
             boggleWindow.closeEvent += HandleCloseEvent;
+            boggleWindow.programStartEvent += handleProgramStartEvent;
+        }
+
+        /// <summary>
+        /// Changes the panel to start page
+        /// </summary>
+        private void handleProgramStartEvent(string panelName, bool status)
+        {
+            
         }
 
         /// <summary>
@@ -93,6 +102,18 @@ namespace BoggleClient
                     Console.WriteLine(response.ReasonPhrase);
                 }
             }
+        }
+
+        /// <summary>
+        /// Controls which panel to display
+        /// </summary>
+        /// <param name="panelName"></param>
+        /// <param name="visible"></param>
+        private void PanelVisible(string panelName, bool visible)
+        {
+            // TODO implement PanelVisible
+            //var panel = this.Controls.OfType<Panel>().FirstOrDefault(p => p.Name == panelName);
+            //if (panel != default(Panel)) panel.Visible = visible;
         }
 
         /// <summary>
