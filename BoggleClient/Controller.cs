@@ -33,22 +33,15 @@ namespace BoggleClient
             boggleWindow.joinCanceledEvent += cancelJoinRequest;
             boggleWindow.closeEvent += HandleCloseEvent;
             boggleWindow.programStartEvent += handleProgramStartEvent;
-            registerPlayer("Andrew");
+            boggleWindow.messagePopUpEvent += handleMessagePopUpEvent;
         }
 
-        /// <summary>
-        /// Changes the panel to start page
-        /// </summary>
-        private void handleProgramStartEvent(string panelName, bool status)
-        {
-            
-        }
-
+        
         /// <summary>
         /// Create HttpClient to communicate with server
         /// </summary>
         /// <returns></returns>
-        public static HttpClient CreateClient()
+        private static HttpClient CreateClient()
         {
             // TODO change Uri to update with input from user
             // Create a client whose base address is the GitHub server
@@ -79,7 +72,7 @@ namespace BoggleClient
         /// <param name="nickName">Desired name of the player.</param>
         private void registerPlayer(string nickName)
         {
-            // TODO implement
+            // TODO implement Player to get token
             using (HttpClient client = CreateClient())
             {
 
@@ -106,22 +99,21 @@ namespace BoggleClient
                 }
                 else
                 {
-                    boggleWindow.
+                    // TODO change
+                    handleMessagePopUpEvent("If Nickname is null, or is empty when trimmed, responds with status 403 (Forbidden).");
                 }
             }
         }
 
         /// <summary>
-        /// Controls which panel to display
+        /// Handles a pop-up dialog with passed message
         /// </summary>
-        /// <param name="panelName"></param>
-        /// <param name="visible"></param>
-        private void PanelVisible(string panelName, bool visible)
+        /// <param name="_message"></param>
+        private void handleMessagePopUpEvent(string _message)
         {
-            // TODO implement PanelVisible
-            //var panel = this.Controls.OfType<Panel>().FirstOrDefault(p => p.Name == panelName);
-            //if (panel != default(Panel)) panel.Visible = visible;
+            boggleWindow.MessagePopUp(_message);
         }
+
 
         /// <summary>
         /// Joins a game or starts a new game.
@@ -147,6 +139,40 @@ namespace BoggleClient
         private void HandleCloseEvent()
         {
             boggleWindow.DoClose();
+        }
+
+        private void HandleAboutEvent()
+        {
+
+        }
+
+        private void HandleHelpEvent()
+        {
+
+        }
+
+        /// <summary>
+        /// dispay end game
+        /// </summary>
+        private void HandleGameEndEvent()
+        {
+
+        }
+
+        /// <summary>
+        /// populate cubes and set timer
+        /// </summary>
+        private void HandleGameStartEvent()
+        {
+
+        }
+
+        /// <summary>
+        /// send to server for points
+        /// </summary>
+        private void HandleWordEnteredEvent()
+        {
+
         }
     }
 }

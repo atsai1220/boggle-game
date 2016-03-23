@@ -57,7 +57,6 @@
             this.box2 = new System.Windows.Forms.Button();
             this.box1 = new System.Windows.Forms.Button();
             this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.startPanel = new System.Windows.Forms.Panel();
             this.menuStrip1.SuspendLayout();
             this.gamePanel.SuspendLayout();
             this.cubeLayoutPanel.SuspendLayout();
@@ -341,15 +340,6 @@
             this.contextMenuStrip1.Name = "contextMenuStrip1";
             this.contextMenuStrip1.Size = new System.Drawing.Size(61, 4);
             // 
-            // startPanel
-            // 
-            this.startPanel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.startPanel.Location = new System.Drawing.Point(0, 0);
-            this.startPanel.Name = "startPanel";
-            this.startPanel.Size = new System.Drawing.Size(584, 462);
-            this.startPanel.TabIndex = 1;
-            this.startPanel.Paint += new System.Windows.Forms.PaintEventHandler(this.startPanel_Paint);
-            // 
             // BoggleGUI
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -357,7 +347,6 @@
             this.ClientSize = new System.Drawing.Size(584, 462);
             this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.menuStrip1);
-            this.Controls.Add(this.startPanel);
             this.Controls.Add(this.gamePanel);
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "BoggleGUI";
@@ -402,7 +391,6 @@
         private System.Windows.Forms.Button box3;
         private System.Windows.Forms.Button box2;
         private System.Windows.Forms.Button box1;
-        private System.Windows.Forms.Panel startPanel;
     }
 }
 
