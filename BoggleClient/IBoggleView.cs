@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace BoggleClient
 {
-    class IBoggleView
+    interface IBoggleView
     {
-        event Action<string> closeEvent;
+        event Action closeEvent;
 
         event Action<string> registerPlayerEvent;
         event Action joinGameEvent;

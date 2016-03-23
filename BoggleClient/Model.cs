@@ -22,10 +22,6 @@ namespace BoggleClient
 
             wordsPlayed = 0;
         }
-
-
-
-
     }
 
 

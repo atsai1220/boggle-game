@@ -18,6 +18,10 @@ namespace BoggleClient
 
         Task<int> playWord(string userToken, string word);
 
+        string Title { set; };
+
+        void DoClose();
+
 
     }
 }
