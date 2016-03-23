@@ -115,6 +115,7 @@ namespace BoggleClient
         }
 
 
+        // Sam
         /// <summary>
         /// Joins a game or starts a new game.
         /// 
@@ -125,6 +126,7 @@ namespace BoggleClient
 
         }
 
+        // Sam
         /// <summary>
         /// Cancel a pending request to join a game.
         /// </summary>
@@ -141,16 +143,19 @@ namespace BoggleClient
             boggleWindow.DoClose();
         }
 
+        // ASm
         private void HandleAboutEvent()
         {
 
         }
 
+        //Andrew
         private void HandleHelpEvent()
         {
 
         }
 
+        //Andrew
         /// <summary>
         /// dispay end game
         /// </summary>
@@ -159,6 +164,7 @@ namespace BoggleClient
 
         }
 
+        // Sam
         /// <summary>
         /// populate cubes and set timer
         /// </summary>
@@ -166,7 +172,8 @@ namespace BoggleClient
         {
 
         }
-
+        
+        // Andrew
         /// <summary>
         /// send to server for points
         /// </summary>
