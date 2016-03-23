@@ -14,6 +14,7 @@ namespace BoggleClient
         event Action joinGameEvent;
         event Action joinCanceledEvent;
 
+        void DoClose();
 
     }
 }

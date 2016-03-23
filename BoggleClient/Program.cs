@@ -14,9 +14,14 @@ namespace BoggleClient
         [STAThread]
         static void Main()
         {
+            
+            
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new BoggleGUI());
+            var boggleGame = new BoggleGUI();
+            var controller = new Controller(boggleGame);
+            Application.Run(boggleGame);
+
 
         }
 

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
@@ -19,9 +20,16 @@ namespace BoggleClient
         /// </summary>
         public Controller()
         {
-            boggleWindow = new BoggleGUI();
             boggleModel = new Model();
+        }
 
+        public Controller(IBoggleView _boggleWindow) : base()
+        {
+            boggleWindow = _boggleWindow;
+            boggleWindow.registerPlayerEvent += registerPlayer;
+            boggleWindow.joinGameEvent += joinGame;
+            boggleWindow.joinCanceledEvent += cancelJoinRequest;
+            boggleWindow.closeEvent += HandleCloseEvent;
         }
 
         /// <summary>
@@ -46,6 +54,11 @@ namespace BoggleClient
         /// <summary>
         /// Registers the player with the boggle server.
         /// Sets the id of the player in the model.
+        /// 
+        /// POST /BoggleService.svc/users
+        /// {
+        ///     "Nickname": "Joe"
+        /// }
         /// </summary>
         /// <param name="nickName">Desired name of the player.</param>
         private void registerPlayer(string nickName)
@@ -59,20 +72,20 @@ namespace BoggleClient
                 // is a JSON object with various properties of the new repo expressed as
                 // properties.
                 dynamic player = new ExpandoObject();
-                player.name = boggleModel.GetName();
+                player.Nickname = boggleModel.GetName();
 
                 // To send a POST request, we must include the serialized parameter object
                 // in the body of the request.
-                StringContent content = new StringContent(JsonConvert.SerializeObject(data), Encoding.UTF8, "application/json");
-                HttpResponseMessage response = client.PostAsync("/user/repos", content).Result;
+                StringContent content = new StringContent(JsonConvert.SerializeObject(player), Encoding.UTF8, "application/json");
+                HttpResponseMessage response = client.PostAsync("/BoggleService.svc/users", content).Result;
 
                 if (response.IsSuccessStatusCode)
                 {
-                    // The deserialized response value is an object that describes the new repository.
+                    // The deserialized response value is an object that describes the user token
                     String result = response.Content.ReadAsStringAsync().Result;
-                    dynamic newRepo = JsonConvert.DeserializeObject(result);
+                    dynamic serverResponse = JsonConvert.DeserializeObject(result);
                     Console.WriteLine("New repository: ");
-                    Console.WriteLine(newRepo);
+                    Console.WriteLine(serverResponse);
                 }
                 else
                 {
@@ -98,6 +111,14 @@ namespace BoggleClient
         private void cancelJoinRequest()
         {
 
+        }
+
+        /// <summary>
+        /// Handles Close event
+        /// </summary>
+        private void HandleCloseEvent()
+        {
+            boggleWindow.DoClose();
         }
     }
 }

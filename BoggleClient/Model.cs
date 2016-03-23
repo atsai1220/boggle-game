@@ -32,9 +32,9 @@ namespace BoggleClient
             return you.nickname;
         }
 
-        public void setPlayerID(string _id)
+        public void setPlayerID(string _userToken)
         {
-            you.id = _id;
+            you.userToken = _userToken;
         }
     }
 
@@ -45,24 +45,25 @@ namespace BoggleClient
     /// </summary>
     class Player
     {
-        public string id { get; set; }
+        public string userToken { get; set; }
         public string nickname { get; set; }
         public int score { get; set; }
 
         public Player()
         {
-            id = null;
+            userToken = null;
             nickname = null;
             score = 0;
         }
 
-        public Player(string _id, string _nickname)
+        public Player(string _userToken, string _nickname)
         {
-            if (_id != null && _nickname != null)
+            if (_userToken != null && _nickname != null)
             {
-                id = _id;
+                userToken = _userToken;
                 nickname = _nickname;
             }
+            // TODO handle exception
         }
     }
 
