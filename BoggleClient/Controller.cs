@@ -5,7 +5,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
+
 
 namespace BoggleClient
 {
@@ -21,8 +21,26 @@ namespace BoggleClient
         {
             boggleWindow = new BoggleGUI();
             boggleModel = new Model();
-            registerPlayer();
 
+        }
+
+        /// <summary>
+        /// Create HttpClient to communicate with server
+        /// </summary>
+        /// <returns></returns>
+        public static HttpClient CreateClient()
+        {
+            // TODO change Uri to update with input from user
+            // Create a client whose base address is the GitHub server
+            HttpClient client = new HttpClient();
+            client.BaseAddress = new Uri("http://bogglecs3500s16.azurewebsites.net");
+
+            // Tell the server that the client will accept this particular type of response data
+            client.DefaultRequestHeaders.Accept.Clear();
+            client.DefaultRequestHeaders.Add("Content-Type", "application/json");
+
+            // There is more client configuration to do, depending on the request.
+            return client;
         }
 
         /// <summary>
@@ -32,66 +50,43 @@ namespace BoggleClient
         /// <param name="nickName">Desired name of the player.</param>
         private void registerPlayer(string nickName)
         {
-            // POST /BoggleService.svc/users
-            HttpClient client = new HttpClient();
-            client.BaseAddress = new Uri();
-
-            // Tell the server that the client will accept this particular type of response data
-            client.DefaultRequestHeaders.Accept.Clear();
-            client.DefaultRequestHeaders.Add("Content-Type", "application/json");
-
-            // An ExpandoObject is one to which in which we can set arbitrary properties.
-            // To create a new public repository, we must send a request parameter which
-            // is a JSON object with various properties of the new repo expressed as
-            // properties.
-            dynamic player = new ExpandoObject();
-            player.name = boggleModel.GetName();
-
-            // To send a POST request, we must include the serialized parameter object
-            // in the body of the request.
-            StringContent content = new StringContent(JsonConvert.SerializeObject(data), Encoding.UTF8, "application/json");
-            HttpResponseMessage response = client.PostAsync("/user/repos", content).Result;
-
-            if (response.IsSuccessStatusCode)
+            // TODO implement
+            using (HttpClient client = CreateClient())
             {
-                // The deserialized response value is an object that describes the new repository.
-                String result = response.Content.ReadAsStringAsync().Result;
-                dynamic newRepo = JsonConvert.DeserializeObject(result);
-                Console.WriteLine("New repository: ");
-                Console.WriteLine(newRepo);
+                // POST /BoggleService.svc/users
+                HttpClient client = new HttpClient();
+                client.BaseAddress = new Uri();
+
+                // Tell the server that the client will accept this particular type of response data
+                client.DefaultRequestHeaders.Accept.Clear();
+                client.DefaultRequestHeaders.Add("Content-Type", "application/json");
+
+                // An ExpandoObject is one to which in which we can set arbitrary properties.
+                // To create a new public repository, we must send a request parameter which
+                // is a JSON object with various properties of the new repo expressed as
+                // properties.
+                dynamic player = new ExpandoObject();
+                player.name = boggleModel.GetName();
+
+                // To send a POST request, we must include the serialized parameter object
+                // in the body of the request.
+                StringContent content = new StringContent(JsonConvert.SerializeObject(data), Encoding.UTF8, "application/json");
+                HttpResponseMessage response = client.PostAsync("/user/repos", content).Result;
+
+                if (response.IsSuccessStatusCode)
+                {
+                    // The deserialized response value is an object that describes the new repository.
+                    String result = response.Content.ReadAsStringAsync().Result;
+                    dynamic newRepo = JsonConvert.DeserializeObject(result);
+                    Console.WriteLine("New repository: ");
+                    Console.WriteLine(newRepo);
+                }
+                else
+                {
+                    Console.WriteLine("Error creating repo: " + response.StatusCode);
+                    Console.WriteLine(response.ReasonPhrase);
+                }
             }
-            else
-            {
-                Console.WriteLine("Error creating repo: " + response.StatusCode);
-                Console.WriteLine(response.ReasonPhrase);
-            }
-
-        }
-
-        /// <summary>
-        /// Creates an HttpClient for communicating with GitHub.  The GitHub API requires specific information
-        /// to appear in each request header.
-        /// </summary>
-        public static HttpClient CreateClient()
-        {
-            // Create a client whose base address is the GitHub server
-            HttpClient client = new HttpClient();
-            client.BaseAddress = new Uri("https://api.github.com/");
-
-            // Tell the server that the client will accept this particular type of response data
-            client.DefaultRequestHeaders.Accept.Clear();
-            client.DefaultRequestHeaders.Add("Accept", "application/vnd.github.v3+json");
-
-            // This is an authorization token that you can create by logging in to your GitHub account.
-            client.DefaultRequestHeaders.Add("Authorization", "token " + TOKEN);
-
-            // When an http request is made from a browser, the user agent describes the browser.
-            // Github requires the email address of the authenticated user.
-            client.DefaultRequestHeaders.UserAgent.Clear();
-            client.DefaultRequestHeaders.Add("User-Agent", Uri.EscapeDataString(EMAIL));
-
-            // There is more client configuration to do, depending on the request.
-            return client;
         }
 
         /// <summary>
