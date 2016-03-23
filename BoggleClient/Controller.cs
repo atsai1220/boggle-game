@@ -53,13 +53,6 @@ namespace BoggleClient
             // TODO implement
             using (HttpClient client = CreateClient())
             {
-                // POST /BoggleService.svc/users
-                HttpClient client = new HttpClient();
-                client.BaseAddress = new Uri();
-
-                // Tell the server that the client will accept this particular type of response data
-                client.DefaultRequestHeaders.Accept.Clear();
-                client.DefaultRequestHeaders.Add("Content-Type", "application/json");
 
                 // An ExpandoObject is one to which in which we can set arbitrary properties.
                 // To create a new public repository, we must send a request parameter which
