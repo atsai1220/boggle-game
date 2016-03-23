@@ -1,15 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace BoggleClient
 {
     class  Controller
     {
-        private IBoggleAPI boggleWindow;
+        private IBoggleView boggleWindow;
         private Model boggleModel;
         
         /// <summary>
@@ -18,6 +20,8 @@ namespace BoggleClient
         public Controller()
         {
             boggleWindow = new BoggleGUI();
+            boggleModel = new Model();
+            registerPlayer();
 
         }
 
@@ -30,7 +34,37 @@ namespace BoggleClient
         {
             // POST /BoggleService.svc/users
             HttpClient client = new HttpClient();
-            client.BaseAddress = new Uri()
+            client.BaseAddress = new Uri();
+
+            // Tell the server that the client will accept this particular type of response data
+            client.DefaultRequestHeaders.Accept.Clear();
+            client.DefaultRequestHeaders.Add("Content-Type", "application/json");
+
+            // An ExpandoObject is one to which in which we can set arbitrary properties.
+            // To create a new public repository, we must send a request parameter which
+            // is a JSON object with various properties of the new repo expressed as
+            // properties.
+            dynamic player = new ExpandoObject();
+            player.name = boggleModel.GetName();
+
+            // To send a POST request, we must include the serialized parameter object
+            // in the body of the request.
+            StringContent content = new StringContent(JsonConvert.SerializeObject(data), Encoding.UTF8, "application/json");
+            HttpResponseMessage response = client.PostAsync("/user/repos", content).Result;
+
+            if (response.IsSuccessStatusCode)
+            {
+                // The deserialized response value is an object that describes the new repository.
+                String result = response.Content.ReadAsStringAsync().Result;
+                dynamic newRepo = JsonConvert.DeserializeObject(result);
+                Console.WriteLine("New repository: ");
+                Console.WriteLine(newRepo);
+            }
+            else
+            {
+                Console.WriteLine("Error creating repo: " + response.StatusCode);
+                Console.WriteLine(response.ReasonPhrase);
+            }
 
         }
 

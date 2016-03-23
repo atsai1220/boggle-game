@@ -10,7 +10,12 @@ namespace BoggleClient
     {
         private string[,] board { get; set; }
         private string[,] cubes { get; set; }
+
+
         private int wordsPlayed { get; set; }
+        private string domain { get; set; }
+        private string gameToken { get; set; }
+
         private Player you;
         private Player opp;
 
@@ -19,8 +24,17 @@ namespace BoggleClient
         {
             string[,] board = new string[4, 4];
             string[,] cubes = new string[16, 6];
-
             wordsPlayed = 0;
+        }
+
+        public Model(string _domain) : base()
+        {
+            domain = _domain;
+        }
+
+        public string GetName()
+        {
+            return you.GetName();
         }
     }
 
@@ -31,9 +45,9 @@ namespace BoggleClient
     /// </summary>
     class Player
     {
-        string id { get; set; }
-        string nickname { get; set; }
-        int score { get; set; }
+        private string id { get; set; }
+        private string nickname { get; set; }
+        private int score { get; set; }
 
         public Player()
         {
@@ -49,6 +63,11 @@ namespace BoggleClient
                 id = _id;
                 nickname = _nickname;
             }
+        }
+
+        public string GetName()
+        {
+            return nickname;
         }
     }
 

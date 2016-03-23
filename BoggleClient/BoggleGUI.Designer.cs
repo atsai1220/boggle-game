@@ -40,7 +40,26 @@
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.panel1 = new System.Windows.Forms.Panel();
             this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.cubeLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
+            this.box1 = new System.Windows.Forms.Button();
+            this.box2 = new System.Windows.Forms.Button();
+            this.box3 = new System.Windows.Forms.Button();
+            this.box4 = new System.Windows.Forms.Button();
+            this.box5 = new System.Windows.Forms.Button();
+            this.box6 = new System.Windows.Forms.Button();
+            this.box7 = new System.Windows.Forms.Button();
+            this.box8 = new System.Windows.Forms.Button();
+            this.box9 = new System.Windows.Forms.Button();
+            this.box10 = new System.Windows.Forms.Button();
+            this.box11 = new System.Windows.Forms.Button();
+            this.box12 = new System.Windows.Forms.Button();
+            this.box13 = new System.Windows.Forms.Button();
+            this.box14 = new System.Windows.Forms.Button();
+            this.box15 = new System.Windows.Forms.Button();
+            this.box16 = new System.Windows.Forms.Button();
             this.menuStrip1.SuspendLayout();
+            this.panel1.SuspendLayout();
+            this.cubeLayoutPanel.SuspendLayout();
             this.SuspendLayout();
             // 
             // menuStrip1
@@ -114,6 +133,7 @@
             // 
             // panel1
             // 
+            this.panel1.Controls.Add(this.cubeLayoutPanel);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panel1.Location = new System.Drawing.Point(0, 24);
             this.panel1.Name = "panel1";
@@ -124,6 +144,201 @@
             // 
             this.contextMenuStrip1.Name = "contextMenuStrip1";
             this.contextMenuStrip1.Size = new System.Drawing.Size(61, 4);
+            // 
+            // cubeLayoutPanel
+            // 
+            this.cubeLayoutPanel.CellBorderStyle = System.Windows.Forms.TableLayoutPanelCellBorderStyle.Outset;
+            this.cubeLayoutPanel.ColumnCount = 4;
+            this.cubeLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
+            this.cubeLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
+            this.cubeLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
+            this.cubeLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
+            this.cubeLayoutPanel.Controls.Add(this.box16, 3, 3);
+            this.cubeLayoutPanel.Controls.Add(this.box15, 2, 3);
+            this.cubeLayoutPanel.Controls.Add(this.box14, 1, 3);
+            this.cubeLayoutPanel.Controls.Add(this.box13, 0, 3);
+            this.cubeLayoutPanel.Controls.Add(this.box12, 3, 2);
+            this.cubeLayoutPanel.Controls.Add(this.box11, 2, 2);
+            this.cubeLayoutPanel.Controls.Add(this.box10, 1, 2);
+            this.cubeLayoutPanel.Controls.Add(this.box9, 0, 2);
+            this.cubeLayoutPanel.Controls.Add(this.box8, 3, 1);
+            this.cubeLayoutPanel.Controls.Add(this.box7, 2, 1);
+            this.cubeLayoutPanel.Controls.Add(this.box6, 1, 1);
+            this.cubeLayoutPanel.Controls.Add(this.box5, 0, 1);
+            this.cubeLayoutPanel.Controls.Add(this.box4, 3, 0);
+            this.cubeLayoutPanel.Controls.Add(this.box3, 2, 0);
+            this.cubeLayoutPanel.Controls.Add(this.box2, 1, 0);
+            this.cubeLayoutPanel.Controls.Add(this.box1, 0, 0);
+            this.cubeLayoutPanel.Cursor = System.Windows.Forms.Cursors.Default;
+            this.cubeLayoutPanel.Location = new System.Drawing.Point(3, 3);
+            this.cubeLayoutPanel.Name = "cubeLayoutPanel";
+            this.cubeLayoutPanel.RowCount = 4;
+            this.cubeLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
+            this.cubeLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
+            this.cubeLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
+            this.cubeLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
+            this.cubeLayoutPanel.Size = new System.Drawing.Size(410, 410);
+            this.cubeLayoutPanel.TabIndex = 0;
+            // 
+            // box1
+            // 
+            this.box1.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.box1.Location = new System.Drawing.Point(5, 5);
+            this.box1.Name = "box1";
+            this.box1.Size = new System.Drawing.Size(94, 94);
+            this.box1.TabIndex = 4;
+            this.box1.Text = "box1";
+            this.box1.UseVisualStyleBackColor = true;
+            // 
+            // box2
+            // 
+            this.box2.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.box2.Location = new System.Drawing.Point(107, 5);
+            this.box2.Name = "box2";
+            this.box2.Size = new System.Drawing.Size(94, 94);
+            this.box2.TabIndex = 5;
+            this.box2.Text = "box2";
+            this.box2.UseVisualStyleBackColor = true;
+            // 
+            // box3
+            // 
+            this.box3.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.box3.Location = new System.Drawing.Point(209, 5);
+            this.box3.Name = "box3";
+            this.box3.Size = new System.Drawing.Size(94, 94);
+            this.box3.TabIndex = 6;
+            this.box3.Text = "box3";
+            this.box3.UseVisualStyleBackColor = true;
+            // 
+            // box4
+            // 
+            this.box4.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.box4.Location = new System.Drawing.Point(311, 5);
+            this.box4.Name = "box4";
+            this.box4.Size = new System.Drawing.Size(94, 94);
+            this.box4.TabIndex = 7;
+            this.box4.Text = "box4";
+            this.box4.UseVisualStyleBackColor = true;
+            // 
+            // box5
+            // 
+            this.box5.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.box5.Location = new System.Drawing.Point(5, 107);
+            this.box5.Name = "box5";
+            this.box5.Size = new System.Drawing.Size(94, 94);
+            this.box5.TabIndex = 8;
+            this.box5.Text = "box5";
+            this.box5.UseVisualStyleBackColor = true;
+            // 
+            // box6
+            // 
+            this.box6.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.box6.Location = new System.Drawing.Point(107, 107);
+            this.box6.Name = "box6";
+            this.box6.Size = new System.Drawing.Size(94, 94);
+            this.box6.TabIndex = 9;
+            this.box6.Text = "box6";
+            this.box6.UseVisualStyleBackColor = true;
+            // 
+            // box7
+            // 
+            this.box7.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.box7.Location = new System.Drawing.Point(209, 107);
+            this.box7.Name = "box7";
+            this.box7.Size = new System.Drawing.Size(94, 94);
+            this.box7.TabIndex = 10;
+            this.box7.Text = "box7";
+            this.box7.UseVisualStyleBackColor = true;
+            // 
+            // box8
+            // 
+            this.box8.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.box8.Location = new System.Drawing.Point(311, 107);
+            this.box8.Name = "box8";
+            this.box8.Size = new System.Drawing.Size(94, 94);
+            this.box8.TabIndex = 11;
+            this.box8.Text = "box8";
+            this.box8.UseVisualStyleBackColor = true;
+            // 
+            // box9
+            // 
+            this.box9.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.box9.Location = new System.Drawing.Point(5, 209);
+            this.box9.Name = "box9";
+            this.box9.Size = new System.Drawing.Size(94, 94);
+            this.box9.TabIndex = 12;
+            this.box9.Text = "box9";
+            this.box9.UseVisualStyleBackColor = true;
+            // 
+            // box10
+            // 
+            this.box10.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.box10.Location = new System.Drawing.Point(107, 209);
+            this.box10.Name = "box10";
+            this.box10.Size = new System.Drawing.Size(94, 94);
+            this.box10.TabIndex = 13;
+            this.box10.Text = "box10";
+            this.box10.UseVisualStyleBackColor = true;
+            // 
+            // box11
+            // 
+            this.box11.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.box11.Location = new System.Drawing.Point(209, 209);
+            this.box11.Name = "box11";
+            this.box11.Size = new System.Drawing.Size(94, 94);
+            this.box11.TabIndex = 14;
+            this.box11.Text = "box11";
+            this.box11.UseVisualStyleBackColor = true;
+            // 
+            // box12
+            // 
+            this.box12.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.box12.Location = new System.Drawing.Point(311, 209);
+            this.box12.Name = "box12";
+            this.box12.Size = new System.Drawing.Size(94, 94);
+            this.box12.TabIndex = 15;
+            this.box12.Text = "box12";
+            this.box12.UseVisualStyleBackColor = true;
+            // 
+            // box13
+            // 
+            this.box13.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.box13.Location = new System.Drawing.Point(5, 311);
+            this.box13.Name = "box13";
+            this.box13.Size = new System.Drawing.Size(94, 94);
+            this.box13.TabIndex = 16;
+            this.box13.Text = "box13";
+            this.box13.UseVisualStyleBackColor = true;
+            // 
+            // box14
+            // 
+            this.box14.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.box14.Location = new System.Drawing.Point(107, 311);
+            this.box14.Name = "box14";
+            this.box14.Size = new System.Drawing.Size(94, 94);
+            this.box14.TabIndex = 17;
+            this.box14.Text = "box14";
+            this.box14.UseVisualStyleBackColor = true;
+            // 
+            // box15
+            // 
+            this.box15.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.box15.Location = new System.Drawing.Point(209, 311);
+            this.box15.Name = "box15";
+            this.box15.Size = new System.Drawing.Size(94, 94);
+            this.box15.TabIndex = 18;
+            this.box15.Text = "box15";
+            this.box15.UseVisualStyleBackColor = true;
+            // 
+            // box16
+            // 
+            this.box16.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.box16.Location = new System.Drawing.Point(311, 311);
+            this.box16.Name = "box16";
+            this.box16.Size = new System.Drawing.Size(94, 94);
+            this.box16.TabIndex = 19;
+            this.box16.Text = "box16";
+            this.box16.UseVisualStyleBackColor = true;
             // 
             // BoggleGUI
             // 
@@ -139,6 +354,8 @@
             this.Load += new System.EventHandler(this.BoggleGUI_Load);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
+            this.panel1.ResumeLayout(false);
+            this.cubeLayoutPanel.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -157,6 +374,23 @@
         private System.Windows.Forms.ToolStripMenuItem quitToolStripMenuItem;
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.ContextMenuStrip contextMenuStrip1;
+        private System.Windows.Forms.TableLayoutPanel cubeLayoutPanel;
+        private System.Windows.Forms.Button box16;
+        private System.Windows.Forms.Button box15;
+        private System.Windows.Forms.Button box14;
+        private System.Windows.Forms.Button box13;
+        private System.Windows.Forms.Button box12;
+        private System.Windows.Forms.Button box11;
+        private System.Windows.Forms.Button box10;
+        private System.Windows.Forms.Button box9;
+        private System.Windows.Forms.Button box8;
+        private System.Windows.Forms.Button box7;
+        private System.Windows.Forms.Button box6;
+        private System.Windows.Forms.Button box5;
+        private System.Windows.Forms.Button box4;
+        private System.Windows.Forms.Button box3;
+        private System.Windows.Forms.Button box2;
+        private System.Windows.Forms.Button box1;
     }
 }
 

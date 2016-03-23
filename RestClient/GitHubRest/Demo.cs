@@ -10,16 +10,16 @@ namespace Restful
     {
         // You'll need to put your own persona access token here
         // It needs to have repo deletion capability
-        private const string TOKEN = "";
+        private const string TOKEN = "5a39871ee4af708be8a027e7307aa5eb8224467a";
 
         // You'll need to put your own GitHub user name here
-        private const string USER_NAME = "josephzachary";
+        private const string USER_NAME = "atsai1220";
 
         // You'll need to put your own login name here
-        private const string EMAIL = "zachary@cs.utah.edu";
+        private const string EMAIL = "andrewtsai1220@gmail.com";
 
         // You'll need to put one of your public REPOs here
-        private const string PUBLIC_REPO = "repo1";
+        private const string PUBLIC_REPO = "";
 
         public static void Main(string[] args)
         {
