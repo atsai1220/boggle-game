@@ -26,6 +26,7 @@ namespace BoggleClient
         public event Action joinGameEvent;
         public event Action<string, bool> programStartEvent;
         public event Action<string> registerPlayerEvent;
+        public event Action<string> MessagePopUpEvent;
 
         /// <summary>
         /// Close current window
@@ -33,6 +34,15 @@ namespace BoggleClient
         public void DoClose()
         {
             Close();
+        }
+
+        /// <summary>
+        /// Shows a pop-up with message
+        /// </summary>
+        /// <param name="_message"></param>
+        public void MessagePopUp(string _message)
+        {
+            MessageBox.Show(_message);
         }
 
         private void BoggleGUI_Load(object sender, EventArgs e)

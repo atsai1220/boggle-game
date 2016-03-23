@@ -17,6 +17,7 @@ namespace BoggleClient
         event Action gameStartEvent;
         event Action AboutEvent;
         event Action helpEvent;
+        event Action<string> messagePopUpEvent;
 
 
         void DoClose();

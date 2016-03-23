@@ -106,7 +106,7 @@ namespace BoggleClient
                 }
                 else
                 {
-                    Console.WriteLine(response.ReasonPhrase);
+                    boggleWindow.
                 }
             }
         }
