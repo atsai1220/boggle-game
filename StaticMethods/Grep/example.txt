@@ -1,3 +1,0 @@
-This is a test of the Grep program.
-It should pass along every line
-that contains "the".
