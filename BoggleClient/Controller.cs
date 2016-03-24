@@ -30,7 +30,7 @@ namespace BoggleClient
             boggleModel = new Model();
             boggleWindow = _boggleWindow;
             boggleWindow.registerPlayerEvent += registerPlayer;
-            //         boggleWindow.joinGameEvent += joinGame;
+            boggleWindow.joinGameEvent += (timeLimit) => joinGame(timeLimit);
             boggleWindow.joinCanceledEvent += cancelJoinRequest;
             boggleWindow.closeEvent += HandleCloseEvent;
             boggleWindow.helpEvent += HandleHelpEvent;
@@ -38,7 +38,7 @@ namespace BoggleClient
 
             CreateClient();
 
-            testInit();
+            // testInit();
         }
 
         private void HandleDomainNameEvent(string _domain)
@@ -51,9 +51,9 @@ namespace BoggleClient
         /// </summary>
         private void testInit()
         {
-                     registerPlayer("asdf");
+            registerPlayer("asdf");
 
-                   joinGame(120);
+            joinGame(120);
         }
 
 
@@ -74,17 +74,17 @@ namespace BoggleClient
                     }
                 }
             }
-            
-                // TODO Controller must update boggleModel.domain
-                client.BaseAddress = new Uri(boggleModel.domain);
-                //client.BaseAddress = new Uri("http://bogglecs3500s16.azurewebsites.net");
 
-                // Tell the server that the client will accept this particular type of response data
-                client.DefaultRequestHeaders.Accept.Clear();
-                client.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
+            // TODO Controller must update boggleModel.domain
+            client.BaseAddress = new Uri(boggleModel.domain);
+            //client.BaseAddress = new Uri("http://bogglecs3500s16.azurewebsites.net");
 
-                this.client = client;
-            
+            // Tell the server that the client will accept this particular type of response data
+            client.DefaultRequestHeaders.Accept.Clear();
+            client.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
+
+            this.client = client;
+
         }
 
 
@@ -99,13 +99,9 @@ namespace BoggleClient
         /// }
         /// </summary>
         /// <param name="nickName">Desired name of the player.</param>
-        private void registerPlayer(string nickName)
+        private async void registerPlayer(string nickName)
         {
             // TODO implement Player to get token
-            // An ExpandoObject is one to which in which we can set arbitrary properties.
-            // To create a new public repository, we must send a request parameter which
-            // is a JSON object with various properties of the new repo expressed as
-            // properties.
             dynamic player = new ExpandoObject();
             //player.Nickname = boggleModel.GetName();
             player.Nickname = nickName;
@@ -113,11 +109,10 @@ namespace BoggleClient
             // To send a POST request, we must include the serialized parameter object
             // in the body of the request.
             StringContent content = new StringContent(JsonConvert.SerializeObject(player), Encoding.UTF8, "application/json");
-            HttpResponseMessage response = client.PostAsync("/BoggleService.svc/users", content).Result;
+            HttpResponseMessage response = await client.PostAsync("/BoggleService.svc/users", content);
 
             if (response.IsSuccessStatusCode)
             {
-                // The deserialized response value is an object that describes the user token
                 // TODO get and set user token to player
                 String result = response.Content.ReadAsStringAsync().Result;
                 dynamic serverResponse = JsonConvert.DeserializeObject(result);
@@ -169,7 +164,7 @@ namespace BoggleClient
 
                 previousGameState = "pending";
 
-                checkGameStatus();
+                await checkGameStatus();
 
                 /*
 
@@ -189,7 +184,7 @@ namespace BoggleClient
 
         private string previousGameState;
 
-        private async void checkGameStatus()
+        private async Task checkGameStatus()
         {
             while (true)
             {
@@ -210,12 +205,13 @@ namespace BoggleClient
 
                     Console.WriteLine(gameStatus.GameState);
 
+                    string gameState = gameStatus.GameState;
 
-                    if (gameStatus.GameState.Equals("pending"))
+                    if (gameState.Equals("pending"))
                     {
                         // Wait
                     }
-                    if (gameStatus.GameState.Equals("active"))
+                    if (gameState.Equals("active"))
                     {
                         if (previousGameState.Equals("pending"))
                         {
@@ -226,7 +222,7 @@ namespace BoggleClient
                             HandleGameStateUpdate(gameStatus);
                         }
                     }
-                    if (gameStatus.GameState.Equals("completed"))
+                    if (gameState.Equals("completed"))
                     {
                         if (previousGameState.Equals("active"))
                         {
@@ -239,14 +235,18 @@ namespace BoggleClient
                             return;
                         }
                     }
+
+                    previousGameState = gameState;
                 }
                 else
                 {
                     // TODO display error message.
                 }
-            }
 
-            Thread.Sleep(1000);
+                Task wait = new Task(() => Thread.Sleep(1000));
+                wait.Start();
+                await wait;
+            }
         }
 
         // Sam
