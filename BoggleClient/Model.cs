@@ -12,9 +12,8 @@ namespace BoggleClient
         
         public int wordsPlayed { get; set; }
         public string domain { get; set; }
-        public string gameToken { get; set; }
 
-        public OrderedDictionary wordRecord;
+        public List<string> wordRecord;
         private Player you;
         
 
@@ -23,7 +22,7 @@ namespace BoggleClient
             you = new Player();
             
             domain = "http://bogglecs3500s16.azurewebsites.net";
-            wordRecord = new OrderedDictionary();
+            wordRecord = new List<string>();
             wordsPlayed = 0;
 
         }

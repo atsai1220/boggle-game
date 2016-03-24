@@ -78,11 +78,13 @@ namespace BoggleClient
         int Player1Score
         {
             set;
+            get;
         }
 
         int Player2Score
         {
             set;
+            get;
         }
 
         int TimeRemaining

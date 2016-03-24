@@ -347,9 +347,8 @@ otherwise, -1 pt");
         /// <summary>
         /// send to server for points
         /// </summary>
-        private async void HandleWordEnteredEvent(dynamic gameStatus, string _wordEntered)
-        {
-                string result = await response.Content.ReadAsStringAsync();
+        private async void HandleWordEnteredEvent(string _wordEntered)
+        { 
 
             dynamic word = new ExpandoObject();
             word.UserToken = boggleModel.UserToken;
@@ -359,7 +358,8 @@ otherwise, -1 pt");
             // in the body of the request.
             //     PUT /BoggleService.svc/games/:GameID
             StringContent content = new StringContent(JsonConvert.SerializeObject(word), Encoding.UTF8, "application/json");
-            HttpResponseMessage response = await client.PostAsync("/BoggleService.svc/games/:" + boggleModel.GameId, content);
+            HttpResponseMessage response = await client.PutAsync("/BoggleService.svc/games/" + boggleModel.GameId, content);
+            
 
             if (response.IsSuccessStatusCode)
             {
@@ -367,20 +367,22 @@ otherwise, -1 pt");
                 String result = response.Content.ReadAsStringAsync().Result;
                 dynamic serverResponse = JsonConvert.DeserializeObject(result);
                 Console.WriteLine(serverResponse);
-                
                 boggleModel.wordsPlayed++;
-                boggleModel.wordRecord.Add(_wordEntered, serverResponse.Score);
+                int intScore;
+                string _score = serverResponse.Score;
+                int.TryParse(_score, out intScore);
+                boggleWindow.Player1Score += intScore;
+                boggleWindow.AddWord(_wordEntered, intScore);
+
+                boggleModel.wordRecord.Add(_wordEntered + "\t" + intScore.ToString());
+
             }
             // If Word is null or empty when trimmed, or if GameID or UserToken is missing or invalid, 
             // or if UserToken is not a player in the game identified by GameID, responds with response 
             // code 403 (Forbidden).
-            else if (response.StatusCode.Equals(403))
+            else
             {
                 handleMessagePopUpEvent("Check Word/GameID/UserToken");
-            }
-            else if (response.StatusCode.Equals(409))
-            {
-                handleMessagePopUpEvent("Game state not active");
             }
         }
     }
