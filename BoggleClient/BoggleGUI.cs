@@ -136,14 +136,32 @@ namespace BoggleClient
         {
             if (helpEvent != null)
             {
-
+                helpEvent();
             }
+        }
 
+        /// <summary>
+        /// Clicking and selecting a domain
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void domainToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            using (domainForm domainForm = new domainForm())
+            {
+                if (domainForm.ShowDialog() == DialogResult.OK)
+                {
+                    if (domainNameEntered != null)
+                    {
+                        domainNameEntered(domainForm.TheValue);
+                    }
+                }
+            }
         }
 
         private void joinNewGameToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if(joinGameEvent != null)
+            if (joinGameEvent != null)
             {
                 // TODO get this from somewhere.
                 joinGameEvent(100);
@@ -152,7 +170,7 @@ namespace BoggleClient
 
         private void setNicknameToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if(registerPlayerEvent != null)
+            if (registerPlayerEvent != null)
             {
                 // TODO Query user for nickname.
                 registerPlayerEvent("asdf");

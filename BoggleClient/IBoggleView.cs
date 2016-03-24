@@ -49,6 +49,8 @@ namespace BoggleClient
 
 
 
+
+
         void DoClose();
 
         void MessagePopUp(string _message);

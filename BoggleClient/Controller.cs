@@ -14,6 +14,7 @@ namespace BoggleClient
 {
     class Controller
     {
+        private HttpClient client;
         private IBoggleView boggleWindow;
         private Model boggleModel;
 
@@ -22,22 +23,28 @@ namespace BoggleClient
         /// </summary>
         public Controller()
         {
-            boggleModel = new Model();
         }
 
         public Controller(IBoggleView _boggleWindow) : base()
         {
             boggleModel = new Model();
-
             boggleWindow = _boggleWindow;
             boggleWindow.registerPlayerEvent += registerPlayer;
             boggleWindow.joinGameEvent += (timeLimit) => joinGame(timeLimit);
             boggleWindow.joinCanceledEvent += cancelJoinRequest;
             boggleWindow.closeEvent += HandleCloseEvent;
             boggleWindow.helpEvent += HandleHelpEvent;
+            boggleWindow.domainNameEntered += HandleDomainNameEvent;
             boggleWindow.wordEnteredEvent += HandleWordEnteredEvent;
 
+            CreateClient();
+
             // testInit();
+        }
+
+        private void HandleDomainNameEvent(string _domain)
+        {
+            boggleModel.domain = _domain;
         }
 
         /// <summary>
@@ -55,21 +62,30 @@ namespace BoggleClient
         /// Create HttpClient to communicate with server
         /// </summary>
         /// <returns></returns>
-        private static HttpClient CreateClient()
+        private void CreateClient()
         {
-            // TODO change Uri to update with input from user
-            // Create a client whose base address is the GitHub server
             HttpClient client = new HttpClient();
-            client.BaseAddress = new Uri("http://bogglecs3500s16.azurewebsites.net");
+            while (boggleModel.domain == null)
+            {
+                using (domainForm domainForm = new domainForm())
+                {
+                    if (domainForm.ShowDialog() == DialogResult.OK)
+                    {
+                        this.boggleModel.domain = domainForm.TheValue;
+                    }
+                }
+            }
+
+            // TODO Controller must update boggleModel.domain
+            client.BaseAddress = new Uri(boggleModel.domain);
+            //client.BaseAddress = new Uri("http://bogglecs3500s16.azurewebsites.net");
 
             // Tell the server that the client will accept this particular type of response data
             client.DefaultRequestHeaders.Accept.Clear();
             client.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
 
+            this.client = client;
 
-
-            // There is more client configuration to do, depending on the request.
-            return client;
         }
 
 
@@ -87,8 +103,6 @@ namespace BoggleClient
         private async void registerPlayer(string nickName)
         {
             // TODO implement Player to get token
-            using (HttpClient client = CreateClient())
-            {
                 dynamic player = new ExpandoObject();
                 //player.Nickname = boggleModel.GetName();
                 player.Nickname = nickName;
@@ -113,7 +127,6 @@ namespace BoggleClient
                     handleMessagePopUpEvent("If Nickname is null, or is empty when trimmed, responds with status 403 (Forbidden).");
                 }
             }
-        }
 
         /// <summary>
         /// Handles a pop-up dialog with passed message
@@ -134,8 +147,6 @@ namespace BoggleClient
         /// </summary>
         private async void joinGame(int timeLimit)
         {
-            using (HttpClient client = CreateClient())
-            {
                 dynamic data = new ExpandoObject();
 
                 data.UserToken = boggleModel.UserToken;
@@ -171,7 +182,6 @@ namespace BoggleClient
                     // TODO Display error message
                 }
             }
-        }
 
         private string previousGameState;
 
@@ -179,8 +189,6 @@ namespace BoggleClient
         {
             while (true)
             {
-                using (HttpClient client = CreateClient())
-                {
                     string url = String.Format("/BoggleService.svc/games/{0}", boggleModel.GameId);
 
                     //  Request the short version
@@ -235,7 +243,6 @@ namespace BoggleClient
                     {
                         // TODO display error message.
                     }
-                }
 
                 Task wait = new Task(() => Thread.Sleep(1000));
                 wait.Start();
@@ -249,8 +256,6 @@ namespace BoggleClient
         /// </summary>
         private async void cancelJoinRequest()
         {
-            using (HttpClient client = CreateClient())
-            {
                 dynamic data = new ExpandoObject();
                 data.UserToken = boggleModel.UserToken;
 
@@ -267,7 +272,6 @@ namespace BoggleClient
                     // TODO display error message
                 }
             }
-        }
 
         /// <summary>
         /// Handles Close event

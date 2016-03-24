@@ -66,6 +66,8 @@
             this.box2 = new System.Windows.Forms.Button();
             this.box1 = new System.Windows.Forms.Button();
             this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.setNicknameToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.domainToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.wordEntry = new System.Windows.Forms.TextBox();
             this.menuStrip1.SuspendLayout();
             this.gamePanel.SuspendLayout();
@@ -89,6 +91,7 @@
             this.joinNewGameToolStripMenuItem,
             this.cancelGameToolStripMenuItem,
             this.quitToolStripMenuItem,
+            this.domainToolStripMenuItem,
             this.setNicknameToolStripMenuItem});
             this.boggleToolStripMenuItem.Name = "boggleToolStripMenuItem";
             this.boggleToolStripMenuItem.Size = new System.Drawing.Size(56, 20);
@@ -450,6 +453,13 @@
             this.wordEntry.TabIndex = 9;
             this.wordEntry.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.wordEntry_KeyPress);
             // 
+            // domainToolStripMenuItem
+            // 
+            this.domainToolStripMenuItem.Name = "domainToolStripMenuItem";
+            this.domainToolStripMenuItem.Size = new System.Drawing.Size(153, 22);
+            this.domainToolStripMenuItem.Text = "Domain";
+            this.domainToolStripMenuItem.Click += new System.EventHandler(this.domainToolStripMenuItem_Click);
+            // 
             // BoggleGUI
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -511,6 +521,7 @@
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.ToolStripMenuItem setNicknameToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem domainToolStripMenuItem;
         private System.Windows.Forms.TextBox wordEntry;
     }
 }
