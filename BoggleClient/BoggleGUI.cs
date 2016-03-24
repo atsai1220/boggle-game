@@ -16,7 +16,7 @@ namespace BoggleClient
         {
             set
             {
-                throw new NotImplementedException();
+                //throw new NotImplementedException();
             }
         }
 
@@ -24,7 +24,7 @@ namespace BoggleClient
         {
             set
             {
-                throw new NotImplementedException();
+                //throw new NotImplementedException();
             }
         }
 
@@ -32,7 +32,7 @@ namespace BoggleClient
         {
             set
             {
-                throw new NotImplementedException();
+                //throw new NotImplementedException();
             }
         }
 
@@ -40,7 +40,7 @@ namespace BoggleClient
         {
             set
             {
-                throw new NotImplementedException();
+                //throw new NotImplementedException();
             }
         }
 
@@ -48,7 +48,7 @@ namespace BoggleClient
         {
             set
             {
-                throw new NotImplementedException();
+                textBox3.Text = value.ToString();
             }
         }
 
@@ -75,7 +75,6 @@ namespace BoggleClient
 
         public event Action AboutEvent;
         public event Action closeEvent;
-        public event Action gameStartEvent;
         public event Action helpEvent;
         public event Action joinCanceledEvent;
         public event Action<int> joinGameEvent;
@@ -85,22 +84,7 @@ namespace BoggleClient
         public event Action<string> messagePopUpEvent;
         public event Action aboutEvent;
         public event Action<string> domainNameEntered;
-        public event Action gameEndEvent;
         public event Action<string> wordEnteredEvent;
-
-
-        event Action<int> IBoggleView.joinGameEvent
-        {
-            add
-            {
-                throw new NotImplementedException();
-            }
-
-            remove
-            {
-                throw new NotImplementedException();
-            }
-        }
 
         /// <summary>
         /// Close current window
@@ -140,7 +124,7 @@ namespace BoggleClient
 
         public void AddWord(string word, int score)
         {
-            throw new NotImplementedException();
+            //throw new NotImplementedException();
         }
 
         /// <summary>
@@ -151,9 +135,9 @@ namespace BoggleClient
         private void howToPlayToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (helpEvent != null)
-            {
+        {
                 helpEvent();
-            }
+        }
         }
 
         /// <summary>
@@ -168,10 +152,26 @@ namespace BoggleClient
                 if (domainForm.ShowDialog() == DialogResult.OK)
                 {
                     if (domainNameEntered != null)
-                    {
+        }
+
+        private void joinNewGameToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if(joinGameEvent != null)
+            {
+                // TODO get this from somewhere.
+                joinGameEvent(100);
+            }
+        }
+
+        private void setNicknameToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if(registerPlayerEvent != null)
+        {
                         domainNameEntered(domainForm.TheValue);
                     }
                 }
+                // TODO Query user for nickname.
+                registerPlayerEvent("asdf");
             }
 
         }

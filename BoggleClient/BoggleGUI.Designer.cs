@@ -65,6 +65,7 @@
             this.box2 = new System.Windows.Forms.Button();
             this.box1 = new System.Windows.Forms.Button();
             this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.setNicknameToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.domainToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.gamePanel.SuspendLayout();
@@ -89,6 +90,8 @@
             this.cancelGameToolStripMenuItem,
             this.domainToolStripMenuItem,
             this.quitToolStripMenuItem});
+            this.quitToolStripMenuItem,
+            this.setNicknameToolStripMenuItem});
             this.boggleToolStripMenuItem.Name = "boggleToolStripMenuItem";
             this.boggleToolStripMenuItem.Size = new System.Drawing.Size(56, 20);
             this.boggleToolStripMenuItem.Text = "Boggle";
@@ -98,6 +101,7 @@
             this.joinNewGameToolStripMenuItem.Name = "joinNewGameToolStripMenuItem";
             this.joinNewGameToolStripMenuItem.Size = new System.Drawing.Size(153, 22);
             this.joinNewGameToolStripMenuItem.Text = "Join new game";
+            this.joinNewGameToolStripMenuItem.Click += new System.EventHandler(this.joinNewGameToolStripMenuItem_Click);
             // 
             // cancelGameToolStripMenuItem
             // 
@@ -439,6 +443,13 @@
             this.domainToolStripMenuItem.Text = "Domain";
             this.domainToolStripMenuItem.Click += new System.EventHandler(this.domainToolStripMenuItem_Click);
             // 
+            // setNicknameToolStripMenuItem
+            // 
+            this.setNicknameToolStripMenuItem.Name = "setNicknameToolStripMenuItem";
+            this.setNicknameToolStripMenuItem.Size = new System.Drawing.Size(153, 22);
+            this.setNicknameToolStripMenuItem.Text = "Set Nickname";
+            this.setNicknameToolStripMenuItem.Click += new System.EventHandler(this.setNicknameToolStripMenuItem_Click);
+            // 
             // BoggleGUI
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -500,6 +511,7 @@
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.ToolStripMenuItem domainToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem setNicknameToolStripMenuItem;
     }
 }
 
