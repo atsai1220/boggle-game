@@ -183,7 +183,8 @@ namespace BoggleClient
             {
                 e.Handled = true;
 
-                wordEnteredEvent(wordBox.Text);
+                wordEnteredEvent(wordEntry.Text);
+                wordEntry.Text = "";
             }
         }
     }

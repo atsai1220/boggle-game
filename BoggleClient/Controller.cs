@@ -347,9 +347,28 @@ otherwise, -1 pt");
         /// <summary>
         /// send to server for points
         /// </summary>
-        private void HandleWordEnteredEvent(string word)
+        private async void HandleWordEnteredEvent(string word)
         {
+            dynamic data = new ExpandoObject();
+            data.UserToken = boggleModel.UserToken;
+            data.Word = word;
 
+            StringContent content = new StringContent(JsonConvert.SerializeObject(data), Encoding.UTF8, "application/json");
+
+            string url = String.Format("/BoggleService.svc/games/{0}", boggleModel.GameId);
+
+            HttpResponseMessage response = await client.PutAsync(url, content);
+
+            if (response.IsSuccessStatusCode)
+            {
+                string result = await response.Content.ReadAsStringAsync();
+
+                dynamic gameStatus = JsonConvert.DeserializeObject(result);
+            }
+            else
+            {
+                // TODO display error message.
+            }
         }
     }
 }
