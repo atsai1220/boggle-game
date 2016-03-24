@@ -12,11 +12,11 @@ using System.Threading;
 
 namespace BoggleClient
 {
-    class  Controller
+    class Controller
     {
         private IBoggleView boggleWindow;
         private Model boggleModel;
-        
+
         /// <summary>
         /// Begin controlling boggleWindow
         /// </summary>
@@ -31,12 +31,12 @@ namespace BoggleClient
 
             boggleWindow = _boggleWindow;
             boggleWindow.registerPlayerEvent += registerPlayer;
-   //         boggleWindow.joinGameEvent += joinGame;
+            boggleWindow.joinGameEvent += (timeLimit) => joinGame(timeLimit);
             boggleWindow.joinCanceledEvent += cancelJoinRequest;
             boggleWindow.closeEvent += HandleCloseEvent;
             boggleWindow.helpEvent += HandleHelpEvent;
 
-            testInit();
+            // testInit();
         }
 
         /// <summary>
@@ -45,11 +45,11 @@ namespace BoggleClient
         private void testInit()
         {
             registerPlayer("asdf");
-        
+
             joinGame(120);
         }
 
-        
+
         /// <summary>
         /// Create HttpClient to communicate with server
         /// </summary>
@@ -64,14 +64,14 @@ namespace BoggleClient
             // Tell the server that the client will accept this particular type of response data
             client.DefaultRequestHeaders.Accept.Clear();
             client.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
-            
+
 
 
             // There is more client configuration to do, depending on the request.
             return client;
         }
 
-        
+
 
         /// <summary>
         /// Registers the player with the boggle server.
@@ -83,16 +83,11 @@ namespace BoggleClient
         /// }
         /// </summary>
         /// <param name="nickName">Desired name of the player.</param>
-        private void registerPlayer(string nickName)
+        private async void registerPlayer(string nickName)
         {
             // TODO implement Player to get token
             using (HttpClient client = CreateClient())
             {
-
-                // An ExpandoObject is one to which in which we can set arbitrary properties.
-                // To create a new public repository, we must send a request parameter which
-                // is a JSON object with various properties of the new repo expressed as
-                // properties.
                 dynamic player = new ExpandoObject();
                 //player.Nickname = boggleModel.GetName();
                 player.Nickname = nickName;
@@ -100,11 +95,10 @@ namespace BoggleClient
                 // To send a POST request, we must include the serialized parameter object
                 // in the body of the request.
                 StringContent content = new StringContent(JsonConvert.SerializeObject(player), Encoding.UTF8, "application/json");
-                HttpResponseMessage response = client.PostAsync("/BoggleService.svc/users", content).Result;
+                HttpResponseMessage response = await client.PostAsync("/BoggleService.svc/users", content);
 
                 if (response.IsSuccessStatusCode)
                 {
-                    // The deserialized response value is an object that describes the user token
                     // TODO get and set user token to player
                     String result = response.Content.ReadAsStringAsync().Result;
                     dynamic serverResponse = JsonConvert.DeserializeObject(result);
@@ -150,7 +144,7 @@ namespace BoggleClient
 
                 HttpResponseMessage response = await client.PostAsync("/BoggleService.svc/games", content);
 
-                if(response.IsSuccessStatusCode)
+                if (response.IsSuccessStatusCode)
                 {
                     string result = await response.Content.ReadAsStringAsync();
                     dynamic responseObject = JsonConvert.DeserializeObject(result);
@@ -159,7 +153,7 @@ namespace BoggleClient
 
                     previousGameState = "pending";
 
-                    checkGameStatus();
+                    await checkGameStatus();
 
                     /*
 
@@ -180,9 +174,9 @@ namespace BoggleClient
 
         private string previousGameState;
 
-        private async void checkGameStatus()
+        private async Task checkGameStatus()
         {
-            while(true)
+            while (true)
             {
                 using (HttpClient client = CreateClient())
                 {
@@ -233,14 +227,18 @@ namespace BoggleClient
                                 return;
                             }
                         }
+
+                        previousGameState = gameState;
                     }
                     else
-        {
+                    {
                         // TODO display error message.
                     }
                 }
 
-                Thread.Sleep(1000);
+                Task wait = new Task(() => Thread.Sleep(1000));
+                wait.Start();
+                await wait;
             }
         }
 
@@ -260,9 +258,9 @@ namespace BoggleClient
                 HttpResponseMessage response = await client.PutAsync("/BoggleService.svc/games", content);
 
                 if (response.IsSuccessStatusCode)
-        {
+                {
 
-        }
+                }
                 else
                 {
                     // TODO display error message
@@ -339,7 +337,7 @@ otherwise, -1 pt");
             boggleWindow.Player1Score = gameStatus.Player1.Score;
             boggleWindow.Player2Score = gameStatus.Player2.Score;
         }
-        
+
         // Andrew
         /// <summary>
         /// send to server for points
