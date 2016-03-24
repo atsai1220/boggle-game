@@ -12,11 +12,7 @@ namespace BoggleClient
 {
     public partial class BoggleGUI : Form, IBoggleView
     {
-        public BoggleGUI()
-        {
-            InitializeComponent();
-            
-        }
+
 
         public event Action AboutEvent;
         public event Action closeEvent;
@@ -28,6 +24,54 @@ namespace BoggleClient
         public event Action<string> registerPlayerEvent;
         public event Action<string> MessagePopUpEvent;
         public event Action<string> messagePopUpEvent;
+        public event Action aboutEvent;
+        public event Action<string> domainNameEntered;
+        public event Action gameEndEvent;
+        public event Action<string> wordEnteredEvent;
+
+        public string Nickname
+        {
+            set
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        public int TimeRemaining
+        {
+            set
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        public string BoardString
+        {
+            set
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        public BoggleGUI()
+        {
+            InitializeComponent();
+
+        }
+
+        event Action<int> IBoggleView.joinGameEvent
+        {
+            add
+            {
+                throw new NotImplementedException();
+            }
+
+            remove
+            {
+                throw new NotImplementedException();
+            }
+        }
+
         /// <summary>
         /// Close current window
         /// </summary>
@@ -45,19 +89,6 @@ namespace BoggleClient
             MessageBox.Show(_message);
         }
 
-        /// <summary>
-        /// Hides all panels
-        /// </summary>
-        public void HidePanels()
-        {
-            foreach (var control in Controls)
-            {
-                if (control is Panel)
-                {
-                    ((Panel)control).Visible = false;
-                }
-            }
-        }
 
         private void BoggleGUI_Load(object sender, EventArgs e)
         {
@@ -77,14 +108,22 @@ namespace BoggleClient
             }
         }
 
-        private void gameStartPanel()
+        public void AddWord(string word, int score)
         {
-
+            throw new NotImplementedException();
         }
 
-        private void startPanel_Paint(object sender, PaintEventArgs e)
+        /// <summary>
+        /// Clicking "Help --> How to Play
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void howToPlayToolStripMenuItem_Click(object sender, EventArgs e)
         {
-
+            if (helpEvent != null)
+            {
+                helpEvent();
+            }
         }
     }
 }
