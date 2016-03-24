@@ -177,6 +177,17 @@ namespace BoggleClient
             }
         }
 
+        private void wordEntry_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if(e.KeyChar == '\r')
+            {
+                e.Handled = true;
+
+                wordEnteredEvent(wordEntry.Text);
+                wordEntry.Text = "";
+            }
+        }
+
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void box1_Click(object sender, EventArgs e)

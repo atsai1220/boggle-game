@@ -35,6 +35,7 @@ namespace BoggleClient
             boggleWindow.closeEvent += HandleCloseEvent;
             boggleWindow.helpEvent += HandleHelpEvent;
             boggleWindow.domainNameEntered += HandleDomainNameEvent;
+            boggleWindow.wordEnteredEvent += HandleWordEnteredEvent;
 
             CreateClient();
 
@@ -77,7 +78,7 @@ namespace BoggleClient
 
             // TODO Controller must update boggleModel.domain
             client.BaseAddress = new Uri(boggleModel.domain);
-           
+
 
             // Tell the server that the client will accept this particular type of response data
             client.DefaultRequestHeaders.Accept.Clear();
@@ -348,7 +349,8 @@ otherwise, -1 pt");
         /// </summary>
         private async void HandleWordEnteredEvent(dynamic gameStatus, string _wordEntered)
         {
-            
+                string result = await response.Content.ReadAsStringAsync();
+
             dynamic word = new ExpandoObject();
             word.UserToken = boggleModel.UserToken;
             word.Word = _wordEntered;

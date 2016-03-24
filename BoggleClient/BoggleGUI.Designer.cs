@@ -67,6 +67,9 @@
             this.box2 = new System.Windows.Forms.Button();
             this.box1 = new System.Windows.Forms.Button();
             this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.setNicknameToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.domainToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.wordEntry = new System.Windows.Forms.TextBox();
             this.menuStrip1.SuspendLayout();
             this.gamePanel.SuspendLayout();
             this.cubeLayoutPanel.SuspendLayout();
@@ -153,7 +156,7 @@
             // 
             // statusStrip1
             // 
-            this.statusStrip1.Location = new System.Drawing.Point(0, 440);
+            this.statusStrip1.Location = new System.Drawing.Point(0, 480);
             this.statusStrip1.Name = "statusStrip1";
             this.statusStrip1.Size = new System.Drawing.Size(584, 22);
             this.statusStrip1.TabIndex = 1;
@@ -161,6 +164,7 @@
             // 
             // gamePanel
             // 
+            this.gamePanel.Controls.Add(this.wordEntry);
             this.gamePanel.Controls.Add(this.textBox3);
             this.gamePanel.Controls.Add(this.label4);
             this.gamePanel.Controls.Add(this.wordBox);
@@ -173,7 +177,7 @@
             this.gamePanel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.gamePanel.Location = new System.Drawing.Point(0, 0);
             this.gamePanel.Name = "gamePanel";
-            this.gamePanel.Size = new System.Drawing.Size(584, 462);
+            this.gamePanel.Size = new System.Drawing.Size(584, 502);
             this.gamePanel.TabIndex = 2;
             // 
             // textBox3
@@ -450,11 +454,26 @@
             this.contextMenuStrip1.Name = "contextMenuStrip1";
             this.contextMenuStrip1.Size = new System.Drawing.Size(61, 4);
             // 
+            // wordEntry
+            // 
+            this.wordEntry.Location = new System.Drawing.Point(8, 444);
+            this.wordEntry.Name = "wordEntry";
+            this.wordEntry.Size = new System.Drawing.Size(400, 20);
+            this.wordEntry.TabIndex = 9;
+            this.wordEntry.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.wordEntry_KeyPress);
+            // 
+            // domainToolStripMenuItem
+            // 
+            this.domainToolStripMenuItem.Name = "domainToolStripMenuItem";
+            this.domainToolStripMenuItem.Size = new System.Drawing.Size(153, 22);
+            this.domainToolStripMenuItem.Text = "Domain";
+            this.domainToolStripMenuItem.Click += new System.EventHandler(this.domainToolStripMenuItem_Click);
+            // 
             // BoggleGUI
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(584, 462);
+            this.ClientSize = new System.Drawing.Size(584, 502);
             this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.menuStrip1);
             this.Controls.Add(this.gamePanel);
@@ -512,6 +531,7 @@
         private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.ToolStripMenuItem setNicknameToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem domainToolStripMenuItem;
+        private System.Windows.Forms.TextBox wordEntry;
     }
 }
 
