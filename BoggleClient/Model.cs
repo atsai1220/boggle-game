@@ -32,6 +32,11 @@ namespace BoggleClient
         {
             you.userToken = _userToken;
         }
+
+        public string UserToken { get; set; }
+
+        public int GameId { get; set; }
+
     }
 
 

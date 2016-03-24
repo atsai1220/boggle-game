@@ -39,16 +39,6 @@ namespace BoggleClient
         /// Event triggered when game is cancelled
         /// </summary>
         event Action joinCanceledEvent;
-
-        /// <summary>
-        /// Event triggered when game starts.
-        /// </summary>
-        event Action gameStartEvent;
-
-        /// <summary>
-        /// Event triggered when game ends.
-        /// </summary>
-        event Action gameEndEvent;
         
 
         /// <summary>
@@ -71,6 +61,21 @@ namespace BoggleClient
         void AddWord(string word, int score);
 
         string Nickname
+        {
+            set;
+        }
+
+        string Player2Nickname
+        {
+            set;
+        }
+
+        int Player1Score
+        {
+            set;
+        }
+
+        int Player2Score
         {
             set;
         }
