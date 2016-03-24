@@ -31,9 +31,10 @@ namespace BoggleClient
 
             boggleWindow = _boggleWindow;
             boggleWindow.registerPlayerEvent += registerPlayer;
-            boggleWindow.joinGameEvent += joinGame;
+   //         boggleWindow.joinGameEvent += joinGame;
             boggleWindow.joinCanceledEvent += cancelJoinRequest;
             boggleWindow.closeEvent += HandleCloseEvent;
+            boggleWindow.helpEvent += HandleHelpEvent;
 
             testInit();
         }
@@ -44,7 +45,7 @@ namespace BoggleClient
         private void testInit()
         {
             registerPlayer("asdf");
-
+        
             joinGame(120);
         }
 
@@ -234,7 +235,7 @@ namespace BoggleClient
                         }
                     }
                     else
-                    {
+        {
                         // TODO display error message.
                     }
                 }
@@ -259,9 +260,9 @@ namespace BoggleClient
                 HttpResponseMessage response = await client.PutAsync("/BoggleService.svc/games", content);
 
                 if (response.IsSuccessStatusCode)
-                {
+        {
 
-                }
+        }
                 else
                 {
                     // TODO display error message
@@ -286,12 +287,28 @@ namespace BoggleClient
         //Andrew
         private void HandleHelpEvent()
         {
+            boggleWindow.MessagePopUp(
+                @"How to:
+1) Register your account with a nickname
+2) Join a game with a specified time
+3) Wait till another player joins
+4) Start!
 
+Rules:
+Create strings that are legal words for points!
+< 3 characters 0 pt
+3 - 4 characters 1 pt
+5 characters 2 pts
+6 characters 3 pts
+7 characters 5 pts
+> 7 characters 11 pts
+
+otherwise, -1 pt");
         }
 
         //Andrew
         /// <summary>
-        /// dispay end game
+        /// dispay end game with list of words and score
         /// </summary>
         private void HandleGameEndEvent(dynamic gameStatus)
         {
@@ -322,7 +339,7 @@ namespace BoggleClient
             boggleWindow.Player1Score = gameStatus.Player1.Score;
             boggleWindow.Player2Score = gameStatus.Player2.Score;
         }
-
+        
         // Andrew
         /// <summary>
         /// send to server for points
