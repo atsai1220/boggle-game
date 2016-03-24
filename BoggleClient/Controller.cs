@@ -151,7 +151,8 @@ namespace BoggleClient
         //Andrew
         private void HandleHelpEvent()
         {
-            boggleWindow.MessagePopUp(@"How to:
+            boggleWindow.MessagePopUp(
+                @"How to:
 1) Register your account with a nickname
 2) Join a game with a specified time
 3) Wait till another player joins
@@ -171,7 +172,7 @@ otherwise, -1 pt");
 
         //Andrew
         /// <summary>
-        /// dispay end game
+        /// dispay end game with list of words and score
         /// </summary>
         private void HandleGameEndEvent()
         {

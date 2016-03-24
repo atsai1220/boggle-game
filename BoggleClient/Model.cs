@@ -3,26 +3,22 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Collections.ObjectModel;
 
 namespace BoggleClient
 {
     class Model
     {
-        private string[,] board { get; set; }
-        private string[,] cubes { get; set; }
-
-
-        private int wordsPlayed { get; set; }
-        private string domain { get; set; }
-        private string gameToken { get; set; }
+        
+        public int wordsPlayed { get; set; }
+        public string domain { get; set; }
+        public string gameToken { get; set; }
 
         private Player you;
 
 
         public Model()
         {
-            string[,] board = new string[4, 4];
-            string[,] cubes = new string[16, 6];
             you = new Player();
             wordsPlayed = 0;
         }
@@ -64,6 +60,17 @@ namespace BoggleClient
                 nickname = _nickname;
             }
             // TODO handle exception
+        }
+    }
+
+    /// <summary>
+    /// Ordered collection of recorded words with their respective points
+    /// </summary>
+    class WordsCollection : KeyedCollection<string, int>
+    {
+        protected override string GetKeyForItem(int item)
+        {
+            throw new NotImplementedException();
         }
     }
 
