@@ -55,6 +55,15 @@ namespace BoggleClient
 
         private void HandleGameStartRequest(string domain, string nickname, string duration)
         {
+            if(domain.Equals(""))
+            {
+
+            }
+            if(nickname == "")
+            {
+
+            }
+
             boggleModel.domain = domain;
 
             CreateClient();
