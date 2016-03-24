@@ -14,16 +14,35 @@ namespace BoggleClient
     {
         public string Nickname
         {
-            set;
-            get;
+            set
+            {
+                player1NameLabel.Text = value;
+        }
         }
 
         public string Player2Nickname
         {
-            set;
-            get;
+            set
+            {
+                player2NameLabel.Text = value;
+            }
         }
 
+        public int Player1Score
+        {
+            set
+            {
+                player1ScoreLabel.Text = value.ToString();
+            }
+        }
+
+        public int Player2Score
+        {
+            set
+            {
+                player2ScoreLabel.Text = value.ToString();
+            }
+        }
 
         public int TimeRemaining
         {
@@ -48,18 +67,31 @@ namespace BoggleClient
             }
         }
 
-        public int Player1Score
+        int IBoggleView.Player1Score
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+
+            set
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        int IBoggleView.Player2Score
         {
              set
             {
                 ScoreCountBox.Text = value.ToString();
-            }
+        }
         }
 
-        public int Player2Score
+            set
         {
-            set;
-            get;
+                throw new NotImplementedException();
+            }
         }
 
         public BoggleGUI()
@@ -155,13 +187,13 @@ namespace BoggleClient
         /// <param name="e"></param>
         private void domainToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            using (domainForm domainForm = new domainForm())
+            using (StartForm domainForm = new StartForm())
             {
                 if (domainForm.ShowDialog() == DialogResult.OK)
                 {
                     if (domainNameEntered != null)
                     {
-                        domainNameEntered(domainForm.TheValue);
+                        //domainNameEntered(domainForm.TheValue);
                     }
                 }
             }
@@ -196,5 +228,12 @@ namespace BoggleClient
             }
         }
 
+        private void cancelGameToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if(joinCanceledEvent != null)
+            {
+                joinCanceledEvent();
+            }
+        }
     }
 }
