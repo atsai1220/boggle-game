@@ -34,11 +34,14 @@
             this.joinNewGameToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.cancelGameToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.quitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.domainToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.setNicknameToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.howToPlayToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.gamePanel = new System.Windows.Forms.Panel();
+            this.wordEntry = new System.Windows.Forms.TextBox();
             this.textBox3 = new System.Windows.Forms.TextBox();
             this.label4 = new System.Windows.Forms.Label();
             this.wordBox = new System.Windows.Forms.RichTextBox();
@@ -65,9 +68,10 @@
             this.box2 = new System.Windows.Forms.Button();
             this.box1 = new System.Windows.Forms.Button();
             this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.setNicknameToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.domainToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.wordEntry = new System.Windows.Forms.TextBox();
+            this.player1NameLabel = new System.Windows.Forms.Label();
+            this.player1ScoreLabel = new System.Windows.Forms.Label();
+            this.player2ScoreLabel = new System.Windows.Forms.Label();
+            this.player2NameLabel = new System.Windows.Forms.Label();
             this.menuStrip1.SuspendLayout();
             this.gamePanel.SuspendLayout();
             this.cubeLayoutPanel.SuspendLayout();
@@ -108,6 +112,7 @@
             this.cancelGameToolStripMenuItem.Name = "cancelGameToolStripMenuItem";
             this.cancelGameToolStripMenuItem.Size = new System.Drawing.Size(153, 22);
             this.cancelGameToolStripMenuItem.Text = "Cancel game";
+            this.cancelGameToolStripMenuItem.Click += new System.EventHandler(this.cancelGameToolStripMenuItem_Click);
             // 
             // quitToolStripMenuItem
             // 
@@ -115,6 +120,13 @@
             this.quitToolStripMenuItem.Size = new System.Drawing.Size(153, 22);
             this.quitToolStripMenuItem.Text = "Quit";
             this.quitToolStripMenuItem.Click += new System.EventHandler(this.quitToolStripMenuItem_Click);
+            // 
+            // domainToolStripMenuItem
+            // 
+            this.domainToolStripMenuItem.Name = "domainToolStripMenuItem";
+            this.domainToolStripMenuItem.Size = new System.Drawing.Size(153, 22);
+            this.domainToolStripMenuItem.Text = "Domain";
+            this.domainToolStripMenuItem.Click += new System.EventHandler(this.domainToolStripMenuItem_Click);
             // 
             // setNicknameToolStripMenuItem
             // 
@@ -155,6 +167,10 @@
             // 
             // gamePanel
             // 
+            this.gamePanel.Controls.Add(this.player2ScoreLabel);
+            this.gamePanel.Controls.Add(this.player2NameLabel);
+            this.gamePanel.Controls.Add(this.player1ScoreLabel);
+            this.gamePanel.Controls.Add(this.player1NameLabel);
             this.gamePanel.Controls.Add(this.wordEntry);
             this.gamePanel.Controls.Add(this.textBox3);
             this.gamePanel.Controls.Add(this.label4);
@@ -170,6 +186,14 @@
             this.gamePanel.Name = "gamePanel";
             this.gamePanel.Size = new System.Drawing.Size(584, 502);
             this.gamePanel.TabIndex = 2;
+            // 
+            // wordEntry
+            // 
+            this.wordEntry.Location = new System.Drawing.Point(17, 398);
+            this.wordEntry.Name = "wordEntry";
+            this.wordEntry.Size = new System.Drawing.Size(245, 20);
+            this.wordEntry.TabIndex = 9;
+            this.wordEntry.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.wordEntry_KeyPress);
             // 
             // textBox3
             // 
@@ -269,22 +293,22 @@
             this.cubeLayoutPanel.Controls.Add(this.box2, 1, 0);
             this.cubeLayoutPanel.Controls.Add(this.box1, 0, 0);
             this.cubeLayoutPanel.Cursor = System.Windows.Forms.Cursors.Default;
-            this.cubeLayoutPanel.Location = new System.Drawing.Point(3, 27);
+            this.cubeLayoutPanel.Location = new System.Drawing.Point(12, 142);
             this.cubeLayoutPanel.Name = "cubeLayoutPanel";
             this.cubeLayoutPanel.RowCount = 4;
             this.cubeLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
             this.cubeLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
             this.cubeLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
             this.cubeLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
-            this.cubeLayoutPanel.Size = new System.Drawing.Size(410, 410);
+            this.cubeLayoutPanel.Size = new System.Drawing.Size(250, 250);
             this.cubeLayoutPanel.TabIndex = 0;
             // 
             // box16
             // 
             this.box16.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.box16.Location = new System.Drawing.Point(311, 311);
+            this.box16.Location = new System.Drawing.Point(191, 191);
             this.box16.Name = "box16";
-            this.box16.Size = new System.Drawing.Size(94, 94);
+            this.box16.Size = new System.Drawing.Size(54, 54);
             this.box16.TabIndex = 19;
             this.box16.Text = "box16";
             this.box16.UseVisualStyleBackColor = true;
@@ -292,9 +316,9 @@
             // box15
             // 
             this.box15.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.box15.Location = new System.Drawing.Point(209, 311);
+            this.box15.Location = new System.Drawing.Point(129, 191);
             this.box15.Name = "box15";
-            this.box15.Size = new System.Drawing.Size(94, 94);
+            this.box15.Size = new System.Drawing.Size(54, 54);
             this.box15.TabIndex = 18;
             this.box15.Text = "box15";
             this.box15.UseVisualStyleBackColor = true;
@@ -302,9 +326,9 @@
             // box14
             // 
             this.box14.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.box14.Location = new System.Drawing.Point(107, 311);
+            this.box14.Location = new System.Drawing.Point(67, 191);
             this.box14.Name = "box14";
-            this.box14.Size = new System.Drawing.Size(94, 94);
+            this.box14.Size = new System.Drawing.Size(54, 54);
             this.box14.TabIndex = 17;
             this.box14.Text = "box14";
             this.box14.UseVisualStyleBackColor = true;
@@ -312,9 +336,9 @@
             // box13
             // 
             this.box13.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.box13.Location = new System.Drawing.Point(5, 311);
+            this.box13.Location = new System.Drawing.Point(5, 191);
             this.box13.Name = "box13";
-            this.box13.Size = new System.Drawing.Size(94, 94);
+            this.box13.Size = new System.Drawing.Size(54, 54);
             this.box13.TabIndex = 16;
             this.box13.Text = "box13";
             this.box13.UseVisualStyleBackColor = true;
@@ -322,9 +346,9 @@
             // box12
             // 
             this.box12.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.box12.Location = new System.Drawing.Point(311, 209);
+            this.box12.Location = new System.Drawing.Point(191, 129);
             this.box12.Name = "box12";
-            this.box12.Size = new System.Drawing.Size(94, 94);
+            this.box12.Size = new System.Drawing.Size(54, 54);
             this.box12.TabIndex = 15;
             this.box12.Text = "box12";
             this.box12.UseVisualStyleBackColor = true;
@@ -332,9 +356,9 @@
             // box11
             // 
             this.box11.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.box11.Location = new System.Drawing.Point(209, 209);
+            this.box11.Location = new System.Drawing.Point(129, 129);
             this.box11.Name = "box11";
-            this.box11.Size = new System.Drawing.Size(94, 94);
+            this.box11.Size = new System.Drawing.Size(54, 54);
             this.box11.TabIndex = 14;
             this.box11.Text = "box11";
             this.box11.UseVisualStyleBackColor = true;
@@ -342,9 +366,9 @@
             // box10
             // 
             this.box10.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.box10.Location = new System.Drawing.Point(107, 209);
+            this.box10.Location = new System.Drawing.Point(67, 129);
             this.box10.Name = "box10";
-            this.box10.Size = new System.Drawing.Size(94, 94);
+            this.box10.Size = new System.Drawing.Size(54, 54);
             this.box10.TabIndex = 13;
             this.box10.Text = "box10";
             this.box10.UseVisualStyleBackColor = true;
@@ -352,9 +376,9 @@
             // box9
             // 
             this.box9.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.box9.Location = new System.Drawing.Point(5, 209);
+            this.box9.Location = new System.Drawing.Point(5, 129);
             this.box9.Name = "box9";
-            this.box9.Size = new System.Drawing.Size(94, 94);
+            this.box9.Size = new System.Drawing.Size(54, 54);
             this.box9.TabIndex = 12;
             this.box9.Text = "box9";
             this.box9.UseVisualStyleBackColor = true;
@@ -362,9 +386,9 @@
             // box8
             // 
             this.box8.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.box8.Location = new System.Drawing.Point(311, 107);
+            this.box8.Location = new System.Drawing.Point(191, 67);
             this.box8.Name = "box8";
-            this.box8.Size = new System.Drawing.Size(94, 94);
+            this.box8.Size = new System.Drawing.Size(54, 54);
             this.box8.TabIndex = 11;
             this.box8.Text = "box8";
             this.box8.UseVisualStyleBackColor = true;
@@ -372,9 +396,9 @@
             // box7
             // 
             this.box7.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.box7.Location = new System.Drawing.Point(209, 107);
+            this.box7.Location = new System.Drawing.Point(129, 67);
             this.box7.Name = "box7";
-            this.box7.Size = new System.Drawing.Size(94, 94);
+            this.box7.Size = new System.Drawing.Size(54, 54);
             this.box7.TabIndex = 10;
             this.box7.Text = "box7";
             this.box7.UseVisualStyleBackColor = true;
@@ -382,9 +406,9 @@
             // box6
             // 
             this.box6.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.box6.Location = new System.Drawing.Point(107, 107);
+            this.box6.Location = new System.Drawing.Point(67, 67);
             this.box6.Name = "box6";
-            this.box6.Size = new System.Drawing.Size(94, 94);
+            this.box6.Size = new System.Drawing.Size(54, 54);
             this.box6.TabIndex = 9;
             this.box6.Text = "box6";
             this.box6.UseVisualStyleBackColor = true;
@@ -392,9 +416,9 @@
             // box5
             // 
             this.box5.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.box5.Location = new System.Drawing.Point(5, 107);
+            this.box5.Location = new System.Drawing.Point(5, 67);
             this.box5.Name = "box5";
-            this.box5.Size = new System.Drawing.Size(94, 94);
+            this.box5.Size = new System.Drawing.Size(54, 54);
             this.box5.TabIndex = 8;
             this.box5.Text = "box5";
             this.box5.UseVisualStyleBackColor = true;
@@ -402,9 +426,9 @@
             // box4
             // 
             this.box4.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.box4.Location = new System.Drawing.Point(311, 5);
+            this.box4.Location = new System.Drawing.Point(191, 5);
             this.box4.Name = "box4";
-            this.box4.Size = new System.Drawing.Size(94, 94);
+            this.box4.Size = new System.Drawing.Size(54, 54);
             this.box4.TabIndex = 7;
             this.box4.Text = "box4";
             this.box4.UseVisualStyleBackColor = true;
@@ -412,9 +436,9 @@
             // box3
             // 
             this.box3.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.box3.Location = new System.Drawing.Point(209, 5);
+            this.box3.Location = new System.Drawing.Point(129, 5);
             this.box3.Name = "box3";
-            this.box3.Size = new System.Drawing.Size(94, 94);
+            this.box3.Size = new System.Drawing.Size(54, 54);
             this.box3.TabIndex = 6;
             this.box3.Text = "box3";
             this.box3.UseVisualStyleBackColor = true;
@@ -422,9 +446,9 @@
             // box2
             // 
             this.box2.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.box2.Location = new System.Drawing.Point(107, 5);
+            this.box2.Location = new System.Drawing.Point(67, 5);
             this.box2.Name = "box2";
-            this.box2.Size = new System.Drawing.Size(94, 94);
+            this.box2.Size = new System.Drawing.Size(54, 54);
             this.box2.TabIndex = 5;
             this.box2.Text = "box2";
             this.box2.UseVisualStyleBackColor = true;
@@ -434,7 +458,7 @@
             this.box1.Cursor = System.Windows.Forms.Cursors.Hand;
             this.box1.Location = new System.Drawing.Point(5, 5);
             this.box1.Name = "box1";
-            this.box1.Size = new System.Drawing.Size(94, 94);
+            this.box1.Size = new System.Drawing.Size(54, 54);
             this.box1.TabIndex = 4;
             this.box1.Text = "box1";
             this.box1.UseVisualStyleBackColor = true;
@@ -444,20 +468,41 @@
             this.contextMenuStrip1.Name = "contextMenuStrip1";
             this.contextMenuStrip1.Size = new System.Drawing.Size(61, 4);
             // 
-            // wordEntry
+            // player1NameLabel
             // 
-            this.wordEntry.Location = new System.Drawing.Point(8, 444);
-            this.wordEntry.Name = "wordEntry";
-            this.wordEntry.Size = new System.Drawing.Size(400, 20);
-            this.wordEntry.TabIndex = 9;
-            this.wordEntry.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.wordEntry_KeyPress);
+            this.player1NameLabel.AutoSize = true;
+            this.player1NameLabel.Location = new System.Drawing.Point(14, 57);
+            this.player1NameLabel.Name = "player1NameLabel";
+            this.player1NameLabel.Size = new System.Drawing.Size(76, 13);
+            this.player1NameLabel.TabIndex = 10;
+            this.player1NameLabel.Text = "Player 1 Name";
             // 
-            // domainToolStripMenuItem
+            // player1ScoreLabel
             // 
-            this.domainToolStripMenuItem.Name = "domainToolStripMenuItem";
-            this.domainToolStripMenuItem.Size = new System.Drawing.Size(153, 22);
-            this.domainToolStripMenuItem.Text = "Domain";
-            this.domainToolStripMenuItem.Click += new System.EventHandler(this.domainToolStripMenuItem_Click);
+            this.player1ScoreLabel.AutoSize = true;
+            this.player1ScoreLabel.Location = new System.Drawing.Point(17, 74);
+            this.player1ScoreLabel.Name = "player1ScoreLabel";
+            this.player1ScoreLabel.Size = new System.Drawing.Size(13, 13);
+            this.player1ScoreLabel.TabIndex = 11;
+            this.player1ScoreLabel.Text = "0";
+            // 
+            // player2ScoreLabel
+            // 
+            this.player2ScoreLabel.AutoSize = true;
+            this.player2ScoreLabel.Location = new System.Drawing.Point(155, 74);
+            this.player2ScoreLabel.Name = "player2ScoreLabel";
+            this.player2ScoreLabel.Size = new System.Drawing.Size(13, 13);
+            this.player2ScoreLabel.TabIndex = 13;
+            this.player2ScoreLabel.Text = "0";
+            // 
+            // player2NameLabel
+            // 
+            this.player2NameLabel.AutoSize = true;
+            this.player2NameLabel.Location = new System.Drawing.Point(152, 57);
+            this.player2NameLabel.Name = "player2NameLabel";
+            this.player2NameLabel.Size = new System.Drawing.Size(76, 13);
+            this.player2NameLabel.TabIndex = 12;
+            this.player2NameLabel.Text = "Player 2 Name";
             // 
             // BoggleGUI
             // 
@@ -522,6 +567,10 @@
         private System.Windows.Forms.ToolStripMenuItem setNicknameToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem domainToolStripMenuItem;
         private System.Windows.Forms.TextBox wordEntry;
+        private System.Windows.Forms.Label player2ScoreLabel;
+        private System.Windows.Forms.Label player2NameLabel;
+        private System.Windows.Forms.Label player1ScoreLabel;
+        private System.Windows.Forms.Label player1NameLabel;
     }
 }
 

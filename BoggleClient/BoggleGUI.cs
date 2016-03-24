@@ -16,7 +16,7 @@ namespace BoggleClient
         {
             set
             {
-                //throw new NotImplementedException();
+                player1NameLabel.Text = value;
             }
         }
 
@@ -24,7 +24,7 @@ namespace BoggleClient
         {
             set
             {
-                //throw new NotImplementedException();
+                player2NameLabel.Text = value;
             }
         }
 
@@ -32,7 +32,7 @@ namespace BoggleClient
         {
             set
             {
-                //throw new NotImplementedException();
+                player1ScoreLabel.Text = value.ToString();
             }
         }
 
@@ -40,7 +40,7 @@ namespace BoggleClient
         {
             set
             {
-                //throw new NotImplementedException();
+                player2ScoreLabel.Text = value.ToString();
             }
         }
 
@@ -147,13 +147,13 @@ namespace BoggleClient
         /// <param name="e"></param>
         private void domainToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            using (domainForm domainForm = new domainForm())
+            using (StartForm domainForm = new StartForm())
             {
                 if (domainForm.ShowDialog() == DialogResult.OK)
                 {
                     if (domainNameEntered != null)
                     {
-                        domainNameEntered(domainForm.TheValue);
+                        //domainNameEntered(domainForm.TheValue);
                     }
                 }
             }
@@ -185,6 +185,14 @@ namespace BoggleClient
 
                 wordEnteredEvent(wordEntry.Text);
                 wordEntry.Text = "";
+            }
+        }
+
+        private void cancelGameToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if(joinCanceledEvent != null)
+            {
+                joinCanceledEvent();
             }
         }
     }
