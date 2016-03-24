@@ -45,8 +45,8 @@
             this.textBox3 = new System.Windows.Forms.TextBox();
             this.label4 = new System.Windows.Forms.Label();
             this.wordBox = new System.Windows.Forms.RichTextBox();
-            this.textBox2 = new System.Windows.Forms.TextBox();
-            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.wordCountBox = new System.Windows.Forms.TextBox();
+            this.ScoreCountBox = new System.Windows.Forms.TextBox();
             this.label3 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
@@ -175,8 +175,8 @@
             this.gamePanel.Controls.Add(this.textBox3);
             this.gamePanel.Controls.Add(this.label4);
             this.gamePanel.Controls.Add(this.wordBox);
-            this.gamePanel.Controls.Add(this.textBox2);
-            this.gamePanel.Controls.Add(this.textBox1);
+            this.gamePanel.Controls.Add(this.wordCountBox);
+            this.gamePanel.Controls.Add(this.ScoreCountBox);
             this.gamePanel.Controls.Add(this.label3);
             this.gamePanel.Controls.Add(this.label2);
             this.gamePanel.Controls.Add(this.label1);
@@ -224,21 +224,21 @@
             this.wordBox.TabIndex = 6;
             this.wordBox.Text = "";
             // 
-            // textBox2
+            // wordCountBox
             // 
-            this.textBox2.Location = new System.Drawing.Point(462, 77);
-            this.textBox2.Name = "textBox2";
-            this.textBox2.ReadOnly = true;
-            this.textBox2.Size = new System.Drawing.Size(100, 20);
-            this.textBox2.TabIndex = 5;
+            this.wordCountBox.Location = new System.Drawing.Point(462, 77);
+            this.wordCountBox.Name = "wordCountBox";
+            this.wordCountBox.ReadOnly = true;
+            this.wordCountBox.Size = new System.Drawing.Size(100, 20);
+            this.wordCountBox.TabIndex = 5;
             // 
-            // textBox1
+            // ScoreCountBox
             // 
-            this.textBox1.Location = new System.Drawing.Point(462, 50);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.ReadOnly = true;
-            this.textBox1.Size = new System.Drawing.Size(100, 20);
-            this.textBox1.TabIndex = 4;
+            this.ScoreCountBox.Location = new System.Drawing.Point(462, 50);
+            this.ScoreCountBox.Name = "ScoreCountBox";
+            this.ScoreCountBox.ReadOnly = true;
+            this.ScoreCountBox.Size = new System.Drawing.Size(100, 20);
+            this.ScoreCountBox.TabIndex = 4;
             // 
             // label3
             // 
@@ -559,11 +559,11 @@
         private System.Windows.Forms.TextBox textBox3;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.RichTextBox wordBox;
-        private System.Windows.Forms.TextBox textBox2;
+        private System.Windows.Forms.TextBox wordCountBox;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.TextBox ScoreCountBox;
         private System.Windows.Forms.ToolStripMenuItem setNicknameToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem domainToolStripMenuItem;
         private System.Windows.Forms.TextBox wordEntry;

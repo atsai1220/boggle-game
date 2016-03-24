@@ -67,6 +67,32 @@ namespace BoggleClient
             }
         }
 
+        int IBoggleView.Player1Score
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+
+            set
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        int IBoggleView.Player2Score
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+
+            set
+            {
+                throw new NotImplementedException();
+            }
+        }
+
         public BoggleGUI()
         {
             InitializeComponent();
@@ -124,7 +150,20 @@ namespace BoggleClient
 
         public void AddWord(string word, int score)
         {
-            //throw new NotImplementedException();
+            // update score
+            int _score;
+            int.TryParse(this.ScoreCountBox.Text, out _score);
+            _score += score;
+            this.ScoreCountBox.Text = _score.ToString();
+
+            // update word count
+            int _wordCount;
+            int.TryParse(this.wordCountBox.Text, out _wordCount);
+            _wordCount++;
+            this.wordCountBox.Text = _wordCount.ToString();
+
+            // update word list
+            wordBox.Text += word + "\t" + score.ToString() + "\n";
         }
 
         /// <summary>
@@ -182,9 +221,9 @@ namespace BoggleClient
             if(e.KeyChar == '\r')
             {
                 e.Handled = true;
-
                 wordEnteredEvent(wordEntry.Text);
                 wordEntry.Text = "";
+                
             }
         }
 
