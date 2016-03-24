@@ -14,16 +14,35 @@ namespace BoggleClient
     {
         public string Nickname
         {
-            set;
-            get;
+            set
+            {
+                player1NameLabel.Text = value;
+            }
         }
 
         public string Player2Nickname
         {
-            set;
-            get;
+            set
+            {
+                player2NameLabel.Text = value;
+            }
         }
 
+        public int Player1Score
+        {
+            set
+            {
+                player1ScoreLabel.Text = value.ToString();
+            }
+        }
+
+        public int Player2Score
+        {
+            set
+            {
+                player2ScoreLabel.Text = value.ToString();
+            }
+        }
 
         public int TimeRemaining
         {
@@ -37,36 +56,23 @@ namespace BoggleClient
         {
             set
             {
-                for(int i = 0; i < 16; i++)
+                for (int i = 0; i < 16; i++)
                 {
                     int row = i / 4;
                     int col = i % 4;
 
-                    Button cube = (Button) cubeLayoutPanel.GetControlFromPosition(col, row);
+                    Button cube = (Button)cubeLayoutPanel.GetControlFromPosition(col, row);
                     cube.Text = value[i] + "";
                 }
             }
         }
 
-        public int Player1Score
-        {
-             set
-            {
-                ScoreCountBox.Text = value.ToString();
-            }
-        }
-
-        public int Player2Score
-        {
-            set;
-            get;
-        }
 
         public BoggleGUI()
         {
             InitializeComponent();
         }
-            
+
 
         public event Action AboutEvent;
         public event Action closeEvent;
@@ -101,7 +107,7 @@ namespace BoggleClient
 
         private void BoggleGUI_Load(object sender, EventArgs e)
         {
-            
+
         }
 
         /// <summary>
@@ -119,11 +125,11 @@ namespace BoggleClient
 
         public void AddWord(string word, int score)
         {
-        //    // update score
-        //    int _score;
-        //    int.TryParse(this.ScoreCountBox.Text, out _score);
-        //    _score += score;
-        //    this.ScoreCountBox.Text = _score.ToString();
+            //    // update score
+            //    int _score;
+            //    int.TryParse(this.ScoreCountBox.Text, out _score);
+            //    _score += score;
+            //    this.ScoreCountBox.Text = _score.ToString();
 
             // update word count
             int _wordCount;
@@ -155,13 +161,13 @@ namespace BoggleClient
         /// <param name="e"></param>
         private void domainToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            using (domainForm domainForm = new domainForm())
+            using (StartForm domainForm = new StartForm())
             {
                 if (domainForm.ShowDialog() == DialogResult.OK)
                 {
                     if (domainNameEntered != null)
                     {
-                        domainNameEntered(domainForm.TheValue);
+                        //domainNameEntered(domainForm.TheValue);
                     }
                 }
             }
@@ -187,14 +193,21 @@ namespace BoggleClient
 
         private void wordEntry_KeyPress(object sender, KeyPressEventArgs e)
         {
-            if(e.KeyChar == '\r')
+            if (e.KeyChar == '\r')
             {
                 e.Handled = true;
                 wordEnteredEvent(wordEntry.Text);
                 wordEntry.Text = "";
-                
+
             }
         }
 
+        private void cancelGameToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (joinCanceledEvent != null)
+            {
+                joinCanceledEvent();
+            }
+        }
     }
 }
