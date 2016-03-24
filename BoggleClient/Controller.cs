@@ -12,31 +12,38 @@ using System.Threading;
 
 namespace BoggleClient
 {
-    class  Controller
+    class Controller
     {
+        private HttpClient client;
         private IBoggleView boggleWindow;
         private Model boggleModel;
-        
+
         /// <summary>
         /// Begin controlling boggleWindow
         /// </summary>
         public Controller()
         {
-            boggleModel = new Model();
         }
 
         public Controller(IBoggleView _boggleWindow) : base()
         {
             boggleModel = new Model();
-
             boggleWindow = _boggleWindow;
             boggleWindow.registerPlayerEvent += registerPlayer;
-   //         boggleWindow.joinGameEvent += joinGame;
+            //         boggleWindow.joinGameEvent += joinGame;
             boggleWindow.joinCanceledEvent += cancelJoinRequest;
             boggleWindow.closeEvent += HandleCloseEvent;
             boggleWindow.helpEvent += HandleHelpEvent;
+            boggleWindow.domainNameEntered += HandleDomainNameEvent;
+
+            CreateClient();
 
             testInit();
+        }
+
+        private void HandleDomainNameEvent(string _domain)
+        {
+            boggleModel.domain = _domain;
         }
 
         /// <summary>
@@ -44,34 +51,43 @@ namespace BoggleClient
         /// </summary>
         private void testInit()
         {
-            registerPlayer("asdf");
-        
-            joinGame(120);
+                     registerPlayer("asdf");
+
+                   joinGame(120);
         }
 
-        
+
         /// <summary>
         /// Create HttpClient to communicate with server
         /// </summary>
         /// <returns></returns>
-        private static HttpClient CreateClient()
+        private void CreateClient()
         {
-            // TODO change Uri to update with input from user
-            // Create a client whose base address is the GitHub server
             HttpClient client = new HttpClient();
-            client.BaseAddress = new Uri("http://bogglecs3500s16.azurewebsites.net");
-
-            // Tell the server that the client will accept this particular type of response data
-            client.DefaultRequestHeaders.Accept.Clear();
-            client.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
+            while (boggleModel.domain == null)
+            {
+                using (domainForm domainForm = new domainForm())
+                {
+                    if (domainForm.ShowDialog() == DialogResult.OK)
+                    {
+                        this.boggleModel.domain = domainForm.TheValue;
+                    }
+                }
+            }
             
+                // TODO Controller must update boggleModel.domain
+                client.BaseAddress = new Uri(boggleModel.domain);
+                //client.BaseAddress = new Uri("http://bogglecs3500s16.azurewebsites.net");
 
+                // Tell the server that the client will accept this particular type of response data
+                client.DefaultRequestHeaders.Accept.Clear();
+                client.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
 
-            // There is more client configuration to do, depending on the request.
-            return client;
+                this.client = client;
+            
         }
 
-        
+
 
         /// <summary>
         /// Registers the player with the boggle server.
@@ -86,37 +102,33 @@ namespace BoggleClient
         private void registerPlayer(string nickName)
         {
             // TODO implement Player to get token
-            using (HttpClient client = CreateClient())
+            // An ExpandoObject is one to which in which we can set arbitrary properties.
+            // To create a new public repository, we must send a request parameter which
+            // is a JSON object with various properties of the new repo expressed as
+            // properties.
+            dynamic player = new ExpandoObject();
+            //player.Nickname = boggleModel.GetName();
+            player.Nickname = nickName;
+
+            // To send a POST request, we must include the serialized parameter object
+            // in the body of the request.
+            StringContent content = new StringContent(JsonConvert.SerializeObject(player), Encoding.UTF8, "application/json");
+            HttpResponseMessage response = client.PostAsync("/BoggleService.svc/users", content).Result;
+
+            if (response.IsSuccessStatusCode)
             {
+                // The deserialized response value is an object that describes the user token
+                // TODO get and set user token to player
+                String result = response.Content.ReadAsStringAsync().Result;
+                dynamic serverResponse = JsonConvert.DeserializeObject(result);
+                Console.WriteLine(serverResponse);
 
-                // An ExpandoObject is one to which in which we can set arbitrary properties.
-                // To create a new public repository, we must send a request parameter which
-                // is a JSON object with various properties of the new repo expressed as
-                // properties.
-                dynamic player = new ExpandoObject();
-                //player.Nickname = boggleModel.GetName();
-                player.Nickname = nickName;
-
-                // To send a POST request, we must include the serialized parameter object
-                // in the body of the request.
-                StringContent content = new StringContent(JsonConvert.SerializeObject(player), Encoding.UTF8, "application/json");
-                HttpResponseMessage response = client.PostAsync("/BoggleService.svc/users", content).Result;
-
-                if (response.IsSuccessStatusCode)
-                {
-                    // The deserialized response value is an object that describes the user token
-                    // TODO get and set user token to player
-                    String result = response.Content.ReadAsStringAsync().Result;
-                    dynamic serverResponse = JsonConvert.DeserializeObject(result);
-                    Console.WriteLine(serverResponse);
-
-                    boggleModel.UserToken = serverResponse.UserToken;
-                }
-                else
-                {
-                    // TODO change
-                    handleMessagePopUpEvent("If Nickname is null, or is empty when trimmed, responds with status 403 (Forbidden).");
-                }
+                boggleModel.UserToken = serverResponse.UserToken;
+            }
+            else
+            {
+                // TODO change
+                handleMessagePopUpEvent("If Nickname is null, or is empty when trimmed, responds with status 403 (Forbidden).");
             }
         }
 
@@ -139,42 +151,39 @@ namespace BoggleClient
         /// </summary>
         private async void joinGame(int timeLimit)
         {
-            using (HttpClient client = CreateClient())
+            dynamic data = new ExpandoObject();
+
+            data.UserToken = boggleModel.UserToken;
+            data.TimeLimit = timeLimit;
+
+            StringContent content = new StringContent(JsonConvert.SerializeObject(data), Encoding.UTF8, "application/json");
+
+            HttpResponseMessage response = await client.PostAsync("/BoggleService.svc/games", content);
+
+            if (response.IsSuccessStatusCode)
             {
-                dynamic data = new ExpandoObject();
+                string result = await response.Content.ReadAsStringAsync();
+                dynamic responseObject = JsonConvert.DeserializeObject(result);
 
-                data.UserToken = boggleModel.UserToken;
-                data.TimeLimit = timeLimit;
+                boggleModel.GameId = responseObject.GameID;
 
-                StringContent content = new StringContent(JsonConvert.SerializeObject(data), Encoding.UTF8, "application/json");
+                previousGameState = "pending";
 
-                HttpResponseMessage response = await client.PostAsync("/BoggleService.svc/games", content);
+                checkGameStatus();
 
-                if(response.IsSuccessStatusCode)
-                {
-                    string result = await response.Content.ReadAsStringAsync();
-                    dynamic responseObject = JsonConvert.DeserializeObject(result);
+                /*
 
-                    boggleModel.GameId = responseObject.GameID;
+                gameCheckTimer = new Timer();
 
-                    previousGameState = "pending";
+                gameCheckTimer.Tick += (a, b) => checkGameStatus();
 
-                    checkGameStatus();
+                gameCheckTimer.Interval = 10000;
 
-                    /*
-
-                    gameCheckTimer = new Timer();
-
-                    gameCheckTimer.Tick += (a, b) => checkGameStatus();
-                    
-                    gameCheckTimer.Interval = 10000;
-
-                    gameCheckTimer.Start();*/
-                }
-                else
-                {
-                    // TODO Display error message
-                }
+                gameCheckTimer.Start();*/
+            }
+            else
+            {
+                // TODO Display error message
             }
         }
 
@@ -182,65 +191,62 @@ namespace BoggleClient
 
         private async void checkGameStatus()
         {
-            while(true)
+            while (true)
             {
-                using (HttpClient client = CreateClient())
+                string url = String.Format("/BoggleService.svc/games/{0}", boggleModel.GameId);
+
+                //  Request the short version
+                if (previousGameState.Equals("active"))
                 {
-                    string url = String.Format("/BoggleService.svc/games/{0}", boggleModel.GameId);
-
-                    //  Request the short version
-                    if (previousGameState.Equals("active"))
-                    {
-                        url += "?yes";
-                    }
-
-                    HttpResponseMessage response = await client.GetAsync(url);
-                    if (response.IsSuccessStatusCode)
-                    {
-                        string result = await response.Content.ReadAsStringAsync();
-
-                        dynamic gameStatus = JsonConvert.DeserializeObject(result);
-
-                        Console.WriteLine(gameStatus.GameState);
-                        
-
-                        if (gameStatus.GameState.Equals("pending"))
-                        {
-                            // Wait
-                        }
-                        if (gameStatus.GameState.Equals("active"))
-                        {
-                            if (previousGameState.Equals("pending"))
-                            {
-                                HandleGameStarted(gameStatus);
-                            }
-                            else if (previousGameState.Equals("active"))
-                            {
-                                HandleGameStateUpdate(gameStatus);
-                            }
-                        }
-                        if (gameStatus.GameState.Equals("completed"))
-                        {
-                            if (previousGameState.Equals("active"))
-                            {
-                                HandleGameStateUpdate(gameStatus);
-                            }
-                            if (previousGameState.Equals("completed"))
-                            {
-                                HandleGameEndEvent(gameStatus);
-
-                                return;
-                            }
-                        }
-                    }
-                    else
-        {
-                        // TODO display error message.
-                    }
+                    url += "?yes";
                 }
 
-                Thread.Sleep(1000);
+                HttpResponseMessage response = await client.GetAsync(url);
+                if (response.IsSuccessStatusCode)
+                {
+                    string result = await response.Content.ReadAsStringAsync();
+
+                    dynamic gameStatus = JsonConvert.DeserializeObject(result);
+
+                    Console.WriteLine(gameStatus.GameState);
+
+
+                    if (gameStatus.GameState.Equals("pending"))
+                    {
+                        // Wait
+                    }
+                    if (gameStatus.GameState.Equals("active"))
+                    {
+                        if (previousGameState.Equals("pending"))
+                        {
+                            HandleGameStarted(gameStatus);
+                        }
+                        else if (previousGameState.Equals("active"))
+                        {
+                            HandleGameStateUpdate(gameStatus);
+                        }
+                    }
+                    if (gameStatus.GameState.Equals("completed"))
+                    {
+                        if (previousGameState.Equals("active"))
+                        {
+                            HandleGameStateUpdate(gameStatus);
+                        }
+                        if (previousGameState.Equals("completed"))
+                        {
+                            HandleGameEndEvent(gameStatus);
+
+                            return;
+                        }
+                    }
+                }
+                else
+                {
+                    // TODO display error message.
+                }
             }
+
+            Thread.Sleep(1000);
         }
 
         // Sam
@@ -249,23 +255,20 @@ namespace BoggleClient
         /// </summary>
         private async void cancelJoinRequest()
         {
-            using (HttpClient client = CreateClient())
+            dynamic data = new ExpandoObject();
+            data.UserToken = boggleModel.UserToken;
+
+            StringContent content = new StringContent(JsonConvert.SerializeObject(data), Encoding.UTF8, "application/json");
+
+            HttpResponseMessage response = await client.PutAsync("/BoggleService.svc/games", content);
+
+            if (response.IsSuccessStatusCode)
             {
-                dynamic data = new ExpandoObject();
-                data.UserToken = boggleModel.UserToken;
 
-                StringContent content = new StringContent(JsonConvert.SerializeObject(data), Encoding.UTF8, "application/json");
-
-                HttpResponseMessage response = await client.PutAsync("/BoggleService.svc/games", content);
-
-                if (response.IsSuccessStatusCode)
-        {
-
-        }
-                else
-                {
-                    // TODO display error message
-                }
+            }
+            else
+            {
+                // TODO display error message
             }
         }
 
@@ -338,7 +341,7 @@ otherwise, -1 pt");
             boggleWindow.Player1Score = gameStatus.Player1.Score;
             boggleWindow.Player2Score = gameStatus.Player2.Score;
         }
-        
+
         // Andrew
         /// <summary>
         /// send to server for points

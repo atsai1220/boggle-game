@@ -70,6 +70,7 @@ namespace BoggleClient
         public BoggleGUI()
         {
             InitializeComponent();
+        }
             
 
         public event Action AboutEvent;
@@ -87,35 +88,6 @@ namespace BoggleClient
         public event Action gameEndEvent;
         public event Action<string> wordEnteredEvent;
 
-        public string Nickname
-        {
-            set
-            {
-                throw new NotImplementedException();
-            }
-        }
-
-        public int TimeRemaining
-        {
-            set
-            {
-                throw new NotImplementedException();
-            }
-        }
-
-        public string BoardString
-        {
-            set
-            {
-                throw new NotImplementedException();
-            }
-        }
-
-        public BoggleGUI()
-        {
-            InitializeComponent();
-
-        }
 
         event Action<int> IBoggleView.joinGameEvent
         {
@@ -179,15 +151,29 @@ namespace BoggleClient
         private void howToPlayToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (helpEvent != null)
-        {
-
-        }
-
-        public void AddWord(string word, int score)
-        {
-            throw new NotImplementedException();
+            {
                 helpEvent();
             }
+        }
+
+        /// <summary>
+        /// Clicking and selecting a domain
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void domainToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            using (domainForm domainForm = new domainForm())
+            {
+                if (domainForm.ShowDialog() == DialogResult.OK)
+                {
+                    if (domainNameEntered != null)
+                    {
+                        domainNameEntered(domainForm.TheValue);
+                    }
+                }
+            }
+
         }
     }
 }
