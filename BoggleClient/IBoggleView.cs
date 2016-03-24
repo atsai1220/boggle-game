@@ -47,6 +47,9 @@ namespace BoggleClient
         /// </summary>
         event Action<string> wordEnteredEvent;
 
+      
+        
+
 
 
 

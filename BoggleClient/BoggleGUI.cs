@@ -176,5 +176,12 @@ namespace BoggleClient
                 registerPlayerEvent("asdf");
             }
         }
+
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void box1_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }

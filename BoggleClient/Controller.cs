@@ -77,7 +77,7 @@ namespace BoggleClient
 
             // TODO Controller must update boggleModel.domain
             client.BaseAddress = new Uri(boggleModel.domain);
-            //client.BaseAddress = new Uri("http://bogglecs3500s16.azurewebsites.net");
+           
 
             // Tell the server that the client will accept this particular type of response data
             client.DefaultRequestHeaders.Accept.Clear();
@@ -346,9 +346,40 @@ otherwise, -1 pt");
         /// <summary>
         /// send to server for points
         /// </summary>
-        private void HandleWordEnteredEvent()
+        private async void HandleWordEnteredEvent(dynamic gameStatus, string _wordEntered)
         {
+            
+            dynamic word = new ExpandoObject();
+            word.UserToken = boggleModel.UserToken;
+            word.Word = _wordEntered;
 
+            // To send a POST request, we must include the serialized parameter object
+            // in the body of the request.
+            //     PUT /BoggleService.svc/games/:GameID
+            StringContent content = new StringContent(JsonConvert.SerializeObject(word), Encoding.UTF8, "application/json");
+            HttpResponseMessage response = await client.PostAsync("/BoggleService.svc/games/:" + boggleModel.GameId, content);
+
+            if (response.IsSuccessStatusCode)
+            {
+                // TODO get and set user token to player
+                String result = response.Content.ReadAsStringAsync().Result;
+                dynamic serverResponse = JsonConvert.DeserializeObject(result);
+                Console.WriteLine(serverResponse);
+                
+                boggleModel.wordsPlayed++;
+                boggleModel.wordRecord.Add(_wordEntered, serverResponse.Score);
+            }
+            // If Word is null or empty when trimmed, or if GameID or UserToken is missing or invalid, 
+            // or if UserToken is not a player in the game identified by GameID, responds with response 
+            // code 403 (Forbidden).
+            else if (response.StatusCode.Equals(403))
+            {
+                handleMessagePopUpEvent("Check Word/GameID/UserToken");
+            }
+            else if (response.StatusCode.Equals(409))
+            {
+                handleMessagePopUpEvent("Game state not active");
+            }
         }
     }
 }

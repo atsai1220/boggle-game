@@ -22,7 +22,6 @@ namespace BoggleClient
             var controller = new Controller(boggleGame);
             Application.Run(boggleGame);
 
-
         }
 
 

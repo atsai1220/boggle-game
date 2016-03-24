@@ -34,6 +34,8 @@
             this.joinNewGameToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.cancelGameToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.quitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.domainToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.setNicknameToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.howToPlayToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -65,8 +67,6 @@
             this.box2 = new System.Windows.Forms.Button();
             this.box1 = new System.Windows.Forms.Button();
             this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.setNicknameToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.domainToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.gamePanel.SuspendLayout();
             this.cubeLayoutPanel.SuspendLayout();
@@ -114,6 +114,20 @@
             this.quitToolStripMenuItem.Size = new System.Drawing.Size(153, 22);
             this.quitToolStripMenuItem.Text = "Quit";
             this.quitToolStripMenuItem.Click += new System.EventHandler(this.quitToolStripMenuItem_Click);
+            // 
+            // domainToolStripMenuItem
+            // 
+            this.domainToolStripMenuItem.Name = "domainToolStripMenuItem";
+            this.domainToolStripMenuItem.Size = new System.Drawing.Size(153, 22);
+            this.domainToolStripMenuItem.Text = "Domain";
+            this.domainToolStripMenuItem.Click += new System.EventHandler(this.domainToolStripMenuItem_Click);
+            // 
+            // setNicknameToolStripMenuItem
+            // 
+            this.setNicknameToolStripMenuItem.Name = "setNicknameToolStripMenuItem";
+            this.setNicknameToolStripMenuItem.Size = new System.Drawing.Size(153, 22);
+            this.setNicknameToolStripMenuItem.Text = "Set Nickname";
+            this.setNicknameToolStripMenuItem.Click += new System.EventHandler(this.setNicknameToolStripMenuItem_Click);
             // 
             // helpToolStripMenuItem
             // 
@@ -429,25 +443,12 @@
             this.box1.TabIndex = 4;
             this.box1.Text = "box1";
             this.box1.UseVisualStyleBackColor = true;
+            this.box1.Click += new System.EventHandler(this.box1_Click);
             // 
             // contextMenuStrip1
             // 
             this.contextMenuStrip1.Name = "contextMenuStrip1";
             this.contextMenuStrip1.Size = new System.Drawing.Size(61, 4);
-            // 
-            // setNicknameToolStripMenuItem
-            // 
-            this.setNicknameToolStripMenuItem.Name = "setNicknameToolStripMenuItem";
-            this.setNicknameToolStripMenuItem.Size = new System.Drawing.Size(153, 22);
-            this.setNicknameToolStripMenuItem.Text = "Set Nickname";
-            this.setNicknameToolStripMenuItem.Click += new System.EventHandler(this.setNicknameToolStripMenuItem_Click);
-            // 
-            // domainToolStripMenuItem
-            // 
-            this.domainToolStripMenuItem.Name = "domainToolStripMenuItem";
-            this.domainToolStripMenuItem.Size = new System.Drawing.Size(153, 22);
-            this.domainToolStripMenuItem.Text = "Domain";
-            this.domainToolStripMenuItem.Click += new System.EventHandler(this.domainToolStripMenuItem_Click);
             // 
             // BoggleGUI
             // 

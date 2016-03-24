@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 
 namespace BoggleClient
 {
@@ -14,13 +14,18 @@ namespace BoggleClient
         public string domain { get; set; }
         public string gameToken { get; set; }
 
+        public OrderedDictionary wordRecord;
         private Player you;
-
+        
 
         public Model()
         {
             you = new Player();
+            
+            domain = "http://bogglecs3500s16.azurewebsites.net";
+            wordRecord = new OrderedDictionary();
             wordsPlayed = 0;
+
         }
 
         public string GetName()
@@ -36,6 +41,8 @@ namespace BoggleClient
         public string UserToken { get; set; }
 
         public int GameId { get; set; }
+
+        
 
     }
 
@@ -68,16 +75,7 @@ namespace BoggleClient
         }
     }
 
-    /// <summary>
-    /// Ordered collection of recorded words with their respective points
-    /// </summary>
-    class WordsCollection : KeyedCollection<string, int>
-    {
-        protected override string GetKeyForItem(int item)
-        {
-            throw new NotImplementedException();
-        }
-    }
+
 
 
 
