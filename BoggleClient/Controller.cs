@@ -201,13 +201,14 @@ namespace BoggleClient
                         dynamic gameStatus = JsonConvert.DeserializeObject(result);
 
                         Console.WriteLine(gameStatus.GameState);
-                        
 
-                        if (gameStatus.GameState.Equals("pending"))
+                        string gameState = gameStatus.GameState;
+
+                        if (gameState.Equals("pending"))
                         {
                             // Wait
                         }
-                        if (gameStatus.GameState.Equals("active"))
+                        if (gameState.Equals("active"))
                         {
                             if (previousGameState.Equals("pending"))
                             {
@@ -218,7 +219,7 @@ namespace BoggleClient
                                 HandleGameStateUpdate(gameStatus);
                             }
                         }
-                        if (gameStatus.GameState.Equals("completed"))
+                        if (gameState.Equals("completed"))
                         {
                             if (previousGameState.Equals("active"))
                             {
