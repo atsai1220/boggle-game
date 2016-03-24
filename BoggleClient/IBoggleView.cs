@@ -84,7 +84,6 @@ namespace BoggleClient
         int Player2Score
         {
             set;
-            get;
         }
 
         int TimeRemaining
