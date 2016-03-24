@@ -371,7 +371,7 @@ otherwise, -1 pt");
                 int intScore;
                 string _score = serverResponse.Score;
                 int.TryParse(_score, out intScore);
-                boggleWindow.Player1Score += intScore;
+                //boggleWindow.Player1Score = intScore;
                 boggleWindow.AddWord(_wordEntered, intScore);
 
                 boggleModel.wordRecord.Add(_wordEntered + "\t" + intScore.ToString());

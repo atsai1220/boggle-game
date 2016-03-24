@@ -50,8 +50,10 @@ namespace BoggleClient
 
         public int Player1Score
         {
-            set;
-            get;
+             set
+            {
+                ScoreCountBox.Text = value.ToString();
+            }
         }
 
         public int Player2Score
@@ -117,11 +119,11 @@ namespace BoggleClient
 
         public void AddWord(string word, int score)
         {
-            // update score
-            int _score;
-            int.TryParse(this.ScoreCountBox.Text, out _score);
-            _score += score;
-            this.ScoreCountBox.Text = _score.ToString();
+        //    // update score
+        //    int _score;
+        //    int.TryParse(this.ScoreCountBox.Text, out _score);
+        //    _score += score;
+        //    this.ScoreCountBox.Text = _score.ToString();
 
             // update word count
             int _wordCount;
