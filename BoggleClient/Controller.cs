@@ -15,8 +15,7 @@ namespace BoggleClient
     class Controller
     {
         private HttpClient client;
-        private BoggleGUI boggleWindow;
-        private StartForm boggleStart;
+        private IBoggleView boggleWindow;
         private Model boggleModel;
 
         /// <summary>
@@ -26,56 +25,21 @@ namespace BoggleClient
         {
         }
 
-        public Controller(StartForm boggleStart) : base()
+        public Controller(IBoggleView _boggleWindow) : base()
         {
-            this.boggleStart = boggleStart;
-
             boggleModel = new Model();
-
-            boggleStart.startGameEvent += HandleGameStartRequest;
-
-            /*
             boggleWindow = _boggleWindow;
             boggleWindow.registerPlayerEvent += registerPlayer;
             boggleWindow.joinGameEvent += (timeLimit) => joinGame(timeLimit);
-            boggleWindow.joinCanceledEvent += HandleCancelJoinRequest;
+            boggleWindow.joinCanceledEvent += cancelJoinRequest;
             boggleWindow.closeEvent += HandleCloseEvent;
             boggleWindow.helpEvent += HandleHelpEvent;
             boggleWindow.domainNameEntered += HandleDomainNameEvent;
             boggleWindow.wordEnteredEvent += HandleWordEnteredEvent;
-
-
-            boggleWindow.BoardString = "                ";
-            */
-
-            //CreateClient();
-
-            // testInit();
-        }
-
-        private void HandleGameStartRequest(string domain, string nickname, string duration)
-        {
-            boggleModel.domain = domain;
 
             CreateClient();
 
-            registerPlayer(nickname);
-
-            boggleWindow = new BoggleGUI();
-
-            boggleWindow.registerPlayerEvent += registerPlayer;
-            boggleWindow.joinGameEvent += (timeLimit) => joinGame(timeLimit);
-            boggleWindow.joinCanceledEvent += HandleCancelJoinRequest;
-            boggleWindow.closeEvent += HandleCloseEvent;
-            boggleWindow.helpEvent += HandleHelpEvent;
-            boggleWindow.domainNameEntered += HandleDomainNameEvent;
-            boggleWindow.wordEnteredEvent += HandleWordEnteredEvent;
-
-            boggleWindow.BoardString = "                ";
-
-            boggleStart.Hide();
-            boggleWindow.ShowDialog(boggleStart);
-            boggleStart.Show();
+            // testInit();
         }
 
         private void HandleDomainNameEvent(string _domain)
@@ -101,6 +65,16 @@ namespace BoggleClient
         private void CreateClient()
         {
             HttpClient client = new HttpClient();
+            while (boggleModel.domain == null)
+            {
+                using (domainForm domainForm = new domainForm())
+                {
+                    if (domainForm.ShowDialog() == DialogResult.OK)
+                    {
+                        this.boggleModel.domain = domainForm.TheValue;
+                    }
+                }
+            }
 
             // TODO Controller must update boggleModel.domain
             client.BaseAddress = new Uri(boggleModel.domain);
@@ -191,9 +165,17 @@ namespace BoggleClient
 
                 previousGameState = "pending";
 
-                gameOn = true;
+                await checkGameStatus();
 
-                    await checkGameStatus();
+                /*
+
+                gameCheckTimer = new Timer();
+
+                gameCheckTimer.Tick += (a, b) => checkGameStatus();
+
+                gameCheckTimer.Interval = 10000;
+
+                gameCheckTimer.Start();*/
             }
             else
             {
@@ -203,11 +185,9 @@ namespace BoggleClient
 
         private string previousGameState;
 
-        private bool gameOn;
-
         private async Task checkGameStatus()
         {
-            while (gameOn)
+            while (true)
             {
                 string url = String.Format("/BoggleService.svc/games/{0}", boggleModel.GameId);
 
@@ -274,10 +254,8 @@ namespace BoggleClient
         /// <summary>
         /// Cancel a pending request to join a game.
         /// </summary>
-        private async void HandleCancelJoinRequest()
+        private async void cancelJoinRequest()
         {
-            gameOn = false;
-
             dynamic data = new ExpandoObject();
             data.UserToken = boggleModel.UserToken;
 
@@ -393,6 +371,7 @@ otherwise, -1 pt");
                 int intScore;
                 string _score = serverResponse.Score;
                 int.TryParse(_score, out intScore);
+                //boggleWindow.Player1Score = intScore;
                 boggleWindow.AddWord(_wordEntered, intScore);
 
                 boggleModel.wordRecord.Add(_wordEntered + "\t" + intScore.ToString());

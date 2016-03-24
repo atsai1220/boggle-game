@@ -18,9 +18,10 @@ namespace BoggleClient
             
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            var boggleStart = new StartForm();
-            var controller = new Controller(boggleStart);
-            Application.Run(boggleStart);
+            var boggleGame = new BoggleGUI();
+            var controller = new Controller(boggleGame);
+            Application.Run(boggleGame);
+
         }
 
 
