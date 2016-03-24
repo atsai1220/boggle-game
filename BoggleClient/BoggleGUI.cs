@@ -158,5 +158,15 @@ namespace BoggleClient
                 registerPlayerEvent("asdf");
             }
         }
+
+        private void wordEntry_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if(e.KeyChar == '\r')
+            {
+                e.Handled = true;
+
+                wordEnteredEvent(wordBox.Text);
+            }
+        }
     }
 }

@@ -35,6 +35,7 @@ namespace BoggleClient
             boggleWindow.joinCanceledEvent += cancelJoinRequest;
             boggleWindow.closeEvent += HandleCloseEvent;
             boggleWindow.helpEvent += HandleHelpEvent;
+            boggleWindow.wordEnteredEvent += HandleWordEnteredEvent;
 
             // testInit();
         }
@@ -342,7 +343,7 @@ otherwise, -1 pt");
         /// <summary>
         /// send to server for points
         /// </summary>
-        private void HandleWordEnteredEvent()
+        private void HandleWordEnteredEvent(string word)
         {
 
         }
