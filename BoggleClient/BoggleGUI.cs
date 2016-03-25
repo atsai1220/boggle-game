@@ -186,6 +186,8 @@ namespace BoggleClient
                 // Display form
                 endForm.ShowDialog();
 
+                this.wordCountBox.Text = "0";
+                wordBox.Text = "";
             }
         }
 

@@ -30,6 +30,9 @@ namespace BoggleClient
         /// <param name="_list2"></param>
         public void receiveText(List<string> _list1, List<string> _list2)
         {
+            richTextBox1.Text = "";
+            richTextBox2.Text = "";
+
             foreach (string item in _list1)
             {
                 richTextBox1.Text += item + "\n";

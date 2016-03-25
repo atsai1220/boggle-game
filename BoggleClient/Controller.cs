@@ -395,6 +395,9 @@ otherwise, -1 pt");
             List<string> player1List = new List<string>();
             List<string> player2List = new List<string>();
 
+            boggleModel.wordsPlayed = 0;
+            
+
             HttpResponseMessage response = await client.GetAsync("/BoggleService.svc/games/" + boggleModel.GameId + "?yes");
             String result = response.Content.ReadAsStringAsync().Result;
             dynamic serverResponse = JsonConvert.DeserializeObject(result);

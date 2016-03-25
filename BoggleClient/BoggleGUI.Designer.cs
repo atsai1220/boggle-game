@@ -45,9 +45,7 @@
             this.label4 = new System.Windows.Forms.Label();
             this.wordBox = new System.Windows.Forms.RichTextBox();
             this.wordCountBox = new System.Windows.Forms.TextBox();
-            this.ScoreCountBox = new System.Windows.Forms.TextBox();
             this.label3 = new System.Windows.Forms.Label();
-            this.label2 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this.cubeLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
             this.box16 = new System.Windows.Forms.Button();
@@ -94,7 +92,7 @@
             // quitToolStripMenuItem
             // 
             this.quitToolStripMenuItem.Name = "quitToolStripMenuItem";
-            this.quitToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.quitToolStripMenuItem.Size = new System.Drawing.Size(97, 22);
             this.quitToolStripMenuItem.Text = "Quit";
             this.quitToolStripMenuItem.Click += new System.EventHandler(this.quitToolStripMenuItem_Click);
             // 
@@ -109,7 +107,7 @@
             // howToPlayToolStripMenuItem
             // 
             this.howToPlayToolStripMenuItem.Name = "howToPlayToolStripMenuItem";
-            this.howToPlayToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.howToPlayToolStripMenuItem.Size = new System.Drawing.Size(147, 22);
             this.howToPlayToolStripMenuItem.Text = "How to play...";
             this.howToPlayToolStripMenuItem.Click += new System.EventHandler(this.howToPlayToolStripMenuItem_Click);
             // 
@@ -132,9 +130,7 @@
             this.gamePanel.Controls.Add(this.label4);
             this.gamePanel.Controls.Add(this.wordBox);
             this.gamePanel.Controls.Add(this.wordCountBox);
-            this.gamePanel.Controls.Add(this.ScoreCountBox);
             this.gamePanel.Controls.Add(this.label3);
-            this.gamePanel.Controls.Add(this.label2);
             this.gamePanel.Controls.Add(this.label1);
             this.gamePanel.Controls.Add(this.cubeLayoutPanel);
             this.gamePanel.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -208,47 +204,30 @@
             // 
             this.wordBox.Cursor = System.Windows.Forms.Cursors.No;
             this.wordBox.DetectUrls = false;
-            this.wordBox.Location = new System.Drawing.Point(424, 103);
+            this.wordBox.Location = new System.Drawing.Point(424, 79);
             this.wordBox.Name = "wordBox";
             this.wordBox.ReadOnly = true;
             this.wordBox.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
-            this.wordBox.Size = new System.Drawing.Size(139, 227);
+            this.wordBox.Size = new System.Drawing.Size(139, 251);
             this.wordBox.TabIndex = 6;
             this.wordBox.Text = "";
             // 
             // wordCountBox
             // 
-            this.wordCountBox.Location = new System.Drawing.Point(462, 77);
+            this.wordCountBox.Location = new System.Drawing.Point(462, 53);
             this.wordCountBox.Name = "wordCountBox";
             this.wordCountBox.ReadOnly = true;
             this.wordCountBox.Size = new System.Drawing.Size(100, 20);
             this.wordCountBox.TabIndex = 5;
             // 
-            // ScoreCountBox
-            // 
-            this.ScoreCountBox.Location = new System.Drawing.Point(462, 50);
-            this.ScoreCountBox.Name = "ScoreCountBox";
-            this.ScoreCountBox.ReadOnly = true;
-            this.ScoreCountBox.Size = new System.Drawing.Size(100, 20);
-            this.ScoreCountBox.TabIndex = 4;
-            // 
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(420, 80);
+            this.label3.Location = new System.Drawing.Point(420, 56);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(41, 13);
             this.label3.TabIndex = 3;
             this.label3.Text = "Words:";
-            // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(421, 53);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(38, 13);
-            this.label2.TabIndex = 2;
-            this.label2.Text = "Score:";
             // 
             // label1
             // 
@@ -514,9 +493,7 @@
         private System.Windows.Forms.RichTextBox wordBox;
         private System.Windows.Forms.TextBox wordCountBox;
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.TextBox ScoreCountBox;
         private System.Windows.Forms.TextBox wordEntry;
         private System.Windows.Forms.Label player2ScoreLabel;
         private System.Windows.Forms.Label player2NameLabel;
