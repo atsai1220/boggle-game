@@ -352,9 +352,33 @@ otherwise, -1 pt");
         /// <summary>
         /// dispay end game with list of words and score
         /// </summary>
-        private void HandleGameEndEvent(dynamic gameStatus)
+        private async void HandleGameEndEvent(dynamic gameStatus)
         {
+            List<string> player1List = new List<string>();
+            List<string> player2List = new List<string>();
 
+            HttpResponseMessage response = await client.GetAsync("/BoggleService.svc/games/" + boggleModel.GameId + "?yes");
+            String result = response.Content.ReadAsStringAsync().Result;
+            dynamic serverResponse = JsonConvert.DeserializeObject(result);
+
+            // Make recorded words into list
+            foreach (var data in serverResponse.Player1.WordsPlayed)
+            {
+                string _score = data.Score;
+                string _word = data.Word;
+                player1List.Add(_score + "\t" + _word);
+                
+            }
+
+            foreach (var data in serverResponse.Player2.WordsPlayed)
+            {
+                string _score = data.Score;
+                string _word = data.Word;
+                player2List.Add(_score + "\t" + _word);
+
+            }
+
+            boggleWindow.endGameWindow(player1List, player2List);
         }
 
         // Sam
@@ -424,4 +448,6 @@ otherwise, -1 pt");
             }
         }
     }
+
+    
 }

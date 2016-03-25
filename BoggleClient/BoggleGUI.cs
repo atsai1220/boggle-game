@@ -56,14 +56,14 @@ namespace BoggleClient
         {
             set
             {
-                for(int i = 0; i < 16; i++)
+                for (int i = 0; i < 16; i++)
                 {
                     int row = i / 4;
                     int col = i % 4;
 
-                    Button cube = (Button) cubeLayoutPanel.GetControlFromPosition(col, row);
+                    Button cube = (Button)cubeLayoutPanel.GetControlFromPosition(col, row);
 
-                    if(value[i] == 'Q')
+                    if (value[i] == 'Q')
                     {
                         cube.Text = "Qu";
                     }
@@ -79,7 +79,7 @@ namespace BoggleClient
         {
             InitializeComponent();
         }
-            
+
 
         public event Action AboutEvent;
         public event Action closeEvent;
@@ -114,7 +114,7 @@ namespace BoggleClient
 
         private void BoggleGUI_Load(object sender, EventArgs e)
         {
-            
+
         }
 
         /// <summary>
@@ -148,6 +148,17 @@ namespace BoggleClient
             }
         }
 
+        public void endGameWindow(List<string> _list1, List<string> _list2)
+        {
+            // update word list
+            using (EndForm endForm = new EndForm())
+            {
+                endForm.ShowDialog();
+                endForm.receiveText(_list1, _list2);
+            }
+        }
+
+
         private void joinNewGameToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (joinGameEvent != null)
@@ -168,7 +179,7 @@ namespace BoggleClient
 
         private void wordEntry_KeyPress(object sender, KeyPressEventArgs e)
         {
-            if(e.KeyChar == '\r')
+            if (e.KeyChar == '\r')
             {
                 e.Handled = true;
 
