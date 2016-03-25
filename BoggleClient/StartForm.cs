@@ -68,7 +68,7 @@ namespace BoggleClient
         {
             cancelButton.Enabled = enable;
         }
-        
+
         /// <summary>
         /// Loads the start form.
         /// </summary>
