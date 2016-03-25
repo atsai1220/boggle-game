@@ -16,7 +16,7 @@ namespace BoggleClient
         {
             set
             {
-                //throw new NotImplementedException();
+                player1NameLabel.Text = value;
             }
         }
 
@@ -24,7 +24,7 @@ namespace BoggleClient
         {
             set
             {
-                //throw new NotImplementedException();
+                player2NameLabel.Text = value;
             }
         }
 
@@ -32,7 +32,7 @@ namespace BoggleClient
         {
             set
             {
-                //throw new NotImplementedException();
+                player1ScoreLabel.Text = value.ToString();
             }
         }
 
@@ -40,7 +40,7 @@ namespace BoggleClient
         {
             set
             {
-                //throw new NotImplementedException();
+                player2ScoreLabel.Text = value.ToString();
             }
         }
 
@@ -69,17 +69,17 @@ namespace BoggleClient
                     }
                     else
                     {
-                        cube.Text = value[i] + "";
-                    }
+                    cube.Text = value[i] + "";
                 }
             }
+        }
         }
 
         public BoggleGUI()
         {
             InitializeComponent();
         }
-            
+
 
         public event Action AboutEvent;
         public event Action closeEvent;
@@ -114,7 +114,7 @@ namespace BoggleClient
 
         private void BoggleGUI_Load(object sender, EventArgs e)
         {
-            
+
         }
 
         /// <summary>
@@ -132,7 +132,20 @@ namespace BoggleClient
 
         public void AddWord(string word, int score)
         {
-            //throw new NotImplementedException();
+            //    // update score
+            //    int _score;
+            //    int.TryParse(this.ScoreCountBox.Text, out _score);
+            //    _score += score;
+            //    this.ScoreCountBox.Text = _score.ToString();
+
+            // update word count
+            int _wordCount;
+            int.TryParse(this.wordCountBox.Text, out _wordCount);
+            _wordCount++;
+            this.wordCountBox.Text = _wordCount.ToString();
+
+            // update word list
+            wordBox.Text += word + "\t" + score.ToString() + "\n";
         }
 
         /// <summary>
@@ -147,6 +160,19 @@ namespace BoggleClient
                 helpEvent();
             }
         }
+        
+
+        public void endGameWindow(List<string> _list1, List<string> _list2)
+        {
+            // update word list
+            using (EndForm endForm = new EndForm())
+            {
+                endForm.receiveText(_list1, _list2);
+                endForm.ShowDialog();
+                
+            }
+        }
+        
 
         private void joinNewGameToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -174,6 +200,15 @@ namespace BoggleClient
 
                 wordEnteredEvent(wordEntry.Text);
                 wordEntry.Text = "";
+
+            }
+        }
+
+        private void cancelGameToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (joinCanceledEvent != null)
+            {
+                joinCanceledEvent();
             }
         }
     }
