@@ -18,12 +18,31 @@ namespace BoggleClient
         }
 
         public event Action<string, string, string> startGameEvent;
+        public event Action cancelEvent;
 
         private void startButton_Click(object sender, EventArgs e)
         {
             if(startGameEvent != null)
             {
                 startGameEvent(domainBox.Text, nicknameBox.Text, durationBox.Text);
+            }
+        }
+
+        public void setStartButtonEnabled(bool enable)
+        {
+            startButton.Enabled = enable;
+        }
+
+        public void setCancelButtonEnabled(bool enable)
+        {
+            cancelButton.Enabled = enable;
+        }
+
+        private void cancelButton_Click(object sender, EventArgs e)
+        {
+            if (cancelEvent != null)
+            {
+                cancelEvent();
             }
         }
 

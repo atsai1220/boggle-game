@@ -14,26 +14,8 @@ namespace BoggleClient
         event Action closeEvent;
 
         // program events
-        /// <summary>
-        /// Event triggered when domain name is entered
-        /// 
-        /// String parameter is the domain name.
-        /// </summary>
-        event Action<string> domainNameEntered;
 
         /// <summary>
-        /// Event triggered when player registers.
-        /// 
-        /// String is the desired nickname.
-        /// </summary>
-        event Action<string> registerPlayerEvent;
-
-        /// <summary>
-        /// Event triggered when game is joined.
-        /// 
-        /// Int is the desired time limit.
-        /// </summary>
-        event Action<int> joinGameEvent;
 
         /// <summary>
         /// Event triggered when game is cancelled

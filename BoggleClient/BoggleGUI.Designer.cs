@@ -31,16 +31,16 @@
             this.components = new System.ComponentModel.Container();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.boggleToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.joinNewGameToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.cancelGameToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.quitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.domainToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.setNicknameToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.howToPlayToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.gamePanel = new System.Windows.Forms.Panel();
+            this.player2ScoreLabel = new System.Windows.Forms.Label();
+            this.player2NameLabel = new System.Windows.Forms.Label();
+            this.player1ScoreLabel = new System.Windows.Forms.Label();
+            this.player1NameLabel = new System.Windows.Forms.Label();
             this.wordEntry = new System.Windows.Forms.TextBox();
             this.textBox3 = new System.Windows.Forms.TextBox();
             this.label4 = new System.Windows.Forms.Label();
@@ -68,10 +68,6 @@
             this.box2 = new System.Windows.Forms.Button();
             this.box1 = new System.Windows.Forms.Button();
             this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.player1NameLabel = new System.Windows.Forms.Label();
-            this.player1ScoreLabel = new System.Windows.Forms.Label();
-            this.player2ScoreLabel = new System.Windows.Forms.Label();
-            this.player2NameLabel = new System.Windows.Forms.Label();
             this.menuStrip1.SuspendLayout();
             this.gamePanel.SuspendLayout();
             this.cubeLayoutPanel.SuspendLayout();
@@ -91,48 +87,17 @@
             // boggleToolStripMenuItem
             // 
             this.boggleToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.joinNewGameToolStripMenuItem,
-            this.cancelGameToolStripMenuItem,
-            this.quitToolStripMenuItem,
-            this.domainToolStripMenuItem,
-            this.setNicknameToolStripMenuItem});
+            this.quitToolStripMenuItem});
             this.boggleToolStripMenuItem.Name = "boggleToolStripMenuItem";
             this.boggleToolStripMenuItem.Size = new System.Drawing.Size(56, 20);
             this.boggleToolStripMenuItem.Text = "Boggle";
             // 
-            // joinNewGameToolStripMenuItem
-            // 
-            this.joinNewGameToolStripMenuItem.Name = "joinNewGameToolStripMenuItem";
-            this.joinNewGameToolStripMenuItem.Size = new System.Drawing.Size(153, 22);
-            this.joinNewGameToolStripMenuItem.Text = "Join new game";
-            this.joinNewGameToolStripMenuItem.Click += new System.EventHandler(this.joinNewGameToolStripMenuItem_Click);
-            // 
-            // cancelGameToolStripMenuItem
-            // 
-            this.cancelGameToolStripMenuItem.Name = "cancelGameToolStripMenuItem";
-            this.cancelGameToolStripMenuItem.Size = new System.Drawing.Size(153, 22);
-            this.cancelGameToolStripMenuItem.Text = "Cancel game";
-            // 
             // quitToolStripMenuItem
             // 
             this.quitToolStripMenuItem.Name = "quitToolStripMenuItem";
-            this.quitToolStripMenuItem.Size = new System.Drawing.Size(153, 22);
+            this.quitToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.quitToolStripMenuItem.Text = "Quit";
             this.quitToolStripMenuItem.Click += new System.EventHandler(this.quitToolStripMenuItem_Click);
-            // 
-            // domainToolStripMenuItem
-            // 
-            this.domainToolStripMenuItem.Name = "domainToolStripMenuItem";
-            this.domainToolStripMenuItem.Size = new System.Drawing.Size(153, 22);
-            this.domainToolStripMenuItem.Text = "Domain";
-            this.domainToolStripMenuItem.Click += new System.EventHandler(this.domainToolStripMenuItem_Click);
-            // 
-            // setNicknameToolStripMenuItem
-            // 
-            this.setNicknameToolStripMenuItem.Name = "setNicknameToolStripMenuItem";
-            this.setNicknameToolStripMenuItem.Size = new System.Drawing.Size(153, 22);
-            this.setNicknameToolStripMenuItem.Text = "Set Nickname";
-            this.setNicknameToolStripMenuItem.Click += new System.EventHandler(this.setNicknameToolStripMenuItem_Click);
             // 
             // helpToolStripMenuItem
             // 
@@ -185,6 +150,42 @@
             this.gamePanel.Name = "gamePanel";
             this.gamePanel.Size = new System.Drawing.Size(584, 502);
             this.gamePanel.TabIndex = 2;
+            // 
+            // player2ScoreLabel
+            // 
+            this.player2ScoreLabel.AutoSize = true;
+            this.player2ScoreLabel.Location = new System.Drawing.Point(155, 74);
+            this.player2ScoreLabel.Name = "player2ScoreLabel";
+            this.player2ScoreLabel.Size = new System.Drawing.Size(13, 13);
+            this.player2ScoreLabel.TabIndex = 13;
+            this.player2ScoreLabel.Text = "0";
+            // 
+            // player2NameLabel
+            // 
+            this.player2NameLabel.AutoSize = true;
+            this.player2NameLabel.Location = new System.Drawing.Point(152, 57);
+            this.player2NameLabel.Name = "player2NameLabel";
+            this.player2NameLabel.Size = new System.Drawing.Size(76, 13);
+            this.player2NameLabel.TabIndex = 12;
+            this.player2NameLabel.Text = "Player 2 Name";
+            // 
+            // player1ScoreLabel
+            // 
+            this.player1ScoreLabel.AutoSize = true;
+            this.player1ScoreLabel.Location = new System.Drawing.Point(17, 74);
+            this.player1ScoreLabel.Name = "player1ScoreLabel";
+            this.player1ScoreLabel.Size = new System.Drawing.Size(13, 13);
+            this.player1ScoreLabel.TabIndex = 11;
+            this.player1ScoreLabel.Text = "0";
+            // 
+            // player1NameLabel
+            // 
+            this.player1NameLabel.AutoSize = true;
+            this.player1NameLabel.Location = new System.Drawing.Point(14, 57);
+            this.player1NameLabel.Name = "player1NameLabel";
+            this.player1NameLabel.Size = new System.Drawing.Size(76, 13);
+            this.player1NameLabel.TabIndex = 10;
+            this.player1NameLabel.Text = "Player 1 Name";
             // 
             // wordEntry
             // 
@@ -467,42 +468,6 @@
             this.contextMenuStrip1.Name = "contextMenuStrip1";
             this.contextMenuStrip1.Size = new System.Drawing.Size(61, 4);
             // 
-            // player1NameLabel
-            // 
-            this.player1NameLabel.AutoSize = true;
-            this.player1NameLabel.Location = new System.Drawing.Point(14, 57);
-            this.player1NameLabel.Name = "player1NameLabel";
-            this.player1NameLabel.Size = new System.Drawing.Size(76, 13);
-            this.player1NameLabel.TabIndex = 10;
-            this.player1NameLabel.Text = "Player 1 Name";
-            // 
-            // player1ScoreLabel
-            // 
-            this.player1ScoreLabel.AutoSize = true;
-            this.player1ScoreLabel.Location = new System.Drawing.Point(17, 74);
-            this.player1ScoreLabel.Name = "player1ScoreLabel";
-            this.player1ScoreLabel.Size = new System.Drawing.Size(13, 13);
-            this.player1ScoreLabel.TabIndex = 11;
-            this.player1ScoreLabel.Text = "0";
-            // 
-            // player2ScoreLabel
-            // 
-            this.player2ScoreLabel.AutoSize = true;
-            this.player2ScoreLabel.Location = new System.Drawing.Point(155, 74);
-            this.player2ScoreLabel.Name = "player2ScoreLabel";
-            this.player2ScoreLabel.Size = new System.Drawing.Size(13, 13);
-            this.player2ScoreLabel.TabIndex = 13;
-            this.player2ScoreLabel.Text = "0";
-            // 
-            // player2NameLabel
-            // 
-            this.player2NameLabel.AutoSize = true;
-            this.player2NameLabel.Location = new System.Drawing.Point(152, 57);
-            this.player2NameLabel.Name = "player2NameLabel";
-            this.player2NameLabel.Size = new System.Drawing.Size(76, 13);
-            this.player2NameLabel.TabIndex = 12;
-            this.player2NameLabel.Text = "Player 2 Name";
-            // 
             // BoggleGUI
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -533,8 +498,6 @@
         private System.Windows.Forms.ToolStripMenuItem helpToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem howToPlayToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem aboutToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem joinNewGameToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem cancelGameToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem quitToolStripMenuItem;
         private System.Windows.Forms.Panel gamePanel;
         private System.Windows.Forms.ContextMenuStrip contextMenuStrip1;
@@ -563,8 +526,6 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.TextBox ScoreCountBox;
-        private System.Windows.Forms.ToolStripMenuItem setNicknameToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem domainToolStripMenuItem;
         private System.Windows.Forms.TextBox wordEntry;
         private System.Windows.Forms.Label player2ScoreLabel;
         private System.Windows.Forms.Label player2NameLabel;

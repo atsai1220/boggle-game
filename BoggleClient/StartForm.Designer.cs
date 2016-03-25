@@ -35,6 +35,7 @@
             this.durationLabel = new System.Windows.Forms.Label();
             this.durationBox = new System.Windows.Forms.TextBox();
             this.domainBox = new System.Windows.Forms.TextBox();
+            this.cancelButton = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // label1
@@ -99,11 +100,24 @@
             this.domainBox.TabIndex = 8;
             this.domainBox.Text = " http://bogglecs3500s16.azurewebsites.net";
             // 
+            // cancelButton
+            // 
+            this.cancelButton.Enabled = false;
+            this.cancelButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 20F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.cancelButton.Location = new System.Drawing.Point(7, 186);
+            this.cancelButton.Name = "cancelButton";
+            this.cancelButton.Size = new System.Drawing.Size(354, 88);
+            this.cancelButton.TabIndex = 9;
+            this.cancelButton.Text = "Cancel";
+            this.cancelButton.UseVisualStyleBackColor = true;
+            this.cancelButton.Click += new System.EventHandler(this.cancelButton_Click);
+            // 
             // StartForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(373, 191);
+            this.ClientSize = new System.Drawing.Size(373, 288);
+            this.Controls.Add(this.cancelButton);
             this.Controls.Add(this.domainBox);
             this.Controls.Add(this.durationBox);
             this.Controls.Add(this.durationLabel);
@@ -129,5 +143,6 @@
         private System.Windows.Forms.Label durationLabel;
         private System.Windows.Forms.TextBox durationBox;
         private System.Windows.Forms.TextBox domainBox;
+        private System.Windows.Forms.Button cancelButton;
     }
 }

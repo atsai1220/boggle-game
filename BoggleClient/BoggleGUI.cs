@@ -64,11 +64,18 @@ namespace BoggleClient
                     int col = i % 4;
 
                     Button cube = (Button)cubeLayoutPanel.GetControlFromPosition(col, row);
-                    cube.Text = value[i] + "";
+
+                    if (value[i] == 'Q')
+                    {
+                        cube.Text = "Qu";
+                    }
+                    else
+                    {
+                        cube.Text = value[i] + "";
+                    }
                 }
             }
         }
-
 
         public BoggleGUI()
         {
@@ -156,24 +163,6 @@ namespace BoggleClient
             }
         }
 
-        /// <summary>
-        /// Clicking and selecting a domain
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void domainToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            using (StartForm domainForm = new StartForm())
-            {
-                if (domainForm.ShowDialog() == DialogResult.OK)
-                {
-                    if (domainNameEntered != null)
-                    {
-                        //domainNameEntered(domainForm.TheValue);
-                    }
-                }
-            }
-        }
 
         public void endGameWindow(List<string> _list1, List<string> _list2)
         {
@@ -184,10 +173,10 @@ namespace BoggleClient
                 endForm.receiveScores(player1ScoreLabel.Text, player2ScoreLabel.Text);
                 endForm.receiveNames(player1NameLabel.Text, player2NameLabel.Text);
                 endForm.ShowDialog();
-                
+
             }
         }
-        
+
 
         private void joinNewGameToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -212,6 +201,7 @@ namespace BoggleClient
             if (e.KeyChar == '\r')
             {
                 e.Handled = true;
+
                 wordEnteredEvent(wordEntry.Text);
                 wordEntry.Text = "";
 
