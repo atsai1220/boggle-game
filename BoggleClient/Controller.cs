@@ -427,6 +427,7 @@ otherwise, -1 pt");
         /// </summary>
         private void HandleGameStarted(dynamic gameStatus)
         {
+            boggleWindow.ClearBoxes();
             boggleWindow.BoardString = gameStatus.Board;
 
             boggleWindow.TimeRemaining = gameStatus.TimeLeft;

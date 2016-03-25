@@ -22,6 +22,7 @@ namespace BoggleClient
         public BoggleGUI()
         {
             InitializeComponent();
+            
         }
 
         /// <summary>
@@ -61,6 +62,14 @@ namespace BoggleClient
         public void DoClose()
         {
             Close();
+        }
+
+        public void ClearBoxes()
+        {
+            wordBox.Text = "";
+            wordCountBox.Text = "";
+            player1NameLabel.Text = "";
+            player2NameLabel.Text = "";
         }
 
         /// <summary>
