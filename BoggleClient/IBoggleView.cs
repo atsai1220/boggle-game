@@ -9,7 +9,6 @@ namespace BoggleClient
     interface IBoggleView
     {
         // menu events
-        event Action aboutEvent;
         event Action helpEvent;
         event Action closeEvent;
 

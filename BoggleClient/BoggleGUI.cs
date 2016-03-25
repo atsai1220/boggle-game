@@ -10,8 +10,62 @@ using System.Windows.Forms;
 
 namespace BoggleClient
 {
+    /// <summary>
+    /// Class for Boggle game GUI
+    /// </summary>
     public partial class BoggleGUI : Form, IBoggleView
     {
+
+        /// <summary>
+        /// Boggle GUI constructor
+        /// </summary>
+        public BoggleGUI()
+        {
+            InitializeComponent();
+        }
+
+        /// <summary>
+        /// Close game event
+        /// </summary>
+        public event Action closeEvent;
+
+        /// <summary>
+        /// When the help button is pressed
+        /// </summary>
+        public event Action helpEvent;
+
+        /// <summary>
+        /// When Cancel button is pressed
+        /// </summary>
+        public event Action joinCanceledEvent;
+
+        /// <summary>
+        /// When game is joined
+        /// </summary>
+        public event Action<int> joinGameEvent;
+
+        /// <summary>
+        /// When registering for user 
+        /// </summary>
+        public event Action<string> registerPlayerEvent;
+
+        /// <summary>
+        /// When word is entered. 
+        /// Key: Enter
+        /// </summary>
+        public event Action<string> wordEnteredEvent;
+
+        /// <summary>
+        /// Close current window
+        /// </summary>
+        public void DoClose()
+        {
+            Close();
+        }
+
+        /// <summary>
+        /// Holds the nickname for player 1
+        /// </summary>
         public string Nickname
         {
             set
@@ -20,6 +74,9 @@ namespace BoggleClient
             }
         }
 
+        /// <summary>
+        /// Holds the nickname for player 2
+        /// </summary>
         public string Player2Nickname
         {
             set
@@ -28,16 +85,20 @@ namespace BoggleClient
             }
         }
 
+        /// <summary>
+        /// Holds player 1's score
+        /// </summary>
         public int Player1Score
         {
             set
             {
                 player1ScoreLabel.Text = value.ToString();
             }
-            
-           
         }
 
+        /// <summary>
+        /// Holds player 2's score
+        /// </summary>
         public int Player2Score
         {
             set
@@ -46,6 +107,9 @@ namespace BoggleClient
             }
         }
 
+        /// <summary>
+        /// Holds the time remaining
+        /// </summary>
         public int TimeRemaining
         {
             set
@@ -54,6 +118,9 @@ namespace BoggleClient
             }
         }
 
+        /// <summary>
+        /// Displays the Boggle board
+        /// </summary>
         public string BoardString
         {
             set
@@ -77,33 +144,6 @@ namespace BoggleClient
             }
         }
 
-        public BoggleGUI()
-        {
-            InitializeComponent();
-        }
-
-
-        public event Action AboutEvent;
-        public event Action closeEvent;
-        public event Action helpEvent;
-        public event Action joinCanceledEvent;
-        public event Action<int> joinGameEvent;
-        public event Action<string, bool> programStartEvent;
-        public event Action<string> registerPlayerEvent;
-        public event Action<string> MessagePopUpEvent;
-        public event Action<string> messagePopUpEvent;
-        public event Action aboutEvent;
-        public event Action<string> domainNameEntered;
-        public event Action<string> wordEnteredEvent;
-
-        /// <summary>
-        /// Close current window
-        /// </summary>
-        public void DoClose()
-        {
-            Close();
-        }
-
         /// <summary>
         /// Shows a pop-up with message
         /// </summary>
@@ -113,7 +153,47 @@ namespace BoggleClient
             MessageBox.Show(_message);
         }
 
+        /// <summary>
+        /// Method for submitting a word to the word record
+        /// </summary>
+        /// <param name="word">The word being recorded</param>
+        /// <param name="score">The score of this.word</param>
+        public void AddWord(string word, int score)
+        {
+            // update word count
+            int _wordCount;
+            int.TryParse(this.wordCountBox.Text, out _wordCount);
+            _wordCount++;
+            this.wordCountBox.Text = _wordCount.ToString();
 
+            // update word list
+            wordBox.Text += word + "\t" + score.ToString() + "\n";
+        }
+
+        /// <summary>
+        /// Creates the end game window given the game Brief.
+        /// </summary>
+        /// <param name="_list1">Player 1's words and scores</param>
+        /// <param name="_list2">Player 2's words and scores</param>
+        public void endGameWindow(List<string> _list1, List<string> _list2)
+        {
+            // update word list
+            using (EndForm endForm = new EndForm())
+            {
+                endForm.receiveText(_list1, _list2);
+                endForm.receiveScores(player1ScoreLabel.Text, player2ScoreLabel.Text);
+                endForm.receiveNames(player1NameLabel.Text, player2NameLabel.Text);
+                // Display form
+                endForm.ShowDialog();
+
+            }
+        }
+
+        /// <summary>
+        /// Loads BoggleGUI
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void BoggleGUI_Load(object sender, EventArgs e)
         {
 
@@ -132,23 +212,6 @@ namespace BoggleClient
             }
         }
 
-        public void AddWord(string word, int score)
-        {
-            //    // update score
-            //    int _score;
-            //    int.TryParse(this.ScoreCountBox.Text, out _score);
-            //    _score += score;
-            //    this.ScoreCountBox.Text = _score.ToString();
-
-            // update word count
-            int _wordCount;
-            int.TryParse(this.wordCountBox.Text, out _wordCount);
-            _wordCount++;
-            this.wordCountBox.Text = _wordCount.ToString();
-
-            // update word list
-            wordBox.Text += word + "\t" + score.ToString() + "\n";
-        }
 
         /// <summary>
         /// Clicking "Help --> How to Play
@@ -163,39 +226,11 @@ namespace BoggleClient
             }
         }
 
-
-        public void endGameWindow(List<string> _list1, List<string> _list2)
-        {
-            // update word list
-            using (EndForm endForm = new EndForm())
-            {
-                endForm.receiveText(_list1, _list2);
-                endForm.receiveScores(player1ScoreLabel.Text, player2ScoreLabel.Text);
-                endForm.receiveNames(player1NameLabel.Text, player2NameLabel.Text);
-                endForm.ShowDialog();
-
-            }
-        }
-
-
-        private void joinNewGameToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            if (joinGameEvent != null)
-            {
-                // TODO get this from somewhere.
-                joinGameEvent(100);
-            }
-        }
-
-        private void setNicknameToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            if (registerPlayerEvent != null)
-            {
-                // TODO Query user for nickname.
-                registerPlayerEvent("asdf");
-            }
-        }
-
+        /// <summary>
+        /// When Enter is pressed when submitting player's word
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void wordEntry_KeyPress(object sender, KeyPressEventArgs e)
         {
             if (e.KeyChar == '\r')
@@ -205,14 +240,6 @@ namespace BoggleClient
                 wordEnteredEvent(wordEntry.Text);
                 wordEntry.Text = "";
 
-            }
-        }
-
-        private void cancelGameToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            if (joinCanceledEvent != null)
-            {
-                joinCanceledEvent();
             }
         }
     }
