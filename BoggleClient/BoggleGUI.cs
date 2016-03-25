@@ -16,7 +16,7 @@ namespace BoggleClient
         {
             set
             {
-                player1NameLabel.Text = value;
+                //throw new NotImplementedException();
             }
         }
 
@@ -24,7 +24,7 @@ namespace BoggleClient
         {
             set
             {
-                player2NameLabel.Text = value;
+                //throw new NotImplementedException();
             }
         }
 
@@ -32,7 +32,7 @@ namespace BoggleClient
         {
             set
             {
-                player1ScoreLabel.Text = value.ToString();
+                //throw new NotImplementedException();
             }
         }
 
@@ -40,7 +40,7 @@ namespace BoggleClient
         {
             set
             {
-                player2ScoreLabel.Text = value.ToString();
+                //throw new NotImplementedException();
             }
         }
 
@@ -56,23 +56,30 @@ namespace BoggleClient
         {
             set
             {
-                for (int i = 0; i < 16; i++)
+                for(int i = 0; i < 16; i++)
                 {
                     int row = i / 4;
                     int col = i % 4;
 
-                    Button cube = (Button)cubeLayoutPanel.GetControlFromPosition(col, row);
-                    cube.Text = value[i] + "";
+                    Button cube = (Button) cubeLayoutPanel.GetControlFromPosition(col, row);
+
+                    if(value[i] == 'Q')
+                    {
+                        cube.Text = "Qu";
+                    }
+                    else
+                    {
+                        cube.Text = value[i] + "";
+                    }
                 }
             }
         }
-
 
         public BoggleGUI()
         {
             InitializeComponent();
         }
-
+            
 
         public event Action AboutEvent;
         public event Action closeEvent;
@@ -107,7 +114,7 @@ namespace BoggleClient
 
         private void BoggleGUI_Load(object sender, EventArgs e)
         {
-
+            
         }
 
         /// <summary>
@@ -125,20 +132,7 @@ namespace BoggleClient
 
         public void AddWord(string word, int score)
         {
-            //    // update score
-            //    int _score;
-            //    int.TryParse(this.ScoreCountBox.Text, out _score);
-            //    _score += score;
-            //    this.ScoreCountBox.Text = _score.ToString();
-
-            // update word count
-            int _wordCount;
-            int.TryParse(this.wordCountBox.Text, out _wordCount);
-            _wordCount++;
-            this.wordCountBox.Text = _wordCount.ToString();
-
-            // update word list
-            wordBox.Text += word + "\t" + score.ToString() + "\n";
+            //throw new NotImplementedException();
         }
 
         /// <summary>
@@ -151,25 +145,6 @@ namespace BoggleClient
             if (helpEvent != null)
             {
                 helpEvent();
-            }
-        }
-
-        /// <summary>
-        /// Clicking and selecting a domain
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void domainToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            using (StartForm domainForm = new StartForm())
-            {
-                if (domainForm.ShowDialog() == DialogResult.OK)
-                {
-                    if (domainNameEntered != null)
-                    {
-                        //domainNameEntered(domainForm.TheValue);
-                    }
-                }
             }
         }
 
@@ -193,20 +168,12 @@ namespace BoggleClient
 
         private void wordEntry_KeyPress(object sender, KeyPressEventArgs e)
         {
-            if (e.KeyChar == '\r')
+            if(e.KeyChar == '\r')
             {
                 e.Handled = true;
+
                 wordEnteredEvent(wordEntry.Text);
                 wordEntry.Text = "";
-
-            }
-        }
-
-        private void cancelGameToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            if (joinCanceledEvent != null)
-            {
-                joinCanceledEvent();
             }
         }
     }

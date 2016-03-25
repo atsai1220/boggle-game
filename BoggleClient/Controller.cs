@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Net;
 using System.Windows.Forms;
 using System.Threading;
+using System.Text.RegularExpressions;
 
 namespace BoggleClient
 {
@@ -18,13 +19,7 @@ namespace BoggleClient
         private BoggleGUI boggleWindow;
         private StartForm boggleStart;
         private Model boggleModel;
-
-        /// <summary>
-        /// Begin controlling boggleWindow
-        /// </summary>
-        public Controller()
-        {
-        }
+        private bool cancel;
 
         public Controller(StartForm boggleStart) : base()
         {
@@ -33,75 +28,77 @@ namespace BoggleClient
             boggleModel = new Model();
 
             boggleStart.startGameEvent += HandleGameStartRequest;
+            boggleStart.cancelEvent += HandleCancelJoinRequest;
 
-            /*
-            boggleWindow = _boggleWindow;
-            boggleWindow.registerPlayerEvent += registerPlayer;
-            boggleWindow.joinGameEvent += (timeLimit) => joinGame(timeLimit);
+            boggleWindow = new BoggleGUI();
+
             boggleWindow.joinCanceledEvent += HandleCancelJoinRequest;
             boggleWindow.closeEvent += HandleCloseEvent;
             boggleWindow.helpEvent += HandleHelpEvent;
-            boggleWindow.domainNameEntered += HandleDomainNameEvent;
             boggleWindow.wordEnteredEvent += HandleWordEnteredEvent;
-
-
-            boggleWindow.BoardString = "                ";
-            */
-
-            //CreateClient();
-
-            // testInit();
         }
 
-        private void HandleGameStartRequest(string domain, string nickname, string duration)
+        private async void HandleGameStartRequest(string domain, string nickname, string duration)
         {
             if(domain.Equals(""))
             {
-
+                return;
             }
-            if(nickname == "")
+
+            if(nickname.Equals(""))
             {
-
+                return;
             }
+
+            if(!Regex.IsMatch(duration, @"^\d+$"))
+            {
+                return;
+            }
+
+            int dur = int.Parse(duration);
+            if(dur < 5 || dur > 120)
+            {
+                return;
+            }
+
+            cancel = false;
+
+            boggleStart.setStartButtonEnabled(false);
+            boggleStart.setCancelButtonEnabled(true);
 
             boggleModel.domain = domain;
 
             CreateClient();
 
-            registerPlayer(nickname);
+            try
+            {
+                await registerPlayer(nickname);
+            }
+            catch(HttpRequestException)
+            {
+                boggleStart.setStartButtonEnabled(true);
+                boggleStart.setCancelButtonEnabled(false);
 
-            boggleWindow = new BoggleGUI();
+                return;
+            }
 
-            boggleWindow.registerPlayerEvent += registerPlayer;
-            boggleWindow.joinGameEvent += (timeLimit) => joinGame(timeLimit);
-            boggleWindow.joinCanceledEvent += HandleCancelJoinRequest;
-            boggleWindow.closeEvent += HandleCloseEvent;
-            boggleWindow.helpEvent += HandleHelpEvent;
-            boggleWindow.domainNameEntered += HandleDomainNameEvent;
-            boggleWindow.wordEnteredEvent += HandleWordEnteredEvent;
+            await joinGame(dur);
 
-            boggleWindow.BoardString = "                ";
+            if (cancel)
+            {
+                boggleStart.setStartButtonEnabled(true);
+                boggleStart.setCancelButtonEnabled(false);
+
+                return;
+            }
 
             boggleStart.Hide();
             boggleWindow.ShowDialog(boggleStart);
             boggleStart.Show();
+
+            boggleStart.setStartButtonEnabled(true);
+            boggleStart.setCancelButtonEnabled(false);
         }
-
-        private void HandleDomainNameEvent(string _domain)
-        {
-            boggleModel.domain = _domain;
-        }
-
-        /// <summary>
-        /// TODO REmove this (is for testing)
-        /// </summary>
-        private void testInit()
-        {
-            registerPlayer("asdf");
-
-            joinGame(120);
-        }
-
 
         /// <summary>
         /// Create HttpClient to communicate with server
@@ -135,7 +132,7 @@ namespace BoggleClient
         /// }
         /// </summary>
         /// <param name="nickName">Desired name of the player.</param>
-        private async void registerPlayer(string nickName)
+        private async Task registerPlayer(string nickName)
         {
             // TODO implement Player to get token
             dynamic player = new ExpandoObject();
@@ -180,7 +177,7 @@ namespace BoggleClient
         /// 
         /// State should go to waiting for game to start.
         /// </summary>
-        private async void joinGame(int timeLimit)
+        private async Task joinGame(int timeLimit)
         {
             dynamic data = new ExpandoObject();
 
@@ -202,7 +199,14 @@ namespace BoggleClient
 
                 gameOn = true;
 
-                    await checkGameStatus();
+                checkGameStatus();
+
+                while(previousGameState.Equals("pending") && !cancel)
+                {
+                    Task wait = new Task(() => Thread.Sleep(250));
+                    wait.Start();
+                    await wait;
+                }
             }
             else
             {
@@ -216,7 +220,7 @@ namespace BoggleClient
 
         private async Task checkGameStatus()
         {
-            while (gameOn)
+            while (gameOn && !cancel)
             {
                 string url = String.Format("/BoggleService.svc/games/{0}", boggleModel.GameId);
 
@@ -285,7 +289,10 @@ namespace BoggleClient
         /// </summary>
         private async void HandleCancelJoinRequest()
         {
-            gameOn = false;
+            //boggleStart.setStartButtonEnabled(true);
+            boggleStart.setCancelButtonEnabled(false);
+
+            cancel = true;
 
             dynamic data = new ExpandoObject();
             data.UserToken = boggleModel.UserToken;
@@ -309,6 +316,7 @@ namespace BoggleClient
         /// </summary>
         private void HandleCloseEvent()
         {
+            gameOn = false;
             boggleWindow.DoClose();
         }
 
