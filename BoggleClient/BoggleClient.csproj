@@ -63,7 +63,6 @@
       <DependentUpon>StartForm.cs</DependentUpon>
     </Compile>
     <Compile Include="IBoggleView.cs" />
-    <Compile Include="IBoggleAPI.cs" />
     <Compile Include="Model.cs" />
     <Compile Include="Controller.cs" />
     <Compile Include="BoggleGUI.cs">
