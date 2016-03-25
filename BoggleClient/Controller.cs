@@ -13,14 +13,43 @@ using System.Text.RegularExpressions;
 
 namespace BoggleClient
 {
+    /// <summary>
+    /// Code to perform most of the decisions of the boggle client.
+    /// </summary>
     class Controller
     {
+        /// <summary>
+        /// Httpclient used to make api calls.
+        /// </summary>
         private HttpClient client;
+
+        /// <summary>
+        /// The main gui for the game.
+        /// </summary>
         private BoggleGUI boggleWindow;
+
+        /// <summary>
+        /// Initial window that pops up.
+        /// </summary>
         private StartForm boggleStart;
+
+        /// <summary>
+        /// Represents the state of the boggle
+        /// client.
+        /// </summary>
         private Model boggleModel;
+
+        /// <summary>
+        /// This is set to true when cancel button is pressed.
+        /// Used to cancel joining a game.
+        /// </summary>
         private bool cancel;
 
+        /// <summary>
+        /// Constructor for controller.
+        /// 
+        /// Takes in an instance of StartForm
+        /// </summary>
         public Controller(StartForm boggleStart) : base()
         {
             this.boggleStart = boggleStart;
@@ -38,6 +67,12 @@ namespace BoggleClient
             boggleWindow.wordEnteredEvent += HandleWordEnteredEvent;
         }
 
+        /// <summary>
+        /// Called when start game is pressed.
+        /// </summary>
+        /// <param name="domain">The domain name</param>
+        /// <param name="nickname">The nickname</param>
+        /// <param name="duration">The desired duration of the game.</param>
         private async void HandleGameStartRequest(string domain, string nickname, string duration)
         {
             if(domain.Equals(""))
@@ -168,10 +203,7 @@ namespace BoggleClient
         {
             boggleWindow.MessagePopUp(_message);
         }
-
-        //private Timer gameCheckTimer;
-
-        // Sam
+        
         /// <summary>
         /// Joins a game or starts a new game.
         /// 
@@ -214,10 +246,22 @@ namespace BoggleClient
             }
         }
 
+        /// <summary>
+        /// The last game state recieved from the server.
+        /// Transitouns between game states are important
+        /// for knowing what to to.
+        /// </summary>
         private string previousGameState;
 
+        /// <summary>
+        /// boolean checked in gamestate polling loop.
+        /// When it is false checkGameStatus will stop.
+        /// </summary>
         private bool gameOn;
 
+        /// <summary>
+        /// Repeatedly checks the status of the current game.
+        /// </summary>
         private async Task checkGameStatus()
         {
             while (gameOn && !cancel)
@@ -282,8 +326,7 @@ namespace BoggleClient
                 await wait;
             }
         }
-
-        // Sam
+        
         /// <summary>
         /// Cancel a pending request to join a game.
         /// </summary>
@@ -320,13 +363,9 @@ namespace BoggleClient
             boggleWindow.DoClose();
         }
 
-        // ASm
-        private void HandleAboutEvent()
-        {
-
-        }
-
-        //Andrew
+        /// <summary>
+        /// Displays the help message.
+        /// </summary>
         private void HandleHelpEvent()
         {
             boggleWindow.MessagePopUp(
@@ -347,8 +386,7 @@ Create strings that are legal words for points!
 
 otherwise, -1 pt");
         }
-
-        //Andrew
+        
         /// <summary>
         /// dispay end game with list of words and score
         /// </summary>
@@ -380,8 +418,7 @@ otherwise, -1 pt");
 
             boggleWindow.endGameWindow(player1List, player2List);
         }
-
-        // Sam
+        
         /// <summary>
         /// populate cubes and set timer
         /// </summary>
@@ -398,6 +435,9 @@ otherwise, -1 pt");
             boggleWindow.Player2Score = gameStatus.Player2.Score;
         }
 
+        /// <summary>
+        /// Updates the time remaining and the player scores.
+        /// </summary>
         private void HandleGameStateUpdate(dynamic gameStatus)
         {
             boggleWindow.TimeRemaining = gameStatus.TimeLeft;
@@ -405,8 +445,7 @@ otherwise, -1 pt");
             boggleWindow.Player1Score = gameStatus.Player1.Score;
             boggleWindow.Player2Score = gameStatus.Player2.Score;
         }
-
-        // Andrew
+        
         /// <summary>
         /// send to server for points
         /// </summary>
