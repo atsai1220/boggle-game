@@ -55,7 +55,7 @@
             // Player2Label
             // 
             this.Player2Label.AutoSize = true;
-            this.Player2Label.Location = new System.Drawing.Point(220, 9);
+            this.Player2Label.Location = new System.Drawing.Point(201, 9);
             this.Player2Label.Name = "Player2Label";
             this.Player2Label.Size = new System.Drawing.Size(48, 13);
             this.Player2Label.TabIndex = 1;
@@ -73,7 +73,7 @@
             // Name2
             // 
             this.Name2.AutoSize = true;
-            this.Name2.Location = new System.Drawing.Point(275, 9);
+            this.Name2.Location = new System.Drawing.Point(255, 9);
             this.Name2.Name = "Name2";
             this.Name2.Size = new System.Drawing.Size(41, 13);
             this.Name2.TabIndex = 3;
@@ -91,7 +91,7 @@
             // Player2WordsPlayed
             // 
             this.Player2WordsPlayed.AutoSize = true;
-            this.Player2WordsPlayed.Location = new System.Drawing.Point(223, 42);
+            this.Player2WordsPlayed.Location = new System.Drawing.Point(201, 43);
             this.Player2WordsPlayed.Name = "Player2WordsPlayed";
             this.Player2WordsPlayed.Size = new System.Drawing.Size(75, 13);
             this.Player2WordsPlayed.TabIndex = 5;
@@ -102,24 +102,24 @@
             this.richTextBox1.Location = new System.Drawing.Point(15, 59);
             this.richTextBox1.Name = "richTextBox1";
             this.richTextBox1.ReadOnly = true;
-            this.richTextBox1.Size = new System.Drawing.Size(172, 257);
+            this.richTextBox1.Size = new System.Drawing.Size(183, 257);
             this.richTextBox1.TabIndex = 6;
             this.richTextBox1.Text = "";
             // 
             // richTextBox2
             // 
-            this.richTextBox2.Location = new System.Drawing.Point(226, 59);
+            this.richTextBox2.Location = new System.Drawing.Point(204, 59);
             this.richTextBox2.Name = "richTextBox2";
             this.richTextBox2.ReadOnly = true;
-            this.richTextBox2.Size = new System.Drawing.Size(168, 257);
+            this.richTextBox2.Size = new System.Drawing.Size(190, 257);
             this.richTextBox2.TabIndex = 7;
             this.richTextBox2.Text = "";
             // 
             // Done
             // 
-            this.Done.Location = new System.Drawing.Point(167, 322);
+            this.Done.Location = new System.Drawing.Point(12, 364);
             this.Done.Name = "Done";
-            this.Done.Size = new System.Drawing.Size(75, 23);
+            this.Done.Size = new System.Drawing.Size(382, 23);
             this.Done.TabIndex = 8;
             this.Done.Text = "doneButton";
             this.Done.UseVisualStyleBackColor = true;
@@ -128,7 +128,7 @@
             // Score1Label
             // 
             this.Score1Label.AutoSize = true;
-            this.Score1Label.Location = new System.Drawing.Point(12, 332);
+            this.Score1Label.Location = new System.Drawing.Point(13, 327);
             this.Score1Label.Name = "Score1Label";
             this.Score1Label.Size = new System.Drawing.Size(41, 13);
             this.Score1Label.TabIndex = 9;
@@ -137,33 +137,34 @@
             // Score2Label
             // 
             this.Score2Label.AutoSize = true;
-            this.Score2Label.Location = new System.Drawing.Point(278, 330);
+            this.Score2Label.Location = new System.Drawing.Point(227, 325);
             this.Score2Label.Name = "Score2Label";
-            this.Score2Label.Size = new System.Drawing.Size(41, 13);
+            this.Score2Label.Size = new System.Drawing.Size(38, 13);
             this.Score2Label.TabIndex = 10;
-            this.Score2Label.Text = "Score2";
+            this.Score2Label.Text = "Score:";
+            this.Score2Label.Click += new System.EventHandler(this.Score2Label_Click);
             // 
             // textBox1
             // 
             this.textBox1.Location = new System.Drawing.Point(60, 324);
             this.textBox1.Name = "textBox1";
             this.textBox1.ReadOnly = true;
-            this.textBox1.Size = new System.Drawing.Size(100, 20);
+            this.textBox1.Size = new System.Drawing.Size(127, 20);
             this.textBox1.TabIndex = 11;
             // 
             // textBox2
             // 
-            this.textBox2.Location = new System.Drawing.Point(326, 322);
+            this.textBox2.Location = new System.Drawing.Point(271, 324);
             this.textBox2.Name = "textBox2";
             this.textBox2.ReadOnly = true;
-            this.textBox2.Size = new System.Drawing.Size(68, 20);
+            this.textBox2.Size = new System.Drawing.Size(123, 20);
             this.textBox2.TabIndex = 12;
             // 
             // EndForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(406, 356);
+            this.ClientSize = new System.Drawing.Size(406, 399);
             this.Controls.Add(this.textBox2);
             this.Controls.Add(this.textBox1);
             this.Controls.Add(this.Score2Label);

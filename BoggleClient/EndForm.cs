@@ -46,5 +46,10 @@ namespace BoggleClient
         {
             Close();
         }
+
+        private void Score2Label_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }
