@@ -34,6 +34,8 @@ namespace BoggleClient
             {
                 player1ScoreLabel.Text = value.ToString();
             }
+            
+           
         }
 
         public int Player2Score
@@ -168,6 +170,8 @@ namespace BoggleClient
             using (EndForm endForm = new EndForm())
             {
                 endForm.receiveText(_list1, _list2);
+                endForm.receiveScores(player1ScoreLabel.Text, player2ScoreLabel.Text);
+                endForm.receiveNames(player1NameLabel.Text, player2NameLabel.Text);
                 endForm.ShowDialog();
 
             }

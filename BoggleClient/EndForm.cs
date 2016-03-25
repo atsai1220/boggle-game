@@ -29,5 +29,22 @@ namespace BoggleClient
                 richTextBox2.Text += item + "\n";
             }
         }
+
+        public void receiveNames(string name1, string name2)
+        {
+           this.Name1.Text = name1;
+           this.Name2.Text = name2;
+        }
+
+        public void receiveScores(string _score1, string _score2)
+        {
+            this.textBox1.Text = _score1;
+            this.textBox2.Text = _score2;
+        }
+
+        private void Done_Click(object sender, EventArgs e)
+        {
+            Close();
+        }
     }
 }
