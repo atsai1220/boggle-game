@@ -173,6 +173,17 @@ namespace BoggleClient
             }
         }
 
+        public void endGameWindow(List<string> _list1, List<string> _list2)
+        {
+            // update word list
+            using (EndForm endForm = new EndForm())
+            {
+                endForm.ShowDialog();
+                endForm.receiveText(_list1, _list2);
+            }
+        }
+        
+
         private void joinNewGameToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (joinGameEvent != null)
