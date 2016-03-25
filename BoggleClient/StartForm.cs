@@ -10,6 +10,7 @@ using System.Windows.Forms;
 
 namespace BoggleClient
 {
+
     public partial class StartForm : Form
     {
         public StartForm()

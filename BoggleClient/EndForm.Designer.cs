@@ -142,7 +142,6 @@
             this.Score2Label.Size = new System.Drawing.Size(38, 13);
             this.Score2Label.TabIndex = 10;
             this.Score2Label.Text = "Score:";
-            this.Score2Label.Click += new System.EventHandler(this.Score2Label_Click);
             // 
             // textBox1
             // 
