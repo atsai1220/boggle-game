@@ -153,8 +153,9 @@ namespace BoggleClient
             // update word list
             using (EndForm endForm = new EndForm())
             {
-                endForm.ShowDialog();
                 endForm.receiveText(_list1, _list2);
+                endForm.ShowDialog();
+                
             }
         }
 
