@@ -84,6 +84,10 @@ namespace Boggle
                 BoggleBoard board = new BoggleBoard();
                 long startTime = DateTime.UtcNow.Ticks;
                 boggleState.StartGame(boggleState.LastGameId.ToString(), body.UserToken, body.TimeLimit, startTime, board.ToString());
+                // Player 2 score reset
+                boggleState.SetScore(boggleState.LastGameId.ToString(), body.UserToken, 0);
+                // Player 1 score reset 
+                boggleState.SetScore(boggleState.LastGameId.ToString(), player1Id, 0);
                 int oldGameId = boggleState.LastGameId;
                 boggleState.LastGameId++;
                 SetStatus(Created);
@@ -113,6 +117,7 @@ namespace Boggle
         public string PlayWord(PlayWordBody body, string gameId)
         {
             BoggleState _boggleState = BoggleState.getBoggleState();
+            int tmp;
 
             // if Word is null or empty when trimmed
             if (body.Word == null || body.Word.Trim().Equals(""))
@@ -126,25 +131,37 @@ namespace Boggle
                 SetStatus(Forbidden);
                 return null;
             }
-            // if gameId is missing or invalid
+            // if gameId is missing
             else if (gameId == null)
             {
                 SetStatus(Forbidden);
                 return null;
             }
-            int tmp;
-            else if (int.TryParse(gameId, out tmp))
+            // If gameId is invalid
+            else if (int.TryParse(gameId, out tmp) || tmp >= _boggleState.LastGameId)
             {
-                if (tmp >= _boggleState.LastGameId)
-                {
-                    SetStatus(Forbidden);
-                    return null;
-                }
+               SetStatus(Forbidden);
+               return null;
             }
             // If game state isi anything other than "active" -> 409 (Conflict)
-            else if 
+            else if (!GameStatus(gameId, false).GameState.Equals("Active"))
             {
+                SetStatus(Conflict);
+                return null;
+            }
+            // Record trimmed Word by UserToken
+            else
+            {
+                WordPair pair = GetScore(body, gameId);
+                // Add to word record
+                _boggleState.AddWord(gameId, body.UserToken, pair.Word, pair.Score);
+                // Update player total score
+                int currentScore = _boggleState.GetScore(gameId, body.UserToken);
+                currentScore += pair.Score;
+                _boggleState.SetScore(gameId, body.UserToken, currentScore);
 
+                SetStatus(OK);
+                return pair.Score.ToString();
             }
         }
 
@@ -180,6 +197,55 @@ namespace Boggle
             {
                 return GameState.Completed;
             }
+        }
+
+        private WordPair GetScore(PlayWordBody body, string gameId)
+        {
+            BoggleState _boggleState = BoggleState.getBoggleState();
+            BoggleBoard board = new BoggleBoard(_boggleState.GetBoard(gameId));
+            Predicate<WordPair> repeatFinder = (WordPair p) => { return p.Word == body.Word.Trim(); };
+
+            List<WordPair> pairs = _boggleState.GetWords(gameId, body.UserToken);
+            WordPair pair = new WordPair();
+            pair.Word = body.Word.Trim();
+            int wordLength = body.Word.Length;
+
+            // Determine word score first!
+            // Determine if word is legal or not
+            if (board.CanBeFormed(pair.Word))
+            {
+                if (wordLength < 3 || !pairs.Exists(repeatFinder))
+                {
+                    pair.Score = 0;
+                }
+                else if (wordLength == 3 || wordLength == 4)
+                {
+                    pair.Score = 1;
+                }
+                else if (wordLength == 5)
+                {
+                    pair.Score = 2;
+                }
+                else if (wordLength == 6)
+                {
+                    pair.Score = 3;
+                }
+                else if (wordLength == 7)
+                {
+                    pair.Score = 5;
+                }
+                else if (wordLength > 7)
+                {
+                    pair.Score = 11;
+                }
+            }
+            // Not legal
+            else
+            {
+                pair.Score = -1;
+            }
+
+            return pair;
         }
     }
 }
