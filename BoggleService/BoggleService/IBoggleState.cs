@@ -8,7 +8,7 @@ namespace Boggle
 {
     interface IBoggleState
     {
-
+        
         void CreateUser(string nickname, string userToken);
 
         /// <summary>
