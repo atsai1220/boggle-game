@@ -117,6 +117,7 @@ namespace Boggle
         public string PlayWord(PlayWordBody body, string gameId)
         {
             BoggleState _boggleState = BoggleState.getBoggleState();
+            
             int tmp;
 
             // if Word is null or empty when trimmed
@@ -144,7 +145,8 @@ namespace Boggle
                return null;
             }
             // If game state isi anything other than "active" -> 409 (Conflict)
-            else if (!GameStatus(gameId, false).GameState.Equals("Active"))
+            // TODO does this work? (GameState.Active)
+            else if (!getGameState(gameId).Equals(GameState.Active))
             {
                 SetStatus(Conflict);
                 return null;
