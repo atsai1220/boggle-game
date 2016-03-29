@@ -199,8 +199,26 @@ namespace Boggle
         {
             lock (sync)
             {
-                player1Id = games[gameId].player1UserToken;
-                player2Id = games[gameId].player2UserToken;
+                int tmp;
+                int.TryParse(gameId, out tmp);
+                if (tmp == 1)
+                {
+                    player1Id = "";
+                    player2Id = "";
+                    return;
+                }
+                else if (games.ContainsKey(gameId))
+                {
+                    player1Id = games[gameId].player1UserToken;
+                    player2Id = games[gameId].player2UserToken;
+                    return;
+                }
+                else
+                {
+                    player1Id = "";
+                    player2Id = "";
+                    return;
+                }
             }
         }
 

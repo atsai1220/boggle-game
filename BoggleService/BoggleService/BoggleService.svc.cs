@@ -45,7 +45,7 @@ namespace Boggle
                 string userToken = Guid.NewGuid().ToString();
 
                 BoggleState.getBoggleState().CreateUser(body.Nickname.Trim(), userToken);
-
+                SetStatus(Created);
                 return userToken;
             }
         }
@@ -69,8 +69,9 @@ namespace Boggle
             }
             
             // LastGameId always contain a pending game
-            boggleState.GetPlayers(boggleState.LastGameId.ToString(), out player1Id, out player2Id);   
-                     
+            boggleState.GetPlayers(boggleState.LastGameId.ToString(), out player1Id, out player2Id);
+            
+                
             // If UserToken is already a player in the pending game
             if (body.UserToken.Equals(player1Id))
             {
