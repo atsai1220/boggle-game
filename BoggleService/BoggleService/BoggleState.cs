@@ -43,11 +43,11 @@ namespace Boggle
 
             public string player1UserToken;
             public int player1Score;
-            public List<string> player1Words;
+            public List<WordPair> player1Words;
 
             public string player2UserToken;
             public int player2Score;
-            public List<string> player2Words;
+            public List<WordPair> player2Words;
         }
 
         /// <summary>
@@ -89,22 +89,25 @@ namespace Boggle
             BoggleGame game;
             if (games.TryGetValue(gameId, out game))
             {
+                WordPair pair = new WordPair();
+                pair.Word = word;
+                pair.Score = score;
                 // If Player 1 token
                 if (userToken.Equals(game.player1UserToken))
                 {
-                    game.player1Words.Add(word);
+                    game.player1Words.Add(pair);
                 }
                 // If Player 2 token
                 else if (userToken.Equals(game.player2UserToken))
                 {
-                    game.player2Words.Add(word);
+                    game.player2Words.Add(pair);
                 }
                 else
                 {
                     throw new ArgumentException();
                 }
 
-                SetScore(gameId, userToken, score);
+                
             }
             else
             {
@@ -222,7 +225,7 @@ namespace Boggle
         /// <param name="gameId">Id of game</param>
         /// <param name="userToken">Token of player</param>
         /// <returns></returns>
-        public List<string> GetWords(string gameId, string userToken)
+        public List<WordPair> GetWords(string gameId, string userToken)
         {
             // Check if game exists
             if (games.ContainsKey(gameId))

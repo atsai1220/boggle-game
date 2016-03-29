@@ -42,7 +42,7 @@ namespace Boggle
     }
 
     [DataContract]
-    public class WordPair
+    public struct WordPair
     {
         [DataMember]
         public string Word { get; set; }

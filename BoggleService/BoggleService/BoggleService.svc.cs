@@ -104,9 +104,48 @@ namespace Boggle
             throw new NotImplementedException();
         }
 
-        public int PlayWord(PlayWordBody body, string gameId)
+        /// <summary>
+        /// Plays a word
+        /// </summary>
+        /// <param name="body"></param>
+        /// <param name="gameId"></param>
+        /// <returns></returns>
+        public string PlayWord(PlayWordBody body, string gameId)
         {
-            throw new NotImplementedException();
+            BoggleState _boggleState = BoggleState.getBoggleState();
+
+            // if Word is null or empty when trimmed
+            if (body.Word == null || body.Word.Trim().Equals(""))
+            {
+                SetStatus(Forbidden);
+                return null;
+            }
+            // if  UserToken is null or empty
+            else if (body.UserToken == null || body.UserToken.Trim().Equals(""))
+            {
+                SetStatus(Forbidden);
+                return null;
+            }
+            // if gameId is missing or invalid
+            else if (gameId == null)
+            {
+                SetStatus(Forbidden);
+                return null;
+            }
+            int tmp;
+            else if (int.TryParse(gameId, out tmp))
+            {
+                if (tmp >= _boggleState.LastGameId)
+                {
+                    SetStatus(Forbidden);
+                    return null;
+                }
+            }
+            // If game state isi anything other than "active" -> 409 (Conflict)
+            else if 
+            {
+
+            }
         }
 
         public BoggleGameContract GameStatus(string gameId, bool brief)
@@ -141,11 +180,6 @@ namespace Boggle
             {
                 return GameState.Completed;
             }
-        }
-
-        private string CreateGameId()
-        {
-
         }
     }
 }
