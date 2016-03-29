@@ -43,6 +43,7 @@ namespace Boggle
         /// <returns></returns>
         string GetBoard(string gameId);
 
+
         /// <summary>
         /// If game is pending player2Id is an empty string.
         /// </summary>
@@ -51,5 +52,9 @@ namespace Boggle
         /// <param name="player2Id"></param>
         void GetPlayers(string gameId, out string player1Id, out string player2Id);
 
+
+
+        // Queries
+        int LastGameId { get; set; }
     }
 }

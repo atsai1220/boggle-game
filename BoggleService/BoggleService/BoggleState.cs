@@ -23,7 +23,6 @@ namespace Boggle
             {
                 boggleState = new BoggleState();
             }
-
             return boggleState;
         }
 
@@ -31,6 +30,8 @@ namespace Boggle
         private Dictionary<string, string> players;
         // gameId -> BoggleGame
         private Dictionary<string, BoggleGame> games;
+        
+        public int LastGameId { get; set; }
         
 
         private class BoggleGame
@@ -56,6 +57,8 @@ namespace Boggle
         {
             players = new Dictionary<string, string>();
             games = new Dictionary<string, BoggleGame>();
+
+            LastGameId = 1;
         }
 
         /// <summary>
@@ -297,5 +300,6 @@ namespace Boggle
                 throw new ArgumentException();
             }
         }
+
     }
 }

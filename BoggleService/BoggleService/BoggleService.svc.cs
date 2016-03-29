@@ -35,11 +35,11 @@ namespace Boggle
         public string CreateUser(CreateUserBody body)
         {
             // TODO Consider putting an upperbound on nickname length.
-            if(body.Nickname == null || body.Nickname.Trim().Length == 0)
+            if (body.Nickname == null || body.Nickname.Trim().Length == 0)
             {
                 SetStatus(Forbidden);
                 return null;
-        }
+            }
             else
             {
                 string userToken = Guid.NewGuid().ToString();
@@ -52,6 +52,9 @@ namespace Boggle
 
         public string JoinGame(JoinGameBody body)
         {
+            string player1Id;
+            string player2Id;
+            int gameId;
             BoggleState boggleState = BoggleState.getBoggleState();
             // If UserToken is invalid, TimeLimit < 5, or TimeLimit > 120, responds with status 403 (Forbidden).
             if (body.TimeLimit < 5 || body.TimeLimit > 120)
@@ -59,21 +62,23 @@ namespace Boggle
                 SetStatus(Forbidden);
                 return null;
             }
-            // If there is a pending game
-            else if (boggleState.GetGameState() == "PENDING")
+            
+            // LastGameId always contain a pending game
+            gameId = boggleState.LastGameId;
+            boggleState.GetPlayers(gameId.ToString(), out player1Id, out player2Id);   
+                     
+            // If UserToken is already a player in the pending game
+            if (body.UserToken.Equals)
             {
-                // If UserToken is already a player in the pending game
-                if (boggleState)
-                {
-                    SetStatus(Conflict);
-                    return null;
-                }
-                // if there is already one player in the pending game
-                else
-                {
-                    boggleState.AddGame()
-                }
+                SetStatus(Conflict);
+                return null;
             }
+            // if there is already one player in the pending game
+            else
+            {
+                boggleState.AddGame()
+                }
+            
             // If there is already one player in the pending game
             else if ()
 
@@ -102,7 +107,7 @@ namespace Boggle
             string player2Id;
             boggleState.GetPlayers(gameId, out player1Id, out player2Id);
 
-            if(player2Id == "")
+            if (player2Id == "")
             {
                 return GameState.Pending;
             }
@@ -110,10 +115,10 @@ namespace Boggle
             int timeLimit;
             long startTime;
             boggleState.GetTime(gameId, out timeLimit, out startTime);
-            
-            long endTime = startTime + timeLimit * (long) 1e7;
 
-            if(DateTime.UtcNow.Ticks < endTime)
+            long endTime = startTime + timeLimit * (long)1e7;
+
+            if (DateTime.UtcNow.Ticks < endTime)
             {
                 return GameState.Active;
             }
