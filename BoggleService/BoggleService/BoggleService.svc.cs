@@ -50,11 +50,16 @@ namespace Boggle
             }
         }
 
+        /// <summary>
+        /// Joins a game
+        /// </summary>
+        /// <param name="body">Contains UserToken and TimeLimit</param>
+        /// <returns></returns>
         public string JoinGame(JoinGameBody body)
         {
             string player1Id;
             string player2Id;
-            int gameId;
+
             BoggleState boggleState = BoggleState.getBoggleState();
             // If UserToken is invalid, TimeLimit < 5, or TimeLimit > 120, responds with status 403 (Forbidden).
             if (body.TimeLimit < 5 || body.TimeLimit > 120)
@@ -64,24 +69,34 @@ namespace Boggle
             }
             
             // LastGameId always contain a pending game
-            gameId = boggleState.LastGameId;
-            boggleState.GetPlayers(gameId.ToString(), out player1Id, out player2Id);   
+            boggleState.GetPlayers(boggleState.LastGameId.ToString(), out player1Id, out player2Id);   
                      
             // If UserToken is already a player in the pending game
-            if (body.UserToken.Equals)
+            if (body.UserToken.Equals(player1Id))
             {
                 SetStatus(Conflict);
                 return null;
             }
+
             // if there is already one player in the pending game
+            else if (player1Id.Length > 0)
+            {
+                BoggleBoard board = new BoggleBoard();
+                long startTime = DateTime.UtcNow.Ticks;
+                boggleState.StartGame(boggleState.LastGameId.ToString(), body.UserToken, body.TimeLimit, startTime, board.ToString());
+                int oldGameId = boggleState.LastGameId;
+                boggleState.LastGameId++;
+                SetStatus(Created);
+                return oldGameId.ToString();
+            }
+
+            // UserToken is the first player of a new game
             else
             {
-                boggleState.AddGame()
-                }
-            
-            // If there is already one player in the pending game
-            else if ()
-
+                boggleState.AddGame(boggleState.LastGameId.ToString(), body.UserToken, body.TimeLimit);
+                SetStatus(Accepted);
+                return boggleState.LastGameId.ToString();
+            }
         }
 
         public void CancelJoinRequest(CancelJoinRequestBody body)

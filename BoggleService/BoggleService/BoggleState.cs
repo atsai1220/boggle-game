@@ -290,7 +290,6 @@ namespace Boggle
             if (games.TryGetValue(gameId, out game))
             {
                 game.player2UserToken = player2Token;
-                // TODO is this correct? (Game time limit)
                 game.timeLimit = (game.timeLimit + player2TimeLimit) / 2;
                 game.startTime = startTime;
                 game.board = board;
