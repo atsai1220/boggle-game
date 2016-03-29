@@ -30,37 +30,29 @@ namespace Boggle
             return File.OpenRead(AppDomain.CurrentDomain.BaseDirectory + "index.html");
         }
 
-        /// <summary>
-        /// Demo.  You can delete this.
-        /// </summary>
-        public int GetFirst(IList<int> list)
+        public string CreateUser(CreateUserBody body)
         {
-            SetStatus(OK);
-            return list[0];
+            throw new NotImplementedException();
         }
 
-        /// <summary>
-        /// Demo.  You can delete this.
-        /// </summary>
-        /// <returns></returns>
-        public IList<int> Numbers(string n)
+        public string JoinGame(JoinGameBody body)
         {
-            int index;
-            if (!Int32.TryParse(n, out index) || index < 0)
-            {
-                SetStatus(Forbidden);
-                return null;
-            }
-            else
-            {
-                List<int> list = new List<int>();
-                for (int i = 0; i < index; i++)
-                {
-                    list.Add(i);
-                }
-                SetStatus(OK);
-                return list;
-            }
+            throw new NotImplementedException();
+        }
+
+        public void CancelJoinRequest(CancelJoinRequestBody body)
+        {
+            throw new NotImplementedException();
+        }
+
+        public int PlayWord(PlayWordBody body, string gameId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public BoggleGameContract GameStatus(string gameId, bool brief)
+        {
+            throw new NotImplementedException();
         }
     }
 }

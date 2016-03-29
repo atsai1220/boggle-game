@@ -20,23 +20,13 @@ namespace Boggle
         [WebInvoke(Method ="POST", UriTemplate = "/games")]
         string JoinGame(JoinGameBody body);
 
+        [WebInvoke(Method = "PUT", UriTemplate = "/games")]
+        void CancelJoinRequest(CancelJoinRequestBody body);
+
         [WebInvoke(Method = "PUT", UriTemplate = "/games/{gameId}")]
         int PlayWord(PlayWordBody body, string gameId);
 
-
-
-        /// <summary>
-        /// Demo.  You can delete this.
-        /// </summary>
-        /// <param name="n"></param>
-        /// <returns></returns>
-        [WebGet(UriTemplate = "/numbers?length={n}")]
-        IList<int> Numbers(string n);
-
-        /// <summary>
-        /// Demo.  You can delete this.
-        /// </summary>
-        [WebInvoke(Method = "POST", UriTemplate = "/first")]
-        int GetFirst(IList<int> list);
+        [WebInvoke(Method = "GET", UriTemplate = "/games/{gameId}?Brief={brief}")]
+        BoggleGameContract GameStatus(string gameId, bool brief);
     }
 }

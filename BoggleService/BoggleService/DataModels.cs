@@ -10,10 +10,14 @@ namespace Boggle
         public string Nickname { get; set; }
     }
 
-    public class JoinGameBody 
+    public class JoinGameBody
     {
         public string UserToken { get; set; }
         public string TimeLimit { get; set; }
+    }
+    public class CancelJoinRequestBody
+    {
+        public string UserToken { get; set; }
     }
 
     public class PlayWordBody
@@ -21,6 +25,4 @@ namespace Boggle
         public string UserToken { get; set; }
         public string Word { get; set; }
     }
-
-
 }
