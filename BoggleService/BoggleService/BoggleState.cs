@@ -8,11 +8,30 @@ namespace Boggle
 {
     class BoggleState : IBoggleState
     {
-        // userToken -> nickName
-        Dictionary<string, string> players;
-        Dictionary<string, BoggleGame> games;
+        /// <summary>
+        /// Instance of bogglestate
+        /// </summary>
+        private static BoggleState boggleState;
 
-        struct BoggleGame
+        /// <summary>
+        /// Singleton pattern for bogglestate
+        /// </summary>
+        /// <returns></returns>
+        public static BoggleState getBoggleState()
+        {
+            if(boggleState == null)
+            {
+                boggleState = new BoggleState();
+            }
+
+            return boggleState;
+        }
+
+        // userToken -> nickName
+        private Dictionary<string, string> players;
+        private Dictionary<string, BoggleGame> games;
+
+        private class BoggleGame
         {
             public string gameId;
             public string board;
@@ -26,6 +45,15 @@ namespace Boggle
             public string player2UserToken;
             public int player2Score;
             public List<string> player2Words;
+        }
+
+        /// <summary>
+        /// Private constructor for boggleState.
+        /// </summary>
+        private BoggleState()
+        {
+            players = new Dictionary<string, string>();
+            games = new Dictionary<string, BoggleGame>();
         }
 
         /// <summary>
