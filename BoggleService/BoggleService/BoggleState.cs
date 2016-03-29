@@ -10,28 +10,37 @@ namespace Boggle
     {
         // userToken -> nickName
         Dictionary<string, string> players;
-        Dictionary<string, BoggleGame> gameId;
+        Dictionary<string, BoggleGame> games;
 
         struct BoggleGame
         {
-            string gameId;
-            string board;
-            int timeLimit;
-            long startTime;
+            public string gameId;
+            public string board;
+            public int timeLimit;
+            public long startTime;
 
-            string player1UserToken;
-            int player1Score;
-            List<string> player1Words;
+            public string player1UserToken;
+            public int player1Score;
+            public List<string> player1Words;
 
-            string player2UserToken;
-            int player2Score;
-            List<string> player2Words;
+            public string player2UserToken;
+            public int player2Score;
+            public List<string> player2Words;
         }
 
-        //s
+        /// <summary>
+        /// Creates a new game
+        /// </summary>
+        /// <param name="gameId">Id of game</param>
+        /// <param name="player1Token">User token of player 1</param>
+        /// <param name="player1TimeLimit">Time limit requested by player 1</param>
         public void AddGame(string gameId, string player1Token, int player1TimeLimit)
         {
-            throw new NotImplementedException();
+            BoggleGame game = new BoggleGame();
+
+            game.gameId = gameId;
+            game.player1UserToken = player1Token;
+            game.timeLimit = player1TimeLimit;
         }
 
         //a
@@ -40,10 +49,13 @@ namespace Boggle
             throw new NotImplementedException();
         }
 
-        //s
+        /// <summary>
+        /// Removes a game from the list.
+        /// </summary>
+        /// <param name="gameId">The game to remove</param>
         public void CancelGame(string gameId)
         {
-            throw new NotImplementedException();
+            games.Remove(gameId);
         }
 
         //a
@@ -52,10 +64,14 @@ namespace Boggle
             throw new NotImplementedException();
         }
 
-        //s
+        /// <summary>
+        /// Returns the board for the game.
+        /// </summary>
+        /// <param name="gameId">The gameId</param>
+        /// <returns></returns>
         public string GetBoard(string gameId)
         {
-            throw new NotImplementedException();
+            return games[gameId].board;
         }
 
         //a
@@ -64,10 +80,16 @@ namespace Boggle
             throw new NotImplementedException();
         }
 
-        //s
+        /// <summary>
+        /// Get the user tokens of both players
+        /// </summary>
+        /// <param name="gameId">The game id</param>
+        /// <param name="player1Id">The user token of player 1</param>
+        /// <param name="player2Id">The user token of player 2</param>
         public void GetPlayers(string gameId, out string player1Id, out string player2Id)
         {
-            throw new NotImplementedException();
+            player1Id = games[gameId].player1UserToken;
+            player2Id = games[gameId].player2UserToken;
         }
 
         //a
@@ -76,10 +98,16 @@ namespace Boggle
             throw new NotImplementedException();
         }
 
-        //s
+        /// <summary>
+        /// Returns time information from the game.
+        /// </summary>
+        /// <param name="gameId">The id of the game queried</param>
+        /// <param name="timeLimit">The time limit of the game</param>
+        /// <param name="startTime">The time that the game started</param>
         public void GetTime(string gameId, out int timeLimit, out long startTime)
         {
-            throw new NotImplementedException();
+            timeLimit = games[gameId].timeLimit;
+            startTime = games[gameId].startTime;
         }
 
         //a
@@ -88,10 +116,30 @@ namespace Boggle
             throw new NotImplementedException();
         }
 
-        //s
+        /// <summary>
+        /// Set the score of the player refered to by usertoken.
+        /// 
+        /// User token should refer to a user in the game.
+        /// </summary>
+        /// <param name="gameId">The id of the game queried</param>
+        /// <param name="userToken">The user token of the user getting their score changed</param>
+        /// <param name="score">The score</param>
         public void SetScore(string gameId, string userToken, int score)
         {
-            throw new NotImplementedException();
+            var game = games[gameId];
+
+            if(userToken == game.player1UserToken)
+            {
+                game.player1Score = score;
+            }
+            else if(userToken == game.player2UserToken)
+            {
+                game.player2Score = score;
+            }
+            else
+            {
+                //This shouldn't happen.
+            }
         }
 
         //a
