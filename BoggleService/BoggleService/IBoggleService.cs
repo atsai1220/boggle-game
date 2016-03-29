@@ -14,6 +14,17 @@ namespace Boggle
         [WebGet(UriTemplate = "/api")]
         Stream API();
 
+        [WebInvoke(Method = "POST", UriTemplate = "/users")]
+        string CreateUser(CreateUserBody body);
+
+        [WebInvoke(Method ="POST", UriTemplate = "/games")]
+        string JoinGame(JoinGameBody body);
+
+        [WebInvoke(Method = "PUT", UriTemplate = "/games/{gameId}")]
+        int PlayWord(PlayWordBody body, string gameId);
+
+
+
         /// <summary>
         /// Demo.  You can delete this.
         /// </summary>
