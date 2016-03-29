@@ -29,7 +29,9 @@ namespace Boggle
 
         // userToken -> nickName
         private Dictionary<string, string> players;
+        // gameId -> BoggleGame
         private Dictionary<string, BoggleGame> games;
+        
 
         private class BoggleGame
         {
@@ -71,10 +73,40 @@ namespace Boggle
             game.timeLimit = player1TimeLimit;
         }
 
-        //a
+        /// <summary>
+        /// Adds a word to a specific game for a specific player
+        /// then sets the score.
+        /// </summary>
+        /// <param name="gameId">Id of game</param>
+        /// <param name="userToken">User token of player in action</param>
+        /// <param name="word">Word being played</param>
+        /// <param name="score">Score acquired</param>
         public void AddWord(string gameId, string userToken, string word, int score)
         {
-            throw new NotImplementedException();
+            BoggleGame game;
+            if (games.TryGetValue(gameId, out game))
+            {
+                // If Player 1 token
+                if (userToken.Equals(game.player1UserToken))
+                {
+                    game.player1Words.Add(word);
+                }
+                // If Player 2 token
+                else if (userToken.Equals(game.player2UserToken))
+                {
+                    game.player2Words.Add(word);
+                }
+                else
+                {
+                    throw new ArgumentException();
+                }
+
+                SetScore(gameId, userToken, score);
+            }
+            else
+            {
+                throw new ArgumentException();
+            }
         }
 
         /// <summary>
@@ -86,10 +118,15 @@ namespace Boggle
             games.Remove(gameId);
         }
 
-        //a
+        /// <summary>
+        /// Creates a user
+        /// </summary>
+        /// <param name="nickname">Nickname of player</param>
+        /// <param name="userToken">User token of player</param>
         public void CreateUser(string nickname, string userToken)
         {
-            throw new NotImplementedException();
+            // userToken -> nickname
+            players.Add(userToken, nickname);
         }
 
         /// <summary>
@@ -102,10 +139,22 @@ namespace Boggle
             return games[gameId].board;
         }
 
-        //a
+        /// <summary>
+        /// Returns the nickname given the userToken
+        /// </summary>
+        /// <param name="userToken">User token of player</param>
+        /// <returns></returns>
         public string GetNickname(string userToken)
         {
-            throw new NotImplementedException();
+            string nickname;
+            if (players.TryGetValue(userToken, out nickname))
+            {
+                return nickname;
+            }
+            else
+            {
+                throw new ArgumentException();
+            }
         }
 
         /// <summary>
@@ -120,10 +169,36 @@ namespace Boggle
             player2Id = games[gameId].player2UserToken;
         }
 
-        //a
+        /// <summary>
+        /// Returns the score of a player
+        /// </summary>
+        /// <param name="gameId">Id of game</param>
+        /// <param name="userToken">User token of player</param>
+        /// <returns></returns>
         public int GetScore(string gameId, string userToken)
         {
-            throw new NotImplementedException();
+            BoggleGame game;
+            if (games.TryGetValue(gameId, out game))
+            {
+                // Player 1
+                if (game.player1UserToken == userToken)
+                {
+                    return game.player1Score;
+                }
+                // Player 2
+                else if (game.player2UserToken == userToken)
+                {
+                    return game.player2Score;
+                }
+                else
+                {
+                    throw new ArgumentException();
+                }
+            }
+            else
+            {
+                throw new ArgumentException();
+            }
         }
 
         /// <summary>
@@ -138,10 +213,38 @@ namespace Boggle
             startTime = games[gameId].startTime;
         }
 
-        //a
+        /// <summary>
+        /// Returns a List of strings that contains the played words of a player
+        /// </summary>
+        /// <param name="gameId">Id of game</param>
+        /// <param name="userToken">Token of player</param>
+        /// <returns></returns>
         public List<string> GetWords(string gameId, string userToken)
         {
-            throw new NotImplementedException();
+            // Check if game exists
+            if (games.ContainsKey(gameId))
+            {
+                var game = games[gameId];
+                // Player 1
+                if (game.player1UserToken.Equals(userToken))
+                {
+                    return game.player1Words;
+                }
+                // Player 2
+                else if (game.player2UserToken.Equals(userToken))
+                {
+                    return game.player2Words;
+                }
+                else
+                {
+                    throw new ArgumentException();
+                }
+            }
+            else
+            {
+                throw new ArgumentException();
+            }
+
         }
 
         /// <summary>
@@ -170,10 +273,29 @@ namespace Boggle
             }
         }
 
-        //a
+        /// <summary>
+        /// Starts a specific game
+        /// </summary>
+        /// <param name="gameId">Id of game</param>
+        /// <param name="player2Token">Player 2 user token</param>
+        /// <param name="player2TimeLimit">Player 2's specified time limit</param>
+        /// <param name="startTime">System start time of game</param>
+        /// <param name="board">String that rep the board</param>
         public void StartGame(string gameId, string player2Token, int player2TimeLimit, long startTime, string board)
         {
-            throw new NotImplementedException();
+            BoggleGame game;
+            if (games.TryGetValue(gameId, out game))
+            {
+                game.player2UserToken = player2Token;
+                // TODO is this correct? (Game time limit)
+                game.timeLimit = (game.timeLimit + player2TimeLimit) / 2;
+                game.startTime = startTime;
+                game.board = board;
+            }
+            else
+            {
+                throw new ArgumentException();
+            }
         }
     }
 }
