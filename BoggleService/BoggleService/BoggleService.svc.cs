@@ -9,6 +9,8 @@ namespace Boggle
 {
     public class BoggleService : IBoggleService
     {
+        private enum GameState { Pending, Active, Completed }
+
         /// <summary>
         /// The most recent call to SetStatus determines the response code used when
         /// an http response is sent.
@@ -32,18 +34,22 @@ namespace Boggle
 
         public string CreateUser(CreateUserBody body)
         {
-            throw new NotImplementedException();
+            // TODO Consider putting an upperbound on nickname length.
+            if(body.Nickname == null || body.Nickname.Trim().Length == 0)
+            {
+                SetStatus(Forbidden);
+                return null;
+        }
+            else
+            {
+                string userToken = Guid.NewGuid().ToString();
+
+                BoggleState.getBoggleState().CreateUser(body.Nickname.Trim(), userToken);
+
+                return userToken;
+            }
         }
 
-        /// <summary>
-        /// Joins a game given UserToken and TimeLimit
-        /// 
-        /// 
-        /// 
-        /// 
-        /// </summary>
-        /// <param name="body"></param>
-        /// <returns></returns>
         public string JoinGame(JoinGameBody body)
         {
             BoggleState boggleState = BoggleState.getBoggleState();
@@ -86,6 +92,35 @@ namespace Boggle
         public BoggleGameContract GameStatus(string gameId, bool brief)
         {
             throw new NotImplementedException();
+        }
+
+        private GameState getGameState(string gameId)
+        {
+            BoggleState boggleState = BoggleState.getBoggleState();
+
+            string player1Id;
+            string player2Id;
+            boggleState.GetPlayers(gameId, out player1Id, out player2Id);
+
+            if(player2Id == "")
+            {
+                return GameState.Pending;
+            }
+
+            int timeLimit;
+            long startTime;
+            boggleState.GetTime(gameId, out timeLimit, out startTime);
+            
+            long endTime = startTime + timeLimit * (long) 1e7;
+
+            if(DateTime.UtcNow.Ticks < endTime)
+            {
+                return GameState.Active;
+            }
+            else
+            {
+                return GameState.Completed;
+            }
         }
 
         private string CreateGameId()
