@@ -13,7 +13,7 @@ namespace Boggle
     public class JoinGameBody
     {
         public string UserToken { get; set; }
-        public string TimeLimit { get; set; }
+        public int TimeLimit { get; set; }
     }
     public class CancelJoinRequestBody
     {

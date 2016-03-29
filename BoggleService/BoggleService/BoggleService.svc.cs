@@ -35,9 +35,42 @@ namespace Boggle
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// Joins a game given UserToken and TimeLimit
+        /// 
+        /// 
+        /// 
+        /// 
+        /// </summary>
+        /// <param name="body"></param>
+        /// <returns></returns>
         public string JoinGame(JoinGameBody body)
         {
-            throw new NotImplementedException();
+            BoggleState boggleState = BoggleState.getBoggleState();
+            // If UserToken is invalid, TimeLimit < 5, or TimeLimit > 120, responds with status 403 (Forbidden).
+            if (body.TimeLimit < 5 || body.TimeLimit > 120)
+            {
+                SetStatus(Forbidden);
+                return null;
+            }
+            // If there is a pending game
+            else if (boggleState.GetGameState() == "PENDING")
+            {
+                // If UserToken is already a player in the pending game
+                if (boggleState)
+                {
+                    SetStatus(Conflict);
+                    return null;
+                }
+                // if there is already one player in the pending game
+                else
+                {
+                    boggleState.AddGame()
+                }
+            }
+            // If there is already one player in the pending game
+            else if ()
+
         }
 
         public void CancelJoinRequest(CancelJoinRequestBody body)
@@ -53,6 +86,11 @@ namespace Boggle
         public BoggleGameContract GameStatus(string gameId, bool brief)
         {
             throw new NotImplementedException();
+        }
+
+        private string CreateGameId()
+        {
+
         }
     }
 }
