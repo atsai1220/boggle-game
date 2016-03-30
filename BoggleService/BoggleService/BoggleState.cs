@@ -8,10 +8,16 @@ namespace Boggle
 {
     class BoggleState : IBoggleState
     {
+
         /// <summary>
         /// Instance of bogglestate
         /// </summary>
         private static BoggleState boggleState;
+
+        /// <summary>
+        /// Sync object
+        /// </summary>
+        private static readonly object sync = new object();
 
         /// <summary>
         /// Singleton pattern for bogglestate
@@ -32,7 +38,6 @@ namespace Boggle
         private Dictionary<string, BoggleGame> games;
         
         public int LastGameId { get; set; }
-        
 
         private class BoggleGame
         {
@@ -43,11 +48,11 @@ namespace Boggle
 
             public string player1UserToken;
             public int player1Score;
-            public List<string> player1Words;
+            public List<WordPair> player1Words;
 
             public string player2UserToken;
             public int player2Score;
-            public List<string> player2Words;
+            public List<WordPair> player2Words;
         }
 
         /// <summary>
@@ -55,10 +60,13 @@ namespace Boggle
         /// </summary>
         private BoggleState()
         {
-            players = new Dictionary<string, string>();
-            games = new Dictionary<string, BoggleGame>();
+            lock(sync)
+            {
+                players = new Dictionary<string, string>();
+                games = new Dictionary<string, BoggleGame>();
 
-            LastGameId = 1;
+                LastGameId = 1;
+            }
         }
 
         /// <summary>
@@ -69,11 +77,14 @@ namespace Boggle
         /// <param name="player1TimeLimit">Time limit requested by player 1</param>
         public void AddGame(string gameId, string player1Token, int player1TimeLimit)
         {
-            BoggleGame game = new BoggleGame();
+            lock (sync)
+            {
+                BoggleGame game = new BoggleGame();
 
-            game.gameId = gameId;
-            game.player1UserToken = player1Token;
-            game.timeLimit = player1TimeLimit;
+                game.gameId = gameId;
+                game.player1UserToken = player1Token;
+                game.timeLimit = player1TimeLimit;
+            }
         }
 
         /// <summary>
@@ -86,29 +97,35 @@ namespace Boggle
         /// <param name="score">Score acquired</param>
         public void AddWord(string gameId, string userToken, string word, int score)
         {
-            BoggleGame game;
-            if (games.TryGetValue(gameId, out game))
+            lock (sync)
             {
-                // If Player 1 token
-                if (userToken.Equals(game.player1UserToken))
+                BoggleGame game;
+                if (games.TryGetValue(gameId, out game))
                 {
-                    game.player1Words.Add(word);
-                }
-                // If Player 2 token
-                else if (userToken.Equals(game.player2UserToken))
-                {
-                    game.player2Words.Add(word);
+                    WordPair pair = new WordPair();
+                    pair.Word = word;
+                    pair.Score = score;
+                    // If Player 1 token
+                    if (userToken.Equals(game.player1UserToken))
+                    {
+                        game.player1Words.Add(pair);
+                    }
+                    // If Player 2 token
+                    else if (userToken.Equals(game.player2UserToken))
+                    {
+                        game.player2Words.Add(pair);
+                    }
+                    else
+                    {
+                        throw new ArgumentException();
+                    }
+
+
                 }
                 else
                 {
                     throw new ArgumentException();
                 }
-
-                SetScore(gameId, userToken, score);
-            }
-            else
-            {
-                throw new ArgumentException();
             }
         }
 
@@ -118,7 +135,10 @@ namespace Boggle
         /// <param name="gameId">The game to remove</param>
         public void CancelGame(string gameId)
         {
-            games.Remove(gameId);
+            lock (sync)
+            {
+                games.Remove(gameId);
+            }
         }
 
         /// <summary>
@@ -128,8 +148,11 @@ namespace Boggle
         /// <param name="userToken">User token of player</param>
         public void CreateUser(string nickname, string userToken)
         {
-            // userToken -> nickname
-            players.Add(userToken, nickname);
+            lock (sync)
+            {
+                // userToken -> nickname
+                players.Add(userToken, nickname);
+            }
         }
 
         /// <summary>
@@ -139,7 +162,10 @@ namespace Boggle
         /// <returns></returns>
         public string GetBoard(string gameId)
         {
-            return games[gameId].board;
+            lock (sync)
+            {
+                return games[gameId].board;
+            }
         }
 
         /// <summary>
@@ -149,15 +175,18 @@ namespace Boggle
         /// <returns></returns>
         public string GetNickname(string userToken)
         {
-            string nickname;
-            if (players.TryGetValue(userToken, out nickname))
+            lock (sync)
             {
-                return nickname;
-            }
-            else
-            {
-                throw new ArgumentException();
-            }
+                string nickname;
+                if (players.TryGetValue(userToken, out nickname))
+                {
+                    return nickname;
+                }
+                else
+                {
+                    throw new ArgumentException();
+                }
+            }  
         }
 
         /// <summary>
@@ -168,8 +197,29 @@ namespace Boggle
         /// <param name="player2Id">The user token of player 2</param>
         public void GetPlayers(string gameId, out string player1Id, out string player2Id)
         {
-            player1Id = games[gameId].player1UserToken;
-            player2Id = games[gameId].player2UserToken;
+            lock (sync)
+            {
+                int tmp;
+                int.TryParse(gameId, out tmp);
+                if (tmp == 1)
+                {
+                    player1Id = "";
+                    player2Id = "";
+                    return;
+                }
+                else if (games.ContainsKey(gameId))
+                {
+                    player1Id = games[gameId].player1UserToken;
+                    player2Id = games[gameId].player2UserToken;
+                    return;
+                }
+                else
+                {
+                    player1Id = "";
+                    player2Id = "";
+                    return;
+                }
+            }
         }
 
         /// <summary>
@@ -180,27 +230,30 @@ namespace Boggle
         /// <returns></returns>
         public int GetScore(string gameId, string userToken)
         {
-            BoggleGame game;
-            if (games.TryGetValue(gameId, out game))
+            lock (sync)
             {
-                // Player 1
-                if (game.player1UserToken == userToken)
+                BoggleGame game;
+                if (games.TryGetValue(gameId, out game))
                 {
-                    return game.player1Score;
-                }
-                // Player 2
-                else if (game.player2UserToken == userToken)
-                {
-                    return game.player2Score;
+                    // Player 1
+                    if (game.player1UserToken == userToken)
+                    {
+                        return game.player1Score;
+                    }
+                    // Player 2
+                    else if (game.player2UserToken == userToken)
+                    {
+                        return game.player2Score;
+                    }
+                    else
+                    {
+                        throw new ArgumentException();
+                    }
                 }
                 else
                 {
                     throw new ArgumentException();
                 }
-            }
-            else
-            {
-                throw new ArgumentException();
             }
         }
 
@@ -212,8 +265,11 @@ namespace Boggle
         /// <param name="startTime">The time that the game started</param>
         public void GetTime(string gameId, out int timeLimit, out long startTime)
         {
-            timeLimit = games[gameId].timeLimit;
-            startTime = games[gameId].startTime;
+            lock (sync)
+            {
+                timeLimit = games[gameId].timeLimit;
+                startTime = games[gameId].startTime;
+            }
         }
 
         /// <summary>
@@ -222,32 +278,34 @@ namespace Boggle
         /// <param name="gameId">Id of game</param>
         /// <param name="userToken">Token of player</param>
         /// <returns></returns>
-        public List<string> GetWords(string gameId, string userToken)
+        public List<WordPair> GetWords(string gameId, string userToken)
         {
-            // Check if game exists
-            if (games.ContainsKey(gameId))
+            lock (sync)
             {
-                var game = games[gameId];
-                // Player 1
-                if (game.player1UserToken.Equals(userToken))
+                // Check if game exists
+                if (games.ContainsKey(gameId))
                 {
-                    return game.player1Words;
-                }
-                // Player 2
-                else if (game.player2UserToken.Equals(userToken))
-                {
-                    return game.player2Words;
+                    var game = games[gameId];
+                    // Player 1
+                    if (game.player1UserToken.Equals(userToken))
+                    {
+                        return game.player1Words;
+                    }
+                    // Player 2
+                    else if (game.player2UserToken.Equals(userToken))
+                    {
+                        return game.player2Words;
+                    }
+                    else
+                    {
+                        throw new ArgumentException();
+                    }
                 }
                 else
                 {
                     throw new ArgumentException();
                 }
             }
-            else
-            {
-                throw new ArgumentException();
-            }
-
         }
 
         /// <summary>
@@ -260,19 +318,22 @@ namespace Boggle
         /// <param name="score">The score</param>
         public void SetScore(string gameId, string userToken, int score)
         {
-            var game = games[gameId];
+            lock (sync)
+            {
+                var game = games[gameId];
 
-            if(userToken == game.player1UserToken)
-            {
-                game.player1Score = score;
-            }
-            else if(userToken == game.player2UserToken)
-            {
-                game.player2Score = score;
-            }
-            else
-            {
-                //This shouldn't happen.
+                if (userToken == game.player1UserToken)
+                {
+                    game.player1Score = score;
+                }
+                else if (userToken == game.player2UserToken)
+                {
+                    game.player2Score = score;
+                }
+                else
+                {
+                    //This shouldn't happen.
+                }
             }
         }
 
@@ -286,20 +347,21 @@ namespace Boggle
         /// <param name="board">String that rep the board</param>
         public void StartGame(string gameId, string player2Token, int player2TimeLimit, long startTime, string board)
         {
-            BoggleGame game;
-            if (games.TryGetValue(gameId, out game))
+            lock (sync)
             {
-                game.player2UserToken = player2Token;
-                // TODO is this correct? (Game time limit)
-                game.timeLimit = (game.timeLimit + player2TimeLimit) / 2;
-                game.startTime = startTime;
-                game.board = board;
-            }
-            else
-            {
-                throw new ArgumentException();
+                BoggleGame game;
+                if (games.TryGetValue(gameId, out game))
+                {
+                    game.player2UserToken = player2Token;
+                    game.timeLimit = (game.timeLimit + player2TimeLimit) / 2;
+                    game.startTime = startTime;
+                    game.board = board;
+                }
+                else
+                {
+                    throw new ArgumentException();
+                }
             }
         }
-
     }
 }

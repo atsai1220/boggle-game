@@ -4,6 +4,9 @@ using System.Collections.Generic;
 using System.Dynamic;
 using static System.Net.HttpStatusCode;
 using System.Diagnostics;
+using System.Net.Http;
+using System.Text;
+using Newtonsoft.Json;
 
 namespace Boggle
 {
@@ -84,6 +87,61 @@ namespace Boggle
             Response r = client.DoPostAsync("/first", list).Result;
             Assert.AreEqual(OK, r.Status);
             Assert.AreEqual(15, r.Data);
+        }
+
+        /// <summary>
+        /// Tests CreateUser
+        /// </summary>
+        [TestMethod]
+        public void CreateUserTest1()
+        {
+            dynamic player = new ExpandoObject();
+            player.Nickname = "Andrew";
+            Response r = client.DoPostAsync("/users", player).Result;
+            Assert.AreEqual(Created, r.Status);
+        }
+
+        /// <summary>
+        /// Tests CreateUser for empty Nickname
+        /// </summary>
+        [TestMethod]
+        public void CreateuserTest2()
+        {
+            dynamic player = new ExpandoObject();
+            player.Nickname = "";
+            Response r = client.DoPostAsync("/users", player).Result;
+            Assert.AreEqual(Forbidden, r.Status);
+        }
+
+        /// <summary>
+        /// Tests CreateUser for null Nickname
+        /// </summary>
+        [TestMethod]
+        public void CreateuserTest3()
+        {
+            dynamic player = new ExpandoObject();
+            player.Nickname = null;
+            Response r = client.DoPostAsync("/users", player).Result;
+            Assert.AreEqual(Forbidden, r.Status);
+        }
+
+        /// <summary>
+        /// Tests JoinGame
+        /// </summary>
+        [TestMethod]
+        public void JoinGameTest1()
+        {
+            dynamic player = new ExpandoObject();
+            player.Nickname = "Andrew";
+            Response playerR = client.DoPostAsync("/users", player).Result;
+            string userToken = playerR.Data;
+
+            dynamic data = new ExpandoObject();
+            data.UserToken = userToken;
+            data.TimeLimit = 25;
+
+            Response dataR = client.DoPostAsync("/games", data).Result;
+            Assert.AreEqual(Accepted, dataR.Status);
         }
     }
 }

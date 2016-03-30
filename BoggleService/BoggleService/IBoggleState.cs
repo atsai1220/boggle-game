@@ -8,7 +8,7 @@ namespace Boggle
 {
     interface IBoggleState
     {
-
+        
         void CreateUser(string nickname, string userToken);
 
         /// <summary>
@@ -26,11 +26,12 @@ namespace Boggle
 
         void CancelGame(string gameId);
 
+        // TODO can change args to Wordpair word insteaed of string word, int score
         void AddWord(string gameId, string userToken, string word, int score);
 
         void GetTime(string gameId, out int timeLimit, out long startTime);
 
-        List<string> GetWords(string gameId, string userToken);
+        List<WordPair> GetWords(string gameId, string userToken);
 
         void SetScore(string gameId, string userToken, int score);
 
