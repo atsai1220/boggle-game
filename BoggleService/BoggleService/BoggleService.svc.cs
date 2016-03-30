@@ -83,13 +83,13 @@ namespace Boggle
 
             string gameId = boggleState.GetLastGameId();
 
-            if(getGameState(gameId) == GameState.Pending)
+            if (getGameState(gameId) == GameState.Pending)
             {
                 string player1Id;
                 string player2Id;
-                
+
                 boggleState.GetPlayers(gameId, out player1Id, out player2Id);
-                
+
                 // If UserToken is already a player in the pending game
                 if (body.UserToken.Equals(player1Id))
                 {
@@ -121,7 +121,7 @@ namespace Boggle
             string player1UserToken, player2UserToken;
             boggleState.GetPlayers(boggleState.LastGameId.ToString(), out player1UserToken, out player2UserToken);
 
-            if(player1UserToken == body.UserToken)
+            if (player1UserToken == body.UserToken)
             {
                 boggleState.CancelGame(boggleState.LastGameId.ToString());
                 boggleState.LastGameId--;
@@ -143,7 +143,6 @@ namespace Boggle
         public string PlayWord(PlayWordBody body, string gameId)
         {
             BoggleState _boggleState = BoggleState.getBoggleState();
-            
             int tmp;
 
             // if Word is null or empty when trimmed
@@ -165,14 +164,19 @@ namespace Boggle
                 return null;
             }
             // If gameId is invalid
-            else if (int.TryParse(gameId, out tmp) || tmp >= _boggleState.LastGameId)
+            else if (int.TryParse(gameId, out tmp))
             {
-               SetStatus(Forbidden);
-               return null;
+                SetStatus(Forbidden);
+                return null;
             }
-            // If game state isi anything other than "active" -> 409 (Conflict)
+            else if (!_boggleState.GameExists(gameId))
+            {
+                SetStatus(Forbidden);
+                return null;
+            }
+            // If game state is anything other than "active" -> 409 (Conflict)
             // TODO does this work? (GameState.Active)
-            else if (!getGameState(gameId).Equals(GameState.Active))
+            else if (getGameState(gameId) != GameState.Active)
             {
                 SetStatus(Conflict);
                 return null;
