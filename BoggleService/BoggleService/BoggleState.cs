@@ -84,8 +84,6 @@ namespace Boggle
                 game.gameId = gameId;
                 game.player1UserToken = player1Token;
                 game.timeLimit = player1TimeLimit;
-
-                games[gameId] = game;
             }
         }
 

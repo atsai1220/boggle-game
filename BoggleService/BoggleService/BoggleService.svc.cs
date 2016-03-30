@@ -87,9 +87,9 @@ namespace Boggle
             {
                 string player1Id;
                 string player2Id;
-
+                
                 boggleState.GetPlayers(gameId, out player1Id, out player2Id);
-
+                
                 // If UserToken is already a player in the pending game
                 if (body.UserToken.Equals(player1Id))
                 {
@@ -118,20 +118,26 @@ namespace Boggle
         {
             BoggleState boggleState = BoggleState.getBoggleState();
 
-            string player1UserToken, player2UserToken;
-            boggleState.GetPlayers(boggleState.LastGameId.ToString(), out player1UserToken, out player2UserToken);
+            string gameId = boggleState.GetLastGameId();
 
-            if (player1UserToken == body.UserToken)
+            if(getGameState(gameId) == GameState.Pending)
             {
-                boggleState.CancelGame(boggleState.LastGameId.ToString());
-                boggleState.LastGameId--;
+            string player1UserToken, player2UserToken;
+                boggleState.GetPlayers(gameId, out player1UserToken, out player2UserToken);
+
+                if (player1UserToken == body.UserToken)
+            {
+                    boggleState.CancelGame(gameId);
 
                 SetStatus(OK);
+
+                    return;
             }
-            else
-            {
+            }
+
                 SetStatus(Forbidden);
-            }
+
+            return;
         }
 
         /// <summary>
@@ -171,8 +177,8 @@ namespace Boggle
             }
             else if (!_boggleState.GameExists(gameId))
             {
-                SetStatus(Forbidden);
-                return null;
+               SetStatus(Forbidden);
+               return null;
             }
             // If game state is anything other than "active" -> 409 (Conflict)
             // TODO does this work? (GameState.Active)
@@ -270,11 +276,15 @@ namespace Boggle
         {
             BoggleState boggleState = BoggleState.getBoggleState();
 
-            if (int.Parse(gameId) > boggleState.LastGameId)
+            if (boggleState.GameExists(gameId))
             {
                 return GameState.Invalid;
             }
-            else if (int.Parse(gameId) == boggleState.LastGameId)
+
+            string player1UserToken, player2UserToken;
+            boggleState.GetPlayers(gameId, out player1UserToken, out player2UserToken);
+
+            if(player2UserToken == "")
             {
                 return GameState.Pending;
             }
