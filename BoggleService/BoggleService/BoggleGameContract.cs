@@ -29,7 +29,7 @@ namespace Boggle
     }
 
     [DataContract]
-    public class Player
+    public struct Player
     {
         [DataMember(EmitDefaultValue = false)]
         public string Nickname { get; set; }
@@ -42,7 +42,7 @@ namespace Boggle
     }
 
     [DataContract]
-    public class WordPair
+    public struct WordPair
     {
         [DataMember]
         public string Word { get; set; }

@@ -9,7 +9,12 @@ namespace Boggle
 {
     public class BoggleService : IBoggleService
     {
-        private enum GameState { Pending, Active, Completed }
+        /// <summary>
+        /// Enumeration to represent the game state.
+        /// 
+        /// A game is invalid if it hasn't been created yet.
+        /// </summary>
+        private enum GameState { Invalid, Pending, Active, Completed }
 
         /// <summary>
         /// The most recent call to SetStatus determines the response code used when
@@ -86,7 +91,22 @@ namespace Boggle
 
         public void CancelJoinRequest(CancelJoinRequestBody body)
         {
-            throw new NotImplementedException();
+            BoggleState boggleState = BoggleState.getBoggleState();
+
+            string player1UserToken, player2UserToken;
+            boggleState.GetPlayers(boggleState.LastGameId.ToString(), out player1UserToken, out player2UserToken);
+
+            if(player1UserToken == body.UserToken)
+            {
+                boggleState.CancelGame(boggleState.LastGameId.ToString());
+                boggleState.LastGameId--;
+
+                SetStatus(OK);
+            }
+            else
+            {
+                SetStatus(Forbidden);
+            }
         }
 
         public int PlayWord(PlayWordBody body, string gameId)
@@ -96,18 +116,82 @@ namespace Boggle
 
         public BoggleGameContract GameStatus(string gameId, bool brief)
         {
-            throw new NotImplementedException();
+            GameState gameState = getGameState(gameId);
+
+            if (gameState == GameState.Invalid)
+            {
+                SetStatus(Forbidden);
+                return null;
+            }
+
+            BoggleState boggleState = BoggleState.getBoggleState();
+
+            BoggleGameContract game = new BoggleGameContract();
+
+            if (gameState == GameState.Pending)
+            {
+                game.GameState = "pending";
+            }
+            else
+            {
+                if (gameState == GameState.Active)
+                {
+                    game.GameState = "active";
+                }
+                else if (gameState == GameState.Completed)
+                {
+                    game.GameState = "completed";
+                }
+
+                int timeLimit;
+                long startTime;
+                boggleState.GetTime(gameId, out timeLimit, out startTime);
+
+                int timeLeft = timeLimit - (int)((DateTime.Now.Ticks - startTime) / (long)1e7);
+
+                if (timeLeft < 0)
+                {
+                    timeLeft = 0;
+                }
+
+                game.TimeLeft = timeLeft.ToString();
+
+                string player1UserToken, player2UserToken;
+                boggleState.GetPlayers(gameId, out player1UserToken, out player2UserToken);
+
+                game.player1.Score = boggleState.GetScore(gameId, player1UserToken);
+                game.player2.Score = boggleState.GetScore(gameId, player2UserToken);
+
+                if (!brief)
+                {
+                    game.Board = boggleState.GetBoard(gameId);
+
+                    game.TimeLimit = timeLimit.ToString();
+
+                    game.player1.Nickname = boggleState.GetNickname(player1UserToken);
+                    game.player2.Nickname = boggleState.GetNickname(player2UserToken);
+
+                    if (gameState == GameState.Completed)
+                    {
+                        game.player1.WordsPlayed = boggleState.GetWords(gameId, player1UserToken);
+                        game.player2.WordsPlayed = boggleState.GetWords(gameId, player2UserToken);
+                    }
+                }
+            }
+
+            SetStatus(OK);
+            return game;
         }
 
         private GameState getGameState(string gameId)
         {
             BoggleState boggleState = BoggleState.getBoggleState();
 
-            string player1Id;
-            string player2Id;
-            boggleState.GetPlayers(gameId, out player1Id, out player2Id);
-
-            if (player2Id == "")
+            if (int.Parse(gameId) > boggleState.LastGameId)
+            {
+                return GameState.Invalid;
+            }
+            else if (int.Parse(gameId) == boggleState.LastGameId)
             {
                 return GameState.Pending;
             }
