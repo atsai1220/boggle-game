@@ -72,51 +72,46 @@ namespace Boggle
         /// <returns></returns>
         public string JoinGame(JoinGameBody body)
         {
-            string player1Id;
-            string player2Id;
-
-            BoggleState boggleState = BoggleState.getBoggleState();
             // If UserToken is invalid, TimeLimit < 5, or TimeLimit > 120, responds with status 403 (Forbidden).
             if (body.TimeLimit < 5 || body.TimeLimit > 120)
             {
                 SetStatus(Forbidden);
                 return null;
             }
-            
-            // LastGameId always contain a pending game
-            boggleState.GetPlayers(boggleState.LastGameId.ToString(), out player1Id, out player2Id);
-            
-                
-            // If UserToken is already a player in the pending game
-            if (body.UserToken.Equals(player1Id))
-            {
-                SetStatus(Conflict);
-                return null;
-            }
 
-            // if there is already one player in the pending game
-            else if (player1Id.Length > 0)
+            BoggleState boggleState = BoggleState.getBoggleState();
+
+            string gameId = boggleState.GetLastGameId();
+
+            if(getGameState(gameId) == GameState.Pending)
             {
+                string player1Id;
+                string player2Id;
+                
+                boggleState.GetPlayers(gameId, out player1Id, out player2Id);
+                
+                // If UserToken is already a player in the pending game
+                if (body.UserToken.Equals(player1Id))
+                {
+                    SetStatus(Conflict);
+                    return null;
+                }
+
                 BoggleBoard board = new BoggleBoard();
                 long startTime = DateTime.UtcNow.Ticks;
-                boggleState.StartGame(boggleState.LastGameId.ToString(), body.UserToken, body.TimeLimit, startTime, board.ToString());
-                // Player 2 score reset
-                boggleState.SetScore(boggleState.LastGameId.ToString(), body.UserToken, 0);
-                // Player 1 score reset 
-                boggleState.SetScore(boggleState.LastGameId.ToString(), player1Id, 0);
-                int oldGameId = boggleState.LastGameId;
-                boggleState.LastGameId++;
-                SetStatus(Created);
-                return oldGameId.ToString();
-            }
+                boggleState.StartGame(gameId, body.UserToken, body.TimeLimit, startTime, board.ToString());
 
-            // UserToken is the first player of a new game
+                SetStatus(Created);
+            }
             else
             {
-                boggleState.AddGame(boggleState.LastGameId.ToString(), body.UserToken, body.TimeLimit);
+                gameId = boggleState.CreateGame();
+
+                boggleState.AddGame(gameId, body.UserToken, body.TimeLimit);
                 SetStatus(Accepted);
-                return boggleState.LastGameId.ToString();
             }
+
+            return gameId;
         }
 
         public void CancelJoinRequest(CancelJoinRequestBody body)

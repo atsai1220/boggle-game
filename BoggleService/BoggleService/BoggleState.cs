@@ -36,8 +36,8 @@ namespace Boggle
         private Dictionary<string, string> players;
         // gameId -> BoggleGame
         private Dictionary<string, BoggleGame> games;
-        
-        public int LastGameId { get; set; }
+
+        private int lastGameId;
 
         private class BoggleGame
         {
@@ -47,12 +47,12 @@ namespace Boggle
             public long startTime;
 
             public string player1UserToken;
-            public int player1Score;
-            public List<WordPair> player1Words;
+            public int player1Score = 0;
+            public List<WordPair> player1Words = new List<WordPair>();
 
             public string player2UserToken;
-            public int player2Score;
-            public List<WordPair> player2Words;
+            public int player2Score = 0;
+            public List<WordPair> player2Words = new List<WordPair>();
         }
 
         /// <summary>
@@ -65,7 +65,7 @@ namespace Boggle
                 players = new Dictionary<string, string>();
                 games = new Dictionary<string, BoggleGame>();
 
-                LastGameId = 1;
+                lastGameId = 0;
             }
         }
 
@@ -84,6 +84,8 @@ namespace Boggle
                 game.gameId = gameId;
                 game.player1UserToken = player1Token;
                 game.timeLimit = player1TimeLimit;
+
+                games[gameId] = game;
             }
         }
 
@@ -119,8 +121,6 @@ namespace Boggle
                     {
                         throw new ArgumentException();
                     }
-
-
                 }
                 else
                 {
@@ -203,7 +203,7 @@ namespace Boggle
                 int.TryParse(gameId, out tmp);
                 if (tmp == 1)
                 {
-                    player1Id = "";
+                    player1Id = ""; 
                     player2Id = "";
                     return;
                 }
@@ -362,6 +362,29 @@ namespace Boggle
                     throw new ArgumentException();
                 }
             }
+        }
+
+        public bool GameExists(string gameId)
+        {
+            return games.ContainsKey(gameId);
+        }
+
+        public string CreateGame()
+        {
+            lastGameId++;
+            string gameId = lastGameId.ToString();
+
+            BoggleGame boggleGame = new BoggleGame();
+            boggleGame.gameId = gameId;
+
+            games[gameId] = boggleGame;
+
+            return gameId;
+        }
+
+        public string GetLastGameId()
+        {
+            return lastGameId.ToString();
         }
     }
 }
