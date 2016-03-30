@@ -1,8 +1,13 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.IO;
 using System.Net;
+using System.Net.Http;
 using System.ServiceModel.Web;
+using System.Text;
+using System.Threading.Tasks;
 using static System.Net.HttpStatusCode;
 
 namespace Boggle
@@ -37,7 +42,7 @@ namespace Boggle
             return File.OpenRead(AppDomain.CurrentDomain.BaseDirectory + "index.html");
         }
 
-        public string CreateUser(CreateUserBody body)
+        public UserTokenContract CreateUser(CreateUserBody body)
         {
             // TODO Consider putting an upperbound on nickname length.
             if (body.Nickname == null || body.Nickname.Trim().Length == 0)
@@ -51,7 +56,12 @@ namespace Boggle
 
                 BoggleState.getBoggleState().CreateUser(body.Nickname.Trim(), userToken);
                 SetStatus(Created);
-                return userToken;
+
+                UserTokenContract userTokenContract = new UserTokenContract();
+                userTokenContract.UserToken = userToken;
+
+                //return JsonConvert.SerializeObject(response);
+                return userTokenContract;
             }
         }
 

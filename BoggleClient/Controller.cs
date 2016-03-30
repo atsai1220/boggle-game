@@ -152,7 +152,6 @@ namespace BoggleClient
             client.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
 
             this.client = client;
-
         }
 
 

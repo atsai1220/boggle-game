@@ -15,7 +15,7 @@ namespace Boggle
     {
         public HttpStatusCode Status { get; set; }
 
-        public dynamic Data { get; set; }
+        public dynamic Data { get; set;} 
 
         /// <summary>
         /// Converts an HttpStatusCode into a Response

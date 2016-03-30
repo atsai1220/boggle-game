@@ -139,7 +139,7 @@
       <DependentUpon>BoggleService.svc</DependentUpon>
     </Compile>
     <Compile Include="BoggleState.cs" />
-    <Compile Include="BoggleGameContract.cs" />
+    <Compile Include="BoggleContracts.cs" />
     <Compile Include="DataModels.cs" />
     <Compile Include="IBoggleService.cs" />
     <Compile Include="IBoggleState.cs" />

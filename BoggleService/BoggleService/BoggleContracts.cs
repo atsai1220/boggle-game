@@ -50,4 +50,11 @@ namespace Boggle
         [DataMember]
         public int Score { get; set; }
     }
+
+    [DataContract]
+    public class UserTokenContract
+    {
+        [DataMember]
+        public string UserToken { get; set; }
+    }
 }

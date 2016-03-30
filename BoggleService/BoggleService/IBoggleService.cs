@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Dynamic;
 using System.IO;
 using System.ServiceModel;
 using System.ServiceModel.Web;
@@ -14,8 +15,8 @@ namespace Boggle
         [WebGet(UriTemplate = "/api")]
         Stream API();
 
-        [WebInvoke(Method = "POST", UriTemplate = "/users")]
-        string CreateUser(CreateUserBody body);
+        [WebInvoke(Method = "POST", ResponseFormat = WebMessageFormat.Json, UriTemplate = "/users")]
+        UserTokenContract CreateUser(CreateUserBody body);
 
         [WebInvoke(Method ="POST", UriTemplate = "/games")]
         string JoinGame(JoinGameBody body);
