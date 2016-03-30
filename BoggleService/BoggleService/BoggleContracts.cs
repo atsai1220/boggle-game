@@ -58,5 +58,17 @@ namespace Boggle
         public string UserToken { get; set; }
     }
 
+    [DataContract]
+    public class GameIdContract
+    {
+        [DataMember]
+        public string GameID { get; set; }
+    }
 
+    [DataContract]
+    public class PlayWordContract
+    {
+        [DataMember]
+        public string Score { get; set; }
+    }
 }

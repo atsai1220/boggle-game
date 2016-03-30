@@ -60,7 +60,6 @@ namespace Boggle
                 UserTokenContract userTokenContract = new UserTokenContract();
                 userTokenContract.UserToken = userToken;
 
-                //return JsonConvert.SerializeObject(response);
                 return userTokenContract;
             }
         }
@@ -70,7 +69,7 @@ namespace Boggle
         /// </summary>
         /// <param name="body">Contains UserToken and TimeLimit</param>
         /// <returns></returns>
-        public string JoinGame(JoinGameBody body)
+        public GameIdContract JoinGame(JoinGameBody body)
         {
             // If UserToken is invalid, TimeLimit < 5, or TimeLimit > 120, responds with status 403 (Forbidden).
             if (body.TimeLimit < 5 || body.TimeLimit > 120)
@@ -87,9 +86,9 @@ namespace Boggle
             {
                 string player1Id;
                 string player2Id;
-                
+
                 boggleState.GetPlayers(gameId, out player1Id, out player2Id);
-                
+
                 // If UserToken is already a player in the pending game
                 if (body.UserToken.Equals(player1Id))
                 {
@@ -111,7 +110,9 @@ namespace Boggle
                 SetStatus(Accepted);
             }
 
-            return gameId;
+            GameIdContract GameIdContract = new GameIdContract();
+            GameIdContract.GameID = gameId;
+            return GameIdContract;
         }
 
         public void CancelJoinRequest(CancelJoinRequestBody body)
@@ -120,22 +121,22 @@ namespace Boggle
 
             string gameId = boggleState.GetLastGameId();
 
-            if(getGameState(gameId) == GameState.Pending)
+            if (getGameState(gameId) == GameState.Pending)
             {
-            string player1UserToken, player2UserToken;
+                string player1UserToken, player2UserToken;
                 boggleState.GetPlayers(gameId, out player1UserToken, out player2UserToken);
 
                 if (player1UserToken == body.UserToken)
-            {
+                {
                     boggleState.CancelGame(gameId);
 
-                SetStatus(OK);
+                    SetStatus(OK);
 
                     return;
-            }
+                }
             }
 
-                SetStatus(Forbidden);
+            SetStatus(Forbidden);
 
             return;
         }
@@ -146,7 +147,7 @@ namespace Boggle
         /// <param name="body"></param>
         /// <param name="gameId"></param>
         /// <returns></returns>
-        public string PlayWord(PlayWordBody body, string gameId)
+        public PlayWordContract PlayWord(PlayWordBody body, string gameId)
         {
             BoggleState _boggleState = BoggleState.getBoggleState();
             int tmp;
@@ -177,8 +178,8 @@ namespace Boggle
             }
             else if (!_boggleState.GameExists(gameId))
             {
-               SetStatus(Forbidden);
-               return null;
+                SetStatus(Forbidden);
+                return null;
             }
             // If game state is anything other than "active" -> 409 (Conflict)
             // TODO does this work? (GameState.Active)
@@ -199,7 +200,10 @@ namespace Boggle
                 _boggleState.SetScore(gameId, body.UserToken, currentScore);
 
                 SetStatus(OK);
-                return pair.Score.ToString();
+                PlayWordContract PlayWordContract = new PlayWordContract();
+                PlayWordContract.Score = pair.Score.ToString();
+
+                return PlayWordContract;
             }
         }
 
@@ -284,7 +288,7 @@ namespace Boggle
             string player1UserToken, player2UserToken;
             boggleState.GetPlayers(gameId, out player1UserToken, out player2UserToken);
 
-            if(player2UserToken == "")
+            if (player2UserToken == "")
             {
                 return GameState.Pending;
             }
