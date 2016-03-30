@@ -280,7 +280,7 @@ namespace Boggle
         {
             BoggleState boggleState = BoggleState.getBoggleState();
 
-            if (boggleState.GameExists(gameId))
+            if (!boggleState.GameExists(gameId))
             {
                 return GameState.Invalid;
             }
