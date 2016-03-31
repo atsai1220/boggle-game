@@ -70,26 +70,6 @@ namespace Boggle
 
         private RestTestClient client = new RestTestClient("http://localhost:60000/");
 
-        [TestMethod]
-        public void TestMethod1()
-        {
-            Response r = client.DoGetAsync("/numbers?length={0}", "5").Result;
-            Assert.AreEqual(OK, r.Status);
-            Assert.AreEqual(5, r.Data.Count);
-            r = client.DoGetAsync("/numbers?length={0}", "-5").Result;
-            Assert.AreEqual(Forbidden, r.Status);
-        }
-
-        [TestMethod]
-        public void TestMethod2()
-        {
-            List<int> list = new List<int>();
-            list.Add(15);
-            Response r = client.DoPostAsync("/first", list).Result;
-            Assert.AreEqual(OK, r.Status);
-            Assert.AreEqual(15, r.Data);
-        }
-
         /// <summary>
         /// Tests CreateUser
         /// </summary>
@@ -172,8 +152,8 @@ namespace Boggle
             // Player 1
             dynamic player1 = new ExpandoObject();
             player1.Nickname = "Andrew";
-            Response player1R = client.DoPostAsync("/users", player1).Result;
-            string userToken1 = player1R.Data;
+            Response response = client.DoPostAsync("/users", player1).Result;
+            string userToken1 = response.Data.UserToken;
 
             dynamic data1 = new ExpandoObject();
             data1.UserToken = userToken1;
@@ -186,7 +166,7 @@ namespace Boggle
             dynamic player2 = new ExpandoObject();
             player2.Nickname = "Sam";
             Response player2R = client.DoPostAsync("/users", player2).Result;
-            string userToken2 = player2R.Data;
+            string userToken2 = player2R.Data.UserToken;
 
             dynamic data2 = new ExpandoObject();
             data2.UserToken = userToken2;
@@ -194,6 +174,47 @@ namespace Boggle
 
             Response dataR = client.DoPostAsync("/games", data2).Result;
             Assert.AreEqual(Created, dataR.Status);
+        }
+
+        /// <summary>
+        /// 
+        /// 
+        /// </summary>
+        [TestMethod]
+        public void PlayerWordTest1()
+        {
+            // Player 1
+            dynamic player1 = new ExpandoObject();
+            player1.Nickname = "Andrew";
+            Response response1 = client.DoPostAsync("/users", player1).Result;
+            string userToken1 = response1.Data.UserToken;
+
+            dynamic data1 = new ExpandoObject();
+            data1.UserToken = userToken1;
+            data1.TimeLimit = 5;
+
+            Response data1R = client.DoPostAsync("/games", data1).Result;
+            Assert.AreEqual(Accepted, data1R.Status);
+
+            // Player 2
+            dynamic player2 = new ExpandoObject();
+            player2.Nickname = "Sam";
+            Response response2 = client.DoPostAsync("/users", player2).Result;
+            string userToken2 = response2.Data.UserToken;
+
+            dynamic data2 = new ExpandoObject();
+            data2.UserToken = userToken2;
+            data2.TimeLimit = 5;
+
+            Response joinGameResponse = client.DoPostAsync("/games", data2).Result;
+            Assert.AreEqual(Created, joinGameResponse.Status);
+            string gameId = joinGameResponse.Data.GameID;
+
+            // If Word is null or empty when trimmed -> 403 (Forbidden)
+
+
+            // if the gameID or UserToken is missing or invalid -> 403 (Forbidden)
+
         }
 
 
