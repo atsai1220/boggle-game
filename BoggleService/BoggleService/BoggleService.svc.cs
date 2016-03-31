@@ -187,7 +187,7 @@ namespace Boggle
                     return null;
                 }
                 // If gameId is invalid
-                else if (int.TryParse(gameId, out tmp))
+                else if (!int.TryParse(gameId, out tmp))
                 {
                     SetStatus(Forbidden);
                     return null;
@@ -258,10 +258,8 @@ namespace Boggle
                     int timeLimit;
                     long startTime;
                     boggleState.GetTime(gameId, out timeLimit, out startTime);
-
-                    // TODO Commented for testing -- change back
-                    //int timeLeft = timeLimit - (int)((DateTime.UtcNow.Ticks - startTime) / (long)1e7);
-                    int timeLeft = 6;
+                    
+                    int timeLeft = timeLimit - (int)((DateTime.UtcNow.Ticks - startTime) / (long)1e7);
 
                     if (timeLeft < 0)
                     {
@@ -329,9 +327,7 @@ namespace Boggle
                 }
                 else
                 {
-                    //TODO change this back
-                    return GameState.Active;
-                    //return GameState.Completed;
+                    return GameState.Completed;
                 }
             }
         }
@@ -353,7 +349,7 @@ namespace Boggle
                 // Determine if word is legal or not
                 if (board.CanBeFormed(pair.Word))
                 {
-                    if (wordLength < 3 || !pairs.Exists(repeatFinder))
+                    if (wordLength < 3 || pairs.Exists(repeatFinder))
                     {
                         pair.Score = 0;
                     }

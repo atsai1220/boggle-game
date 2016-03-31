@@ -125,7 +125,7 @@ namespace Boggle
             Response dataR = client.DoPostAsync("/games", data).Result;
             Assert.AreEqual(Accepted, dataR.Status);
 
-            CancelGameTest1((String) data.UserToken);
+            CancelGameTest1((String)data.UserToken);
         }
 
         // tests cancel 
@@ -176,6 +176,62 @@ namespace Boggle
             Assert.AreEqual(Created, dataR.Status);
         }
 
+        [TestMethod]
+        public void TestPending()
+        {
+            string userToken = CreateUser("Sam");
+            string gameId = JoinGame(userToken, 120);
+
+            Response response = client.DoGetAsync("games/" + gameId, new string[] { "false" }).Result;
+            Assert.AreEqual("pending", (string) response.Data.GameState);
+        }
+
+        [TestMethod]
+        public void TestActive()
+        {
+            FillIn();
+
+            string player1 = CreateUser("Player1");
+            string player2 = CreateUser("Player2");
+
+            string gameId1 = JoinGame(player1, 5);
+            string gameId2 = JoinGame(player2, 5);
+
+            Assert.AreEqual(gameId1, gameId2);
+
+            Response response = client.DoGetAsync("games/" + gameId1, new string[] { "false" }).Result;
+
+            Assert.AreEqual("active", (string) response.Data.GameState);
+        }
+
+        /// <summary>
+        /// If there is a pending game with one player, fills it in.
+        /// </summary>
+        private void FillIn()
+        {
+            Response response;
+            do
+            {
+                string player = CreateUser("Player");
+
+                dynamic data = new ExpandoObject();
+                data.UserToken = player;
+                data.TimeLimit = 5;
+
+                response = client.DoPostAsync("games", data).Result;
+
+            } while (response.Status != Created);
+        }
+
+        /// <summary>
+        /// Helper method to create a user.
+        /// </summary>
+        /// <param name="nickname">Nickname of the user.</param>
+        /// <returns>The usertoken of the user.</returns>
+        private string CreateUser(string nickname)
+        {
+            dynamic data = new ExpandoObject();
+            data.Nickname = nickname;
         /// <summary>
         /// 
         /// 
@@ -218,5 +274,25 @@ namespace Boggle
         }
 
 
+            Response response = client.DoPostAsync("users", data).Result;
+
+            return response.Data.UserToken;
+        }
+
+        /// <summary>
+        /// Helper method to join a game
+        /// </summary>
+        /// <param name="userToken">User token to join</param>
+        /// <returns>The game id</returns>
+        private string JoinGame(string userToken, int timeLimit)
+        {
+            dynamic data = new ExpandoObject();
+            data.UserToken = userToken;
+            data.TimeLimit = timeLimit;
+
+            Response response = client.DoPostAsync("games", data).Result;
+            
+            return response.Data.GameID;
+        }
     }
 }
