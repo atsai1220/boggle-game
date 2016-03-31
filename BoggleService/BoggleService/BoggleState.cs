@@ -41,11 +41,11 @@ namespace Boggle
             public int timeLimit;
             public long startTime;
 
-            public string player1UserToken;
+            public string player1UserToken = "";
             public int player1Score = 0;
             public List<WordPair> player1Words = new List<WordPair>();
 
-            public string player2UserToken;
+            public string player2UserToken = "";
             public int player2Score = 0;
             public List<WordPair> player2Words = new List<WordPair>();
         }

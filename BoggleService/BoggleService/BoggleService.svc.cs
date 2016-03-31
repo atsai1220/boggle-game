@@ -259,7 +259,9 @@ namespace Boggle
                     long startTime;
                     boggleState.GetTime(gameId, out timeLimit, out startTime);
 
-                    int timeLeft = timeLimit - (int)((DateTime.Now.Ticks - startTime) / (long)1e7);
+                    // TODO Commented for testing -- change back
+                    //int timeLeft = timeLimit - (int)((DateTime.UtcNow.Ticks - startTime) / (long)1e7);
+                    int timeLeft = 6;
 
                     if (timeLeft < 0)
                     {
@@ -271,8 +273,8 @@ namespace Boggle
                     string player1UserToken, player2UserToken;
                     boggleState.GetPlayers(gameId, out player1UserToken, out player2UserToken);
 
-                    game.player1.Score = boggleState.GetScore(gameId, player1UserToken);
-                    game.player2.Score = boggleState.GetScore(gameId, player2UserToken);
+                    game.Player1.Score = boggleState.GetScore(gameId, player1UserToken);
+                    game.Player2.Score = boggleState.GetScore(gameId, player2UserToken);
 
                     if (!brief)
                     {
@@ -280,13 +282,13 @@ namespace Boggle
 
                         game.TimeLimit = timeLimit.ToString();
 
-                        game.player1.Nickname = boggleState.GetNickname(player1UserToken);
-                        game.player2.Nickname = boggleState.GetNickname(player2UserToken);
+                        game.Player1.Nickname = boggleState.GetNickname(player1UserToken);
+                        game.Player2.Nickname = boggleState.GetNickname(player2UserToken);
 
                         if (gameState == GameState.Completed)
                         {
-                            game.player1.WordsPlayed = boggleState.GetWords(gameId, player1UserToken);
-                            game.player2.WordsPlayed = boggleState.GetWords(gameId, player2UserToken);
+                            game.Player1.WordsPlayed = boggleState.GetWords(gameId, player1UserToken);
+                            game.Player2.WordsPlayed = boggleState.GetWords(gameId, player2UserToken);
                         }
                     }
                 }
@@ -327,7 +329,9 @@ namespace Boggle
                 }
                 else
                 {
-                    return GameState.Completed;
+                    //TODO change this back
+                    return GameState.Active;
+                    //return GameState.Completed;
                 }
             }
         }
