@@ -186,6 +186,11 @@ namespace Boggle
                     SetStatus(Forbidden);
                     return null;
                 }
+                else if (gameId.Trim() == "")
+                {
+                    SetStatus(Forbidden);
+                    return null;
+                }
                 // If gameId is invalid
                 else if (!int.TryParse(gameId, out tmp))
                 {

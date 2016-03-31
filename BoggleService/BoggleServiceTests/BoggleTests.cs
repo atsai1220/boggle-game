@@ -183,7 +183,7 @@ namespace Boggle
             string gameId = JoinGame(userToken, 120);
 
             Response response = client.DoGetAsync("games/" + gameId, new string[] { "false" }).Result;
-            Assert.AreEqual("pending", (string) response.Data.GameState);
+            Assert.AreEqual("pending", (string)response.Data.GameState);
         }
 
         [TestMethod]
@@ -201,8 +201,77 @@ namespace Boggle
 
             Response response = client.DoGetAsync("games/" + gameId1, new string[] { "false" }).Result;
 
-            Assert.AreEqual("active", (string) response.Data.GameState);
+            Assert.AreEqual("active", (string)response.Data.GameState);
         }
+
+        /// <summary>
+        /// 
+        /// 
+        /// </summary>
+        [TestMethod]
+        public void PlayerWordTest()
+        {
+            string userToken1 = CreateUser("Andrew");
+            string userToken2 = CreateUser("Sam");
+
+            string gameId1 = JoinGame(userToken1, 10);
+            string gameId2 = JoinGame(userToken2, 10);
+
+            Assert.AreEqual(gameId1, gameId2);
+
+            // If Word is null or empty when trimmed -> 403 (Forbidden)
+            Response responseEmpty = client.DoPutAsync(CreateWord(userToken1, ""), "games/" + gameId1).Result;
+            Assert.AreEqual(Forbidden, responseEmpty.Status);
+
+            Response responseSpace = client.DoPutAsync(CreateWord(userToken1, "   "), "games/" + gameId1).Result;
+            Assert.AreEqual(Forbidden, responseSpace.Status);
+
+            // if the gameID or UserToken is missing or invalid -> 403 (Forbidden)
+            Response responseTokenEmpty = client.DoPutAsync(CreateWord("", ""), "games/" + gameId1).Result;
+            Assert.AreEqual(Forbidden, responseTokenEmpty.Status);
+
+            Response responseIdEmpty = client.DoPutAsync(CreateWord(userToken1, "AAAA"), "games/" + "NO").Result;
+            Assert.AreEqual(Forbidden, responseIdEmpty.Status);
+
+            // Legal word and token and gameid
+            // TODO legal word with score
+            Response gameBrief = client.DoGetAsync("games/" + gameId1, "yes").Result;
+            string board = gameBrief.Data.Board;
+            int legalWordScore;
+
+            string line;
+            Response wordResult = new Response();
+            System.IO.StreamReader file = new System.IO.StreamReader("dictionary.txt");
+            while ((line = file.ReadLine()) != null)
+            {
+                do
+                {
+                    wordResult = client.DoPutAsync(CreateWord(userToken1, line), "games/" + gameId1).Result;
+
+                    string legalWord = wordResult.Data.Score;
+                    int.TryParse(legalWord, out legalWordScore);
+                } while (legalWordScore < 1);
+                break;
+            }
+            Assert.AreEqual(OK, wordResult.Status);
+       
+
+
+            int temp;
+            Response responseLegal = client.DoPutAsync(CreateWord(userToken1, "AAAAA"), "games/" + gameId1).Result;
+            Assert.AreEqual(OK, responseLegal.Status);
+            string score = responseLegal.Data.Score;
+            int.TryParse(score, out temp);
+
+            Assert.AreEqual(temp.ToString(), score);
+
+            // Wait 10 seconds
+            System.Threading.Thread.Sleep(10000);
+            // If game state is NOT active -> 409 (Conflict)
+            Response responseInactive = client.DoPutAsync(CreateWord(userToken1, "AAAA"), "games/" + gameId1).Result;
+            Assert.AreEqual(Conflict, responseInactive.Status);
+        }
+
 
         /// <summary>
         /// If there is a pending game with one player, fills it in.
@@ -232,52 +301,16 @@ namespace Boggle
         {
             dynamic data = new ExpandoObject();
             data.Nickname = nickname;
-        /// <summary>
-        /// 
-        /// 
-        /// </summary>
-        [TestMethod]
-        public void PlayerWordTest1()
-        {
-            // Player 1
-            dynamic player1 = new ExpandoObject();
-            player1.Nickname = "Andrew";
-            Response response1 = client.DoPostAsync("/users", player1).Result;
-            string userToken1 = response1.Data.UserToken;
-
-            dynamic data1 = new ExpandoObject();
-            data1.UserToken = userToken1;
-            data1.TimeLimit = 5;
-
-            Response data1R = client.DoPostAsync("/games", data1).Result;
-            Assert.AreEqual(Accepted, data1R.Status);
-
-            // Player 2
-            dynamic player2 = new ExpandoObject();
-            player2.Nickname = "Sam";
-            Response response2 = client.DoPostAsync("/users", player2).Result;
-            string userToken2 = response2.Data.UserToken;
-
-            dynamic data2 = new ExpandoObject();
-            data2.UserToken = userToken2;
-            data2.TimeLimit = 5;
-
-            Response joinGameResponse = client.DoPostAsync("/games", data2).Result;
-            Assert.AreEqual(Created, joinGameResponse.Status);
-            string gameId = joinGameResponse.Data.GameID;
-
-            // If Word is null or empty when trimmed -> 403 (Forbidden)
-
-
-            // if the gameID or UserToken is missing or invalid -> 403 (Forbidden)
-
-        }
-
 
             Response response = client.DoPostAsync("users", data).Result;
 
             return response.Data.UserToken;
         }
+
+
+
+
+
 
         /// <summary>
         /// Helper method to join a game
@@ -291,8 +324,17 @@ namespace Boggle
             data.TimeLimit = timeLimit;
 
             Response response = client.DoPostAsync("games", data).Result;
-            
+
             return response.Data.GameID;
+        }
+
+        private dynamic CreateWord(string userToken, string word)
+        {
+            dynamic data = new ExpandoObject();
+            data.UserToken = userToken;
+            data.Word = word;
+
+            return data;
         }
     }
 }
