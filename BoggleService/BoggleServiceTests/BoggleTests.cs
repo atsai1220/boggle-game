@@ -189,6 +189,8 @@ namespace Boggle
         [TestMethod]
         public void Player2JoinGame()
         {
+            FillIn();
+
             // Player 1
             dynamic player1 = new ExpandoObject();
             player1.Nickname = "Andrew";
@@ -333,7 +335,7 @@ namespace Boggle
                 if (board.CanBeFormed(line) && line.Length == 6)
                 {
                     wordResult = client.DoPutAsync(CreateWord(userToken1, line), "games/" + gameId1).Result;
-
+                    wordResult = client.DoPutAsync(CreateWord(userToken2, line), "games/" + gameId1).Result;
                     string legalWord = wordResult.Data.Score;
                     int.TryParse(legalWord, out legalWordScore);
 
@@ -377,7 +379,7 @@ namespace Boggle
             }
             Assert.AreEqual(OK, wordResult.Status);
 
-
+            wordResult = client.DoPutAsync(CreateWord(userToken1, "ZZZZZZZZZ"), "games/" + gameId1).Result;
 
             //int temp;
             //Response responseLegal = client.DoPutAsync(CreateWord(userToken1, "AAAAA"), "games/" + gameId1).Result;

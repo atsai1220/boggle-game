@@ -374,10 +374,12 @@ namespace Boggle
                     {
                         pair.Score = 3;
                     }
+                    // SOMETIMES THE BOARD DOES NOT HAVE A WORD THIS LONG
                     else if (wordLength == 7)
                     {
                         pair.Score = 5;
                     }
+                    // SOMETIMES THE BOARD DOES NOT HAVE A WORD THIS LONG
                     else if (wordLength > 7)
                     {
                         pair.Score = 11;

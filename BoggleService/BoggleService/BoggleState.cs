@@ -102,6 +102,7 @@ namespace Boggle
                 {
                     game.player2Words.Add(pair);
                 }
+                // This will only happen if there is a bug in BoggleService.
                 else
                 {
                     throw new ArgumentException();
@@ -155,6 +156,7 @@ namespace Boggle
             {
                 return nickname;
             }
+            // This will only happen if there is a bug in BoggleService.
             else
             {
                 throw new ArgumentException();
@@ -194,11 +196,13 @@ namespace Boggle
                 {
                     return game.player2Score;
                 }
+                // This will only happen if there is a bug in BoggleService.
                 else
                 {
                     throw new ArgumentException();
                 }
             }
+            // This will only happen if there is a bug in BoggleService.
             else
             {
                 throw new ArgumentException();
@@ -225,25 +229,18 @@ namespace Boggle
         /// <returns></returns>
         public List<WordPair> GetWords(string gameId, string userToken)
         {
-            // Check if game exists
-            if (games.ContainsKey(gameId))
+            var game = games[gameId];
+            // Player 1
+            if (game.player1UserToken.Equals(userToken))
             {
-                var game = games[gameId];
-                // Player 1
-                if (game.player1UserToken.Equals(userToken))
-                {
-                    return game.player1Words;
-                }
-                // Player 2
-                else if (game.player2UserToken.Equals(userToken))
-                {
-                    return game.player2Words;
-                }
-                else
-                {
-                    throw new ArgumentException();
-                }
+                return game.player1Words;
             }
+            // Player 2
+            else if (game.player2UserToken.Equals(userToken))
+            {
+                return game.player2Words;
+            }
+            // This will only happen if there is a bug in BoggleService.
             else
             {
                 throw new ArgumentException();
@@ -270,10 +267,6 @@ namespace Boggle
             {
                 game.player2Score = score;
             }
-            else
-            {
-                //This shouldn't happen.
-            }
         }
 
         /// <summary>
@@ -286,18 +279,11 @@ namespace Boggle
         /// <param name="board">String that rep the board</param>
         public void StartGame(string gameId, string player2Token, int player2TimeLimit, long startTime, string board)
         {
-            BoggleGame game;
-            if (games.TryGetValue(gameId, out game))
-            {
-                game.player2UserToken = player2Token;
-                game.timeLimit = (game.timeLimit + player2TimeLimit) / 2;
-                game.startTime = startTime;
-                game.board = board;
-            }
-            else
-            {
-                throw new ArgumentException();
-            }
+            BoggleGame game = games[gameId];
+            game.player2UserToken = player2Token;
+            game.timeLimit = (game.timeLimit + player2TimeLimit) / 2;
+            game.startTime = startTime;
+            game.board = board;
         }
 
         public bool GameExists(string gameId)
