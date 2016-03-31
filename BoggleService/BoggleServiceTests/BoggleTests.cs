@@ -265,7 +265,7 @@ namespace Boggle
 
                     string legalWord = wordResult.Data.Score;
                     int.TryParse(legalWord, out legalWordScore);
-                    
+
                     if (legalWordScore == 1)
                     {
                         break;
@@ -332,12 +332,12 @@ namespace Boggle
 
                     if (legalWordScore == 11)
                     {
-                break;
-            }
+                        break;
+                    }
                 }
             }
             Assert.AreEqual(OK, wordResult.Status);
-       
+
 
 
             //int temp;
@@ -380,12 +380,12 @@ namespace Boggle
 
             Response response = client.DoGetAsync("games/" + gameId1, new string[0]).Result;
 
-            Assert.AreEqual("active", (string) response.Data.GameState);
+            Assert.AreEqual("active", (string)response.Data.GameState);
             string board = response.Data.Board;
 
             response = client.DoGetAsync("games/" + gameId1 + "?Brief=yes").Result;
 
-            Assert.AreEqual("active", (string) response.Data.GameState);
+            Assert.AreEqual("active", (string)response.Data.GameState);
             try
             {
                 board = response.Data.Board;
