@@ -21,10 +21,10 @@ namespace Boggle
         [DataMember(EmitDefaultValue = false)]
         public string TimeLeft { get; set; }
 
-        [DataMember(EmitDefaultValue = false)]
+        [DataMember]
         public Player Player1;
 
-        [DataMember(EmitDefaultValue = false)]
+        [DataMember]
         public Player Player2;
     }
 

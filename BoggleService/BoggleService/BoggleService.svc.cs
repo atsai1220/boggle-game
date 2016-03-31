@@ -26,6 +26,10 @@ namespace Boggle
         /// </summary>
         private static readonly object sync = new object();
 
+        private static HashSet<string> dictionary = new HashSet<string>(File.ReadAllLines(AppDomain.CurrentDomain.BaseDirectory + "dictionary.txt"));
+
+        //private static HashSet<string> dictionary = new HashSet<string>();
+
         /// <summary>
         /// The most recent call to SetStatus determines the response code used when
         /// an http response is sent.
@@ -229,7 +233,7 @@ namespace Boggle
             }
         }
 
-        public BoggleGameContract GameStatus(string gameId, bool brief)
+        public BoggleGameContract GameStatus(string gameId, string brief)
         {
             lock (sync)
             {
@@ -279,7 +283,7 @@ namespace Boggle
                     game.Player1.Score = boggleState.GetScore(gameId, player1UserToken);
                     game.Player2.Score = boggleState.GetScore(gameId, player2UserToken);
 
-                    if (!brief)
+                    if (brief != "yes")
                     {
                         game.Board = boggleState.GetBoard(gameId);
 
@@ -352,7 +356,7 @@ namespace Boggle
 
                 // Determine word score first!
                 // Determine if word is legal or not
-                if (board.CanBeFormed(pair.Word))
+                if (board.CanBeFormed(pair.Word) && dictionary.Contains(pair.Word.ToUpper()))
                 {
                     if (wordLength < 3 || pairs.Exists(repeatFinder))
                     {

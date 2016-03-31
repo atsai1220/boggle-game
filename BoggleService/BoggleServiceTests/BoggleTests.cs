@@ -8,6 +8,7 @@ using System.Net.Http;
 using System.Text;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.Linq;
 
 namespace Boggle
 {
@@ -176,34 +177,6 @@ namespace Boggle
             Assert.AreEqual(Created, dataR.Status);
         }
 
-        [TestMethod]
-        public void TestPending()
-        {
-            string userToken = CreateUser("Sam");
-            string gameId = JoinGame(userToken, 120);
-
-            Response response = client.DoGetAsync("games/" + gameId, new string[] { "false" }).Result;
-            Assert.AreEqual("pending", (string)response.Data.GameState);
-        }
-
-        [TestMethod]
-        public void TestActive()
-        {
-            FillIn();
-
-            string player1 = CreateUser("Player1");
-            string player2 = CreateUser("Player2");
-
-            string gameId1 = JoinGame(player1, 5);
-            string gameId2 = JoinGame(player2, 5);
-
-            Assert.AreEqual(gameId1, gameId2);
-
-            Response response = client.DoGetAsync("games/" + gameId1, new string[] { "false" }).Result;
-
-            Assert.AreEqual("active", (string)response.Data.GameState);
-        }
-
         /// <summary>
         /// 
         /// 
@@ -359,12 +332,12 @@ namespace Boggle
 
                     if (legalWordScore == 11)
                     {
-                        break;
-                    }
+                break;
+            }
                 }
             }
             Assert.AreEqual(OK, wordResult.Status);
-
+       
 
 
             //int temp;
@@ -382,6 +355,75 @@ namespace Boggle
             Assert.AreEqual(Conflict, responseInactive.Status);
         }
 
+        [TestMethod]
+        public void TestPending()
+        {
+            string userToken = CreateUser("Sam");
+            string gameId = JoinGame(userToken, 120);
+
+            Response response = client.DoGetAsync("games/" + gameId, new string[] { "false" }).Result;
+            Assert.AreEqual("pending", (string)response.Data.GameState);
+        }
+
+        [TestMethod]
+        public void TestActive()
+        {
+            FillIn();
+
+            string player1 = CreateUser("Player1");
+            string player2 = CreateUser("Player2");
+
+            string gameId1 = JoinGame(player1, 5);
+            string gameId2 = JoinGame(player2, 5);
+
+            Assert.AreEqual(gameId1, gameId2);
+
+            Response response = client.DoGetAsync("games/" + gameId1, new string[0]).Result;
+
+            Assert.AreEqual("active", (string) response.Data.GameState);
+            string board = response.Data.Board;
+
+            response = client.DoGetAsync("games/" + gameId1 + "?Brief=yes").Result;
+
+            Assert.AreEqual("active", (string) response.Data.GameState);
+            try
+            {
+                board = response.Data.Board;
+                Assert.Fail();
+            }
+            catch { }
+        }
+
+        [TestMethod]
+        public void TestCompleted()
+        {
+            FillIn();
+
+            string player1 = CreateUser("Player1");
+            string player2 = CreateUser("Player2");
+
+            string gameId1 = JoinGame(player1, 5);
+            string gameId2 = JoinGame(player2, 5);
+
+            Assert.AreEqual(gameId1, gameId2);
+
+            Response response;
+            do
+            {
+                response = client.DoGetAsync("games/" + gameId1 + "?Brief=yes", new string[0]).Result;
+            } while (response.Data.GameState != "completed");
+
+            string board;
+            try
+            {
+                board = response.Data.Board;
+                Assert.Fail();
+            }
+            catch { }
+
+            response = client.DoGetAsync("games/" + gameId1, new string[0]).Result;
+            board = response.Data.Board;
+        }
 
         /// <summary>
         /// If there is a pending game with one player, fills it in.
@@ -416,11 +458,6 @@ namespace Boggle
 
             return response.Data.UserToken;
         }
-
-
-
-
-
 
         /// <summary>
         /// Helper method to join a game

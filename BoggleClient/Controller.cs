@@ -226,6 +226,8 @@ namespace BoggleClient
 
                 boggleModel.GameId = responseObject.GameID;
 
+                Console.WriteLine(boggleModel.GameId);
+
                 previousGameState = "pending";
 
                 gameOn = true;
