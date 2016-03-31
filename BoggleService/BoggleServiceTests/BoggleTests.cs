@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.Net.Http;
 using System.Text;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace Boggle
 {
@@ -133,17 +134,18 @@ namespace Boggle
         {
             dynamic player = new ExpandoObject();
             player.Nickname = "Andrew";
-            Response playerR = client.DoPostAsync("/users", player).Result;
-            string userToken = playerR.Data;
+            Response response = client.DoPostAsync("/users", player).Result;
+
+            string userToken = response.Data.UserToken;
 
             dynamic data = new ExpandoObject();
-            data.UserToken = userToken;
+            data.UserToken = response.Data.UserToken;
             data.TimeLimit = 25;
 
             Response dataR = client.DoPostAsync("/games", data).Result;
             Assert.AreEqual(Accepted, dataR.Status);
 
-            CancelGameTest1(userToken);
+            CancelGameTest1((String) data.UserToken);
         }
 
         // tests cancel 
@@ -153,17 +155,18 @@ namespace Boggle
             dynamic data = new ExpandoObject();
             data.UserToken = "thisSHOULDNTwork";
 
-            Response dataR = client.DoPutAsync("/games", data).Result;
+            Response dataR = client.DoPutAsync(data, "/games").Result;
             Assert.AreEqual(Forbidden, dataR);
 
             data.UserToken = userToken;
-            dataR = client.DoPutAsync("/games", data).Result;
+            dataR = client.DoPutAsync(data, "/games").Result;
             Assert.AreEqual(OK, dataR);
         }
 
         /// <summary>
         /// Test player 2 joining a pending game
         /// </summary>
+        [TestMethod]
         public void Player2JoinGame()
         {
             // Player 1
