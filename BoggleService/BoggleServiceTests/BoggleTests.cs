@@ -211,11 +211,13 @@ namespace Boggle
         [TestMethod]
         public void PlayerWordTest()
         {
+            BoggleBoard board;
+
             string userToken1 = CreateUser("Andrew");
             string userToken2 = CreateUser("Sam");
 
-            string gameId1 = JoinGame(userToken1, 10);
-            string gameId2 = JoinGame(userToken2, 10);
+            string gameId1 = JoinGame(userToken1, 5);
+            string gameId2 = JoinGame(userToken2, 5);
 
             Assert.AreEqual(gameId1, gameId2);
 
@@ -226,9 +228,29 @@ namespace Boggle
             Response responseSpace = client.DoPutAsync(CreateWord(userToken1, "   "), "games/" + gameId1).Result;
             Assert.AreEqual(Forbidden, responseSpace.Status);
 
-            // if the gameID or UserToken is missing or invalid -> 403 (Forbidden)
-            Response responseTokenEmpty = client.DoPutAsync(CreateWord("", ""), "games/" + gameId1).Result;
+            // token empty -> 403 (Forbidden)
+            Response responseTokenEmpty = client.DoPutAsync(CreateWord("", "test"), "games/" + gameId1).Result;
             Assert.AreEqual(Forbidden, responseTokenEmpty.Status);
+
+            // token null -> 403 (Forbidden)
+            string testToken = null;
+            Response responseTokenNull = client.DoPutAsync(CreateWord(testToken, "test"), "games/" + gameId1).Result;
+            Assert.AreEqual(Forbidden, responseTokenNull.Status);
+
+            // gameId null -> 403 (Forbidden)
+            //string nullId = null;
+            //Response responseGameNull = client.DoPutAsync(CreateWord(userToken1, "test"), "games/" + nullId).Result;
+            //Assert.AreEqual(Forbidden, responseGameNull.Status);
+
+            // gameId empty -> 403 (Forbidden)
+            //string emptyId = "";
+            //Response responseGameEmpty = client.DoPutAsync(CreateWord(testToken, "test"), "games/" + emptyId).Result;
+            //Assert.AreEqual(Forbidden, responseGameEmpty.Status);
+
+            // gameid dne -> 403 (Forbidden)
+            string dneId = "999";
+            Response responseGameInvalid = client.DoPutAsync(CreateWord(testToken, "test"), "games/" + dneId).Result;
+            Assert.AreEqual(Forbidden, responseGameInvalid.Status);
 
             Response responseIdEmpty = client.DoPutAsync(CreateWord(userToken1, "AAAA"), "games/" + "NO").Result;
             Assert.AreEqual(Forbidden, responseIdEmpty.Status);
@@ -236,37 +258,125 @@ namespace Boggle
             // Legal word and token and gameid
             // TODO legal word with score
             Response gameBrief = client.DoGetAsync("games/" + gameId1, "yes").Result;
-            string board = gameBrief.Data.Board;
-            int legalWordScore;
+            string boardString = gameBrief.Data.Board;
+            board = new BoggleBoard(boardString);
+            int legalWordScore = -2;
 
             string line;
             Response wordResult = new Response();
             System.IO.StreamReader file = new System.IO.StreamReader("dictionary.txt");
+
+
             while ((line = file.ReadLine()) != null)
             {
-                do
+                if (board.CanBeFormed(line) && line.Length < 3)
                 {
                     wordResult = client.DoPutAsync(CreateWord(userToken1, line), "games/" + gameId1).Result;
 
                     string legalWord = wordResult.Data.Score;
                     int.TryParse(legalWord, out legalWordScore);
-                } while (legalWordScore < 1);
-                break;
+                }
+
+                // Found
+                if (legalWordScore == 0)
+                {
+                    break;
+                }
+            }
+
+            while ((line = file.ReadLine()) != null)
+            {
+                if (board.CanBeFormed(line) && line.Length >= 3 && line.Length < 5)
+                {
+                    wordResult = client.DoPutAsync(CreateWord(userToken1, line), "games/" + gameId1).Result;
+
+                    string legalWord = wordResult.Data.Score;
+                    int.TryParse(legalWord, out legalWordScore);
+                    
+                    if (legalWordScore == 1)
+                    {
+                        break;
+                    }
+                }
+            }
+
+            while ((line = file.ReadLine()) != null)
+            {
+                if (board.CanBeFormed(line) && line.Length == 5)
+                {
+                    wordResult = client.DoPutAsync(CreateWord(userToken1, line), "games/" + gameId1).Result;
+
+                    string legalWord = wordResult.Data.Score;
+                    int.TryParse(legalWord, out legalWordScore);
+
+                    if (legalWordScore == 2)
+                    {
+                        break;
+                    }
+                }
+            }
+
+            while ((line = file.ReadLine()) != null)
+            {
+                if (board.CanBeFormed(line) && line.Length == 6)
+                {
+                    wordResult = client.DoPutAsync(CreateWord(userToken1, line), "games/" + gameId1).Result;
+
+                    string legalWord = wordResult.Data.Score;
+                    int.TryParse(legalWord, out legalWordScore);
+
+                    if (legalWordScore == 3)
+                    {
+                        break;
+                    }
+                }
+            }
+
+            while ((line = file.ReadLine()) != null)
+            {
+                if (board.CanBeFormed(line) && line.Length == 7)
+                {
+                    wordResult = client.DoPutAsync(CreateWord(userToken1, line), "games/" + gameId1).Result;
+
+                    string legalWord = wordResult.Data.Score;
+                    int.TryParse(legalWord, out legalWordScore);
+
+                    if (legalWordScore == 5)
+                    {
+                        break;
+                    }
+                }
+            }
+
+            while ((line = file.ReadLine()) != null)
+            {
+                if (board.CanBeFormed(line) && line.Length > 7)
+                {
+                    wordResult = client.DoPutAsync(CreateWord(userToken1, line), "games/" + gameId1).Result;
+
+                    string legalWord = wordResult.Data.Score;
+                    int.TryParse(legalWord, out legalWordScore);
+
+                    if (legalWordScore == 11)
+                    {
+                        break;
+                    }
+                }
             }
             Assert.AreEqual(OK, wordResult.Status);
-       
 
 
-            int temp;
-            Response responseLegal = client.DoPutAsync(CreateWord(userToken1, "AAAAA"), "games/" + gameId1).Result;
-            Assert.AreEqual(OK, responseLegal.Status);
-            string score = responseLegal.Data.Score;
-            int.TryParse(score, out temp);
 
-            Assert.AreEqual(temp.ToString(), score);
+            //int temp;
+            //Response responseLegal = client.DoPutAsync(CreateWord(userToken1, "AAAAA"), "games/" + gameId1).Result;
+            //Assert.AreEqual(OK, responseLegal.Status);
+            //string score = responseLegal.Data.Score;
+            //int.TryParse(score, out temp);
+
+            //Assert.AreEqual(temp.ToString(), score);
 
             // Wait 10 seconds
-            System.Threading.Thread.Sleep(10000);
+            System.Threading.Thread.Sleep(5000);
             // If game state is NOT active -> 409 (Conflict)
             Response responseInactive = client.DoPutAsync(CreateWord(userToken1, "AAAA"), "games/" + gameId1).Result;
             Assert.AreEqual(Conflict, responseInactive.Status);
