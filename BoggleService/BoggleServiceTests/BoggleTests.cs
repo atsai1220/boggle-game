@@ -57,7 +57,7 @@ namespace Boggle
         [ClassInitialize()]
         public static void StartIIS(TestContext testContext)
         {
-            //IISAgent.Start(@"/site:""BoggleService"" /apppool:""Clr4IntegratedAppPool"" /config:""..\..\..\.vs\config\applicationhost.config""");
+            IISAgent.Start(@"/site:""BoggleService"" /apppool:""Clr4IntegratedAppPool"" /config:""..\..\..\.vs\config\applicationhost.config""");
         }
 
         /// <summary>
@@ -66,7 +66,7 @@ namespace Boggle
         [ClassCleanup()]
         public static void StopIIS()
         {
-            //IISAgent.Stop();
+            IISAgent.Stop();
         }
 
         private RestTestClient client = new RestTestClient("http://localhost:60000/");

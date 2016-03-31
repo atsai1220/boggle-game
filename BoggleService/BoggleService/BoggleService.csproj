@@ -127,7 +127,9 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="index.html" />
-    <Content Include="dictionary.txt" />
+    <Content Include="dictionary.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="BoggleService.svc" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
