@@ -273,8 +273,8 @@ namespace Boggle
                     string player1UserToken, player2UserToken;
                     boggleState.GetPlayers(gameId, out player1UserToken, out player2UserToken);
 
-                    game.player1.Score = boggleState.GetScore(gameId, player1UserToken);
-                    game.player2.Score = boggleState.GetScore(gameId, player2UserToken);
+                    game.Player1.Score = boggleState.GetScore(gameId, player1UserToken);
+                    game.Player2.Score = boggleState.GetScore(gameId, player2UserToken);
 
                     if (!brief)
                     {
@@ -282,13 +282,13 @@ namespace Boggle
 
                         game.TimeLimit = timeLimit.ToString();
 
-                        game.player1.Nickname = boggleState.GetNickname(player1UserToken);
-                        game.player2.Nickname = boggleState.GetNickname(player2UserToken);
+                        game.Player1.Nickname = boggleState.GetNickname(player1UserToken);
+                        game.Player2.Nickname = boggleState.GetNickname(player2UserToken);
 
                         if (gameState == GameState.Completed)
                         {
-                            game.player1.WordsPlayed = boggleState.GetWords(gameId, player1UserToken);
-                            game.player2.WordsPlayed = boggleState.GetWords(gameId, player2UserToken);
+                            game.Player1.WordsPlayed = boggleState.GetWords(gameId, player1UserToken);
+                            game.Player2.WordsPlayed = boggleState.GetWords(gameId, player2UserToken);
                         }
                     }
                 }
