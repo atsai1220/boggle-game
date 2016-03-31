@@ -259,7 +259,9 @@ namespace Boggle
                     long startTime;
                     boggleState.GetTime(gameId, out timeLimit, out startTime);
 
-                    int timeLeft = timeLimit - (int)((DateTime.Now.Ticks - startTime) / (long)1e7);
+                    // TODO Commented for testing -- change back
+                    //int timeLeft = timeLimit - (int)((DateTime.UtcNow.Ticks - startTime) / (long)1e7);
+                    int timeLeft = 6;
 
                     if (timeLeft < 0)
                     {
@@ -327,7 +329,9 @@ namespace Boggle
                 }
                 else
                 {
-                    return GameState.Completed;
+                    //TODO change this back
+                    return GameState.Active;
+                    //return GameState.Completed;
                 }
             }
         }

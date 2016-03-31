@@ -22,10 +22,10 @@ namespace Boggle
         public string TimeLeft { get; set; }
 
         [DataMember(EmitDefaultValue = false)]
-        public Player player1;
+        public Player Player1;
 
         [DataMember(EmitDefaultValue = false)]
-        public Player player2;
+        public Player Player2;
     }
 
     [DataContract]
