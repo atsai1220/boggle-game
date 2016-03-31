@@ -9,6 +9,7 @@ using System.Text;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Linq;
+using System.Threading;
 
 namespace Boggle
 {
@@ -127,6 +128,44 @@ namespace Boggle
             Assert.AreEqual(Accepted, dataR.Status);
 
             CancelGameTest1((String)data.UserToken);
+        }
+
+        /// <summary>
+        /// Test that requesting a bad time limit responds with Forbidden
+        /// </summary>
+        [TestMethod]
+        public void JoinGameTest2()
+        {
+            string userToken = CreateUser("User");
+
+            dynamic data = new ExpandoObject();
+            data.UserToken = userToken;
+            data.TimeLimit = 0;
+
+            Response response = client.DoPostAsync("/games", data).Result;
+            Assert.AreEqual(Forbidden, response);
+
+            data.TimeLimit = 121;
+            response = client.DoPostAsync("/games", data).Result;
+            Assert.AreEqual(Forbidden, response);
+        }
+
+        /// <summary>
+        /// Test that joining a game twice responds with conflict.
+        /// </summary>
+        [TestMethod]
+        public void JoinGameTest3()
+        {
+            string userToken = CreateUser("User");
+
+            dynamic data = new ExpandoObject();
+            data.UserToken = userToken;
+            data.TimeLimit = 60;
+
+            client.DoPostAsync("/games", data);
+            Response response = client.DoPostAsync("/games", data).Result;
+
+            Assert.AreEqual(Conflict, response);
         }
 
         // tests cancel 
@@ -411,6 +450,8 @@ namespace Boggle
             do
             {
                 response = client.DoGetAsync("games/" + gameId1 + "?Brief=yes", new string[0]).Result;
+                // Don't spam server with requests.
+                Thread.Sleep(1000);
             } while (response.Data.GameState != "completed");
 
             string board;
@@ -421,8 +462,21 @@ namespace Boggle
             }
             catch { }
 
+            // Wait two seconds to make sure that time recieved is not less than zero.
+            Thread.Sleep(2000);
+
             response = client.DoGetAsync("games/" + gameId1, new string[0]).Result;
             board = response.Data.Board;
+
+            Assert.AreEqual(0, (int) response.Data.TimeLeft);
+        }
+
+        [TestMethod]
+        public void TestInvalid()
+        {
+            Response response = client.DoGetAsync("games/1000000000", new string[0]).Result;
+
+            Assert.AreEqual(Forbidden, response);
         }
 
         /// <summary>
