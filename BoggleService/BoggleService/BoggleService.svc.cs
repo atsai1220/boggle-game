@@ -224,7 +224,7 @@ namespace Boggle
             }
         }
 
-        public BoggleGameContract GameStatus(string gameId, bool brief)
+        public BoggleGameContract GameStatus(string gameId, string brief)
         {
             lock (sync)
             {
@@ -274,7 +274,7 @@ namespace Boggle
                     game.Player1.Score = boggleState.GetScore(gameId, player1UserToken);
                     game.Player2.Score = boggleState.GetScore(gameId, player2UserToken);
 
-                    if (!brief)
+                    if (brief != "yes")
                     {
                         game.Board = boggleState.GetBoard(gameId);
 

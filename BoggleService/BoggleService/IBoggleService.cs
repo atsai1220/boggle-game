@@ -28,6 +28,6 @@ namespace Boggle
         PlayWordContract PlayWord(PlayWordBody body, string gameId);
 
         [WebInvoke(Method = "GET", UriTemplate = "/games/{gameId}?Brief={brief}")]
-        BoggleGameContract GameStatus(string gameId, bool brief);
+        BoggleGameContract GameStatus(string gameId, string brief);
     }
 }

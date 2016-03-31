@@ -8,6 +8,7 @@ using System.Net.Http;
 using System.Text;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.Linq;
 
 namespace Boggle
 {
@@ -56,7 +57,7 @@ namespace Boggle
         [ClassInitialize()]
         public static void StartIIS(TestContext testContext)
         {
-            IISAgent.Start(@"/site:""BoggleService"" /apppool:""Clr4IntegratedAppPool"" /config:""..\..\..\.vs\config\applicationhost.config""");
+            //IISAgent.Start(@"/site:""BoggleService"" /apppool:""Clr4IntegratedAppPool"" /config:""..\..\..\.vs\config\applicationhost.config""");
         }
 
         /// <summary>
@@ -65,30 +66,10 @@ namespace Boggle
         [ClassCleanup()]
         public static void StopIIS()
         {
-            IISAgent.Stop();
+            //IISAgent.Stop();
         }
 
         private RestTestClient client = new RestTestClient("http://localhost:60000/");
-
-        [TestMethod]
-        public void TestMethod1()
-        {
-            Response r = client.DoGetAsync("/numbers?length={0}", "5").Result;
-            Assert.AreEqual(OK, r.Status);
-            Assert.AreEqual(5, r.Data.Count);
-            r = client.DoGetAsync("/numbers?length={0}", "-5").Result;
-            Assert.AreEqual(Forbidden, r.Status);
-        }
-
-        [TestMethod]
-        public void TestMethod2()
-        {
-            List<int> list = new List<int>();
-            list.Add(15);
-            Response r = client.DoPostAsync("/first", list).Result;
-            Assert.AreEqual(OK, r.Status);
-            Assert.AreEqual(15, r.Data);
-        }
 
         /// <summary>
         /// Tests CreateUser
@@ -219,9 +200,51 @@ namespace Boggle
 
             Assert.AreEqual(gameId1, gameId2);
 
-            Response response = client.DoGetAsync("games/" + gameId1, new string[] { "false" }).Result;
+            Response response = client.DoGetAsync("games/" + gameId1, new string[0]).Result;
 
             Assert.AreEqual("active", (string) response.Data.GameState);
+            string board = response.Data.Board;
+
+            response = client.DoGetAsync("games/" + gameId1 + "?Brief=yes").Result;
+
+            Assert.AreEqual("active", (string) response.Data.GameState);
+            try
+            {
+                board = response.Data.Board;
+                Assert.Fail();
+            }
+            catch { }
+        }
+
+        [TestMethod]
+        public void TestCompleted()
+        {
+            FillIn();
+
+            string player1 = CreateUser("Player1");
+            string player2 = CreateUser("Player2");
+
+            string gameId1 = JoinGame(player1, 5);
+            string gameId2 = JoinGame(player2, 5);
+
+            Assert.AreEqual(gameId1, gameId2);
+
+            Response response;
+            do
+            {
+                response = client.DoGetAsync("games/" + gameId1 + "?Brief=yes", new string[0]).Result;
+            } while (response.Data.GameState != "completed");
+
+            string board;
+            try
+            {
+                board = response.Data.Board;
+                Assert.Fail();
+            }
+            catch { }
+
+            response = client.DoGetAsync("games/" + gameId1, new string[0]).Result;
+            board = response.Data.Board;
         }
 
         /// <summary>
