@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
@@ -9,6 +10,21 @@ namespace Boggle
 {
     class BoggleState
     {
+        public static string boggleDB
+        {
+            get
+            {
+                if(boggleDB == null)
+                {
+                    boggleDB = ConfigurationManager.ConnectionStrings["BoggleDB"].ConnectionString;
+                }
+
+                return boggleDB;
+            }
+
+            private set { }
+        }
+
         private string empty;
         /// <summary>
         /// Instance of bogglestate
