@@ -1,0 +1,2 @@
+﻿SELECT MAX(GameId)
+FROM Games

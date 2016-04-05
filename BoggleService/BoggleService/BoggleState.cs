@@ -24,8 +24,7 @@ namespace Boggle
 
             private set { }
         }
-
-        private string empty;
+        
         /// <summary>
         /// Instance of bogglestate
         /// </summary>
@@ -102,8 +101,10 @@ namespace Boggle
         /// <param name="userToken">User token of player in action</param>
         /// <param name="word">Word being played</param>
         /// <param name="score">Score acquired</param>
-        public void AddWord(string gameId, string userToken, string word, int score)
+        public void AddWord(string gameId, string userToken, string word, int score, SqlConnection conn, SqlTransaction trans)
         {
+            SqlCommand command = new SqlCommand(AddWord, conn, trans));
+
             BoggleGame game;
             if (games.TryGetValue(gameId, out game))
             {
