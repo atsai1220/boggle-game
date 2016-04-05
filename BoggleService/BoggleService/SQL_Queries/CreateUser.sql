@@ -1,2 +1,1 @@
-﻿INSERT INTO Games(Player1, Player2, Board, TimeLimit, StartTime)
-VALUES (@UserToken1, @UserToken2, @Board, @TimeLimit, @StartTime)
+﻿insert into Users (UserID, Nickname) values('1234-1234-1234', 'Sam')

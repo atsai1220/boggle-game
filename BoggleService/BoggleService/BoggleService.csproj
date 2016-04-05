@@ -135,6 +135,7 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="BoggleService.svc" />
+    <Content Include="SQL_Queries\CreateUser.sql" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>

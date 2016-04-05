@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -131,8 +132,13 @@ namespace Boggle
         /// <param name="userToken">User token of player</param>
         public void CreateUser(string nickname, string userToken)
         {
-            // userToken -> nickname
-            players.Add(userToken, nickname);
+            using (SqlCommand command =
+                    new SqlCommand("insert into Users (UserID, Name, Email) values(@UserID, @Nickname, @Email)",
+                                    conn,
+                                    trans))
+            {
+
+            }
         }
 
         /// <summary>
