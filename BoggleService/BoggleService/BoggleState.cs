@@ -14,7 +14,7 @@ namespace Boggle
         {
             get
             {
-                if(boggleDB == null)
+                if (boggleDB == null)
                 {
                     boggleDB = ConfigurationManager.ConnectionStrings["BoggleDB"].ConnectionString;
                 }
@@ -84,8 +84,20 @@ namespace Boggle
         /// <param name="gameId">Id of game</param>
         /// <param name="player1Token">User token of player 1</param>
         /// <param name="player1TimeLimit">Time limit requested by player 1</param>
-        public void AddGame(string gameId, string player1Token, int player1TimeLimitm)
+        public void AddGame(string gameId, string player1Token, int player1TimeLimit, SqlConnection conn, SqlTransaction trans)
         {
+            using (SqlCommand command = new SqlCommand("INSERT INTO Games(Player1, Player2, Board, TimeLimit, StartTime) VALUES(@UserToken1, @UserToken2, @Board, @TimeLimit, @StartTime)",
+                    conn,
+                    trans))
+            {
+                command.Parameters.AddWithValue("@UserToken1", player1Token);
+                command.Parameters.AddWithValue("@UserToken2", "");
+                command.Parameters.AddWithValue("@Board", "");
+                command.Parameters.AddWithValue("@TimeLimit", player1TimeLimit);
+                command.Parameters.AddWithValue("@StartTime", "");
+
+                command.ExecuteNonQuery();
+            }
             BoggleGame game = games[gameId];
 
             game.gameId = gameId;
@@ -146,14 +158,16 @@ namespace Boggle
         /// </summary>
         /// <param name="nickname">Nickname of player</param>
         /// <param name="userToken">User token of player</param>
-        public void CreateUser(string nickname, string userToken)
+        public void CreateUser(string nickname, string userToken, SqlConnection conn, SqlTransaction trans)
         {
-            using (SqlCommand command =
-                    new SqlCommand("insert into Users (UserID, Name, Email) values(@UserID, @Nickname, @Email)",
-                                    conn,
-                                    trans))
+            using (SqlCommand command = new SqlCommand("insert into Users(UserID, Nickname) values(@UserID, @Nickname)",
+                    conn,
+                    trans))
             {
+                command.Parameters.AddWithValue("@UserID", userToken);
+                command.Parameters.AddWithValue("@Nickname", nickname.Trim());
 
+                command.ExecuteNonQuery();
             }
         }
 
