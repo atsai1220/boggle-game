@@ -295,16 +295,17 @@ namespace Boggle
         /// <param name="score">The score</param>
         public void SetScore(string gameId, string userToken, int score)
         {
-            var game = games[gameId];
+            //var game = games[gameId];
 
-            if (userToken == game.player1UserToken)
-            {
-                game.player1Score = score;
-            }
-            else if (userToken == game.player2UserToken)
-            {
-                game.player2Score = score;
-            }
+            //if (userToken == game.player1UserToken)
+            //{
+            //    game.player1Score = score;
+            //}
+            //else if (userToken == game.player2UserToken)
+            //{
+            //    game.player2Score = score;
+            //}
+            // No longer necessary because of new database!
         }
 
         /// <summary>

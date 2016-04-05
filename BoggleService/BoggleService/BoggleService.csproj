@@ -142,7 +142,9 @@
     <Content Include="SQL_Queries\GetNickname.sql" />
     <Content Include="SQL_Queries\GetPlayers.sql" />
     <Content Include="SQL_Queries\GetScore.sql" />
+    <Content Include="SQL_Queries\GetWords.sql" />
     <Content Include="SQL_Queries\LastGameId.sql" />
+    <Content Include="SQL_Queries\StartGame.sql" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
