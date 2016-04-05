@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace Boggle
 {
-    class BoggleState : IBoggleState
+    class BoggleState
     {
-
+        private string empty;
         /// <summary>
         /// Instance of bogglestate
         /// </summary>
@@ -67,13 +67,14 @@ namespace Boggle
         /// <param name="gameId">Id of game</param>
         /// <param name="player1Token">User token of player 1</param>
         /// <param name="player1TimeLimit">Time limit requested by player 1</param>
-        public void AddGame(string gameId, string player1Token, int player1TimeLimit)
+        public void AddGame(string gameId, string player1Token, int player1TimeLimitm)
         {
             BoggleGame game = games[gameId];
 
             game.gameId = gameId;
             game.player1UserToken = player1Token;
             game.timeLimit = player1TimeLimit;
+
         }
 
         /// <summary>

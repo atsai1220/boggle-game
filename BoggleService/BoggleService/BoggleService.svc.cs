@@ -14,6 +14,8 @@ namespace Boggle
 {
     public class BoggleService : IBoggleService
     {
+        private static string boggleDB;
+
         /// <summary>
         /// Enumeration to represent the game state.
         /// 
