@@ -25,7 +25,7 @@ namespace Boggle
 
             private set { }
         }
-        
+
         /// <summary>
         /// Instance of bogglestate
         /// </summary>
@@ -42,40 +42,6 @@ namespace Boggle
                 boggleState = new BoggleState();
             }
             return boggleState;
-        }
-
-        // userToken -> nickName
-        private Dictionary<string, string> players;
-        // gameId -> BoggleGame
-        private Dictionary<string, BoggleGame> games;
-
-        private int lastGameId;
-
-        private class BoggleGame
-        {
-            public string gameId;
-            public string board;
-            public int timeLimit;
-            public long startTime;
-
-            public string player1UserToken = "";
-            public int player1Score = 0;
-            public List<WordPair> player1Words = new List<WordPair>();
-
-            public string player2UserToken = "";
-            public int player2Score = 0;
-            public List<WordPair> player2Words = new List<WordPair>();
-        }
-
-        /// <summary>
-        /// Private constructor for boggleState.
-        /// </summary>
-        private BoggleState()
-        {
-            players = new Dictionary<string, string>();
-            games = new Dictionary<string, BoggleGame>();
-
-            lastGameId = 0;
         }
 
         /// <summary>
@@ -98,12 +64,6 @@ namespace Boggle
 
                 command.ExecuteNonQuery();
             }
-            BoggleGame game = games[gameId];
-
-            game.gameId = gameId;
-            game.player1UserToken = player1Token;
-            game.timeLimit = player1TimeLimit;
-
         }
 
         /// <summary>
@@ -165,9 +125,16 @@ namespace Boggle
         /// Removes a game from the list.
         /// </summary>
         /// <param name="gameId">The game to remove</param>
-        public void CancelGame(string gameId)
+        public void CancelGame(string gameId, SqlConnection conn, SqlTransaction trans)
         {
-            games.Remove(gameId);
+            using (SqlCommand command = new SqlCommand("DELETE FROM Games WHERE GameID = @GameID",
+                conn,
+                trans))
+            {
+                command.Parameters.AddWithValue("@GameID", gameId);
+
+                command.ExecuteNonQuery();
+            }
         }
 
         /// <summary>
@@ -269,10 +236,20 @@ namespace Boggle
         /// <param name="gameId">The id of the game queried</param>
         /// <param name="timeLimit">The time limit of the game</param>
         /// <param name="startTime">The time that the game started</param>
-        public void GetTime(string gameId, out int timeLimit, out long startTime)
+        public void GetTime(string gameId, out int timeLimit, out long startTime, SqlConnection conn, SqlTransaction trans)
         {
-            timeLimit = games[gameId].timeLimit;
-            startTime = games[gameId].startTime;
+            using (SqlCommand command = new SqlCommand("SELECT TimeLimit, StartTime FROM Games WHERE GameID = @GameID",
+                conn,
+                trans))
+            {
+                command.Parameters.AddWithValue("@GameID", gameId);
+
+                using (SqlDataReader reader = command.ExecuteReader())
+                {
+                    timeLimit = (int)reader["TimeLimit"];
+                    startTime = (long)reader["StartTime"];
+                }
+            }
         }
 
         /// <summary>
@@ -341,9 +318,26 @@ namespace Boggle
             game.board = board;
         }
 
-        public bool GameExists(string gameId)
+        public bool GameExists(string gameId, SqlConnection conn, SqlTransaction trans)
         {
-            return games.ContainsKey(gameId);
+            using (SqlCommand command = new SqlCommand("SELECT TimeLimit, StartTime FROM Games WHERE GameID = @GameID",
+                    conn,
+                    trans))
+            {
+                command.Parameters.AddWithValue("@GameID", gameId);
+
+                using (SqlDataReader reader = command.ExecuteReader())
+                {
+                    if (reader.HasRows)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+            }
         }
 
         public string CreateGame()

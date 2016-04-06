@@ -1,0 +1,1 @@
+﻿SELECT GameID FROM Games WHERE GameID = @GameID
