@@ -11,19 +11,18 @@ namespace Boggle
 {
     class BoggleState
     {
+        private static string _boggleDB;
         public static string boggleDB
         {
             get
             {
-                if (boggleDB == null)
+                if (_boggleDB == null)
                 {
-                    boggleDB = ConfigurationManager.ConnectionStrings["BoggleDB"].ConnectionString;
+                    _boggleDB = ConfigurationManager.ConnectionStrings["BoggleDB"].ConnectionString;
                 }
 
                 return boggleDB;
             }
-
-            private set { }
         }
 
         /// <summary>

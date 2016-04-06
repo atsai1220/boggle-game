@@ -15,8 +15,6 @@ namespace Boggle
 {
     public class BoggleService : IBoggleService
     {
-        private static string boggleDB;
-
         /// <summary>
         /// Enumeration to represent the game state.
         /// 
@@ -56,25 +54,30 @@ namespace Boggle
 
         public UserTokenContract CreateUser(CreateUserBody body)
         {
-            lock (sync)
+            using (SqlConnection conn = new SqlConnection(BoggleState.boggleDB))
             {
-                // TODO Consider putting an upperbound on nickname length.
-                if (body.Nickname == null || body.Nickname.Trim().Length == 0)
+                conn.Open();
+                using (SqlTransaction trans = conn.BeginTransaction())
                 {
-                    SetStatus(Forbidden);
-                    return null;
-                }
-                else
-                {
-                    string userToken = Guid.NewGuid().ToString();
+                    // TODO Consider putting an upperbound on nickname length.
+                    if (body.Nickname == null || body.Nickname.Trim().Length == 0)
+                    {
+                        SetStatus(Forbidden);
+                        return null;
+                    }
+                    else
+                    {
+                        string userToken = Guid.NewGuid().ToString();
 
-                    BoggleState.getBoggleState().CreateUser(body.Nickname.Trim(), userToken);
-                    SetStatus(Created);
+                        BoggleState.getBoggleState().CreateUser(body.Nickname.Trim(), userToken, conn, trans);
+                        SetStatus(Created);
 
-                    UserTokenContract userTokenContract = new UserTokenContract();
-                    userTokenContract.UserToken = userToken;
+                        UserTokenContract userTokenContract = new UserTokenContract();
+                        userTokenContract.UserToken = userToken;
 
-                    return userTokenContract;
+                        trans.Commit();
+                        return userTokenContract;
+                    }
                 }
             }
         }
@@ -86,13 +89,14 @@ namespace Boggle
         /// <returns></returns>
         public GameIdContract JoinGame(JoinGameBody body)
         {
-
-                // If UserToken is invalid, TimeLimit < 5, or TimeLimit > 120, responds with status 403 (Forbidden).
-                if (body.TimeLimit < 5 || body.TimeLimit > 120)
-                {
-                    SetStatus(Forbidden);
-                    return null;
-                }
+            throw new NotImplementedException();
+            /*
+            // If UserToken is invalid, TimeLimit < 5, or TimeLimit > 120, responds with status 403 (Forbidden).
+            if (body.TimeLimit < 5 || body.TimeLimit > 120)
+            {
+                SetStatus(Forbidden);
+                return null;
+            }
 
             using (SqlConnection conn = new SqlConnection(boggleDB))
             {
@@ -100,57 +104,59 @@ namespace Boggle
 
                 using (SqlTransaction trans = conn.BeginTransaction())
                 {
-                BoggleState boggleState = BoggleState.getBoggleState();
+                    BoggleState boggleState = BoggleState.getBoggleState();
                     string gameId = boggleState.GetLastGameId();
 
 
-                if(!boggleState.PlayerExists(body.UserToken))
-                {
-                    SetStatus(Forbidden);
-                    return null;
-                }
+                    if (!boggleState.PlayerExists(body.UserToken))
+                    {
+                        SetStatus(Forbidden);
+                        return null;
+                    }
 
-                string gameId = boggleState.GetLastGameId();
+                    string gameId = boggleState.GetLastGameId();
                 }
             }
 
 
-                if (getGameState(gameId) == GameState.Pending)
+            if (getGameState(gameId) == GameState.Pending)
+            {
+                string player1Id;
+                string player2Id;
+
+                boggleState.GetPlayers(gameId, out player1Id, out player2Id);
+
+                // If UserToken is already a player in the pending game
+                if (body.UserToken.Equals(player1Id))
                 {
-                    string player1Id;
-                    string player2Id;
-
-                    boggleState.GetPlayers(gameId, out player1Id, out player2Id);
-
-                    // If UserToken is already a player in the pending game
-                    if (body.UserToken.Equals(player1Id))
-                    {
-                        SetStatus(Conflict);
-                        return null;
-                    }
-
-                    BoggleBoard board = new BoggleBoard();
-                    long startTime = DateTime.UtcNow.Ticks;
-                    boggleState.StartGame(gameId, body.UserToken, body.TimeLimit, startTime, board.ToString());
-
-                    SetStatus(Created);
-                }
-                else
-                {
-                    gameId = boggleState.CreateGame();
-
-                    boggleState.AddGame(gameId, body.UserToken, body.TimeLimit);
-                    SetStatus(Accepted);
+                    SetStatus(Conflict);
+                    return null;
                 }
 
-                GameIdContract GameIdContract = new GameIdContract();
-                GameIdContract.GameID = gameId;
-                return GameIdContract;
+                BoggleBoard board = new BoggleBoard();
+                long startTime = DateTime.UtcNow.Ticks;
+                boggleState.StartGame(gameId, body.UserToken, body.TimeLimit, startTime, board.ToString());
 
+                SetStatus(Created);
+            }
+            else
+            {
+                gameId = boggleState.CreateGame();
+
+                boggleState.AddGame(gameId, body.UserToken, body.TimeLimit);
+                SetStatus(Accepted);
+            }
+
+            GameIdContract GameIdContract = new GameIdContract();
+            GameIdContract.GameID = gameId;
+            return GameIdContract;
+            */
         }
 
         public void CancelJoinRequest(CancelJoinRequestBody body)
         {
+            throw new NotImplementedException();
+            /*
             lock (sync)
             {
                 BoggleState boggleState = BoggleState.getBoggleState();
@@ -176,6 +182,7 @@ namespace Boggle
 
                 return;
             }
+            */
         }
 
         /// <summary>
@@ -186,6 +193,8 @@ namespace Boggle
         /// <returns></returns>
         public PlayWordContract PlayWord(PlayWordBody body, string gameId)
         {
+            throw new NotImplementedException();
+            /*
             lock (sync)
             {
                 BoggleState _boggleState = BoggleState.getBoggleState();
@@ -260,11 +269,12 @@ namespace Boggle
 
                     return PlayWordContract;
                 }
-            }
+            }*/
         }
 
         public BoggleGameContract GameStatus(string gameId, string brief)
         {
+            throw new NotImplementedException();/*
             lock (sync)
             {
                 GameState gameState = getGameState(gameId);
@@ -297,7 +307,7 @@ namespace Boggle
                     int timeLimit;
                     long startTime;
                     boggleState.GetTime(gameId, out timeLimit, out startTime);
-                    
+
                     int timeLeft = timeLimit - (int)((DateTime.UtcNow.Ticks - startTime) / (long)1e7);
 
                     if (timeLeft < 0)
@@ -335,11 +345,12 @@ namespace Boggle
 
                 SetStatus(OK);
                 return game;
-            }
+            }*/
         }
 
         private GameState getGameState(string gameId)
         {
+            throw new NotImplementedException();/*
             lock (sync)
             {
                 BoggleState boggleState = BoggleState.getBoggleState();
@@ -371,11 +382,12 @@ namespace Boggle
                 {
                     return GameState.Completed;
                 }
-            }
+            }*/
         }
 
         private WordPair GetScore(PlayWordBody body, string gameId)
         {
+            throw new NotImplementedException();/*
             lock (sync)
             {
                 BoggleState _boggleState = BoggleState.getBoggleState();
@@ -387,7 +399,7 @@ namespace Boggle
                 pair.Word = body.Word.Trim();
                 int wordLength = body.Word.Length;
 
-                if(pairs.Exists(repeatFinder))
+                if (pairs.Exists(repeatFinder))
                 {
                     pair.Score = 0;
                 }
@@ -429,7 +441,7 @@ namespace Boggle
                 }
 
                 return pair;
-            }
+            }*/
         }
     }
 }
