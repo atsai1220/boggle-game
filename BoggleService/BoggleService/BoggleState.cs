@@ -76,8 +76,7 @@ namespace Boggle
         /// <param name="score">Score acquired</param>
         public void AddWord(string gameId, string userToken, string word, int score, SqlConnection conn, SqlTransaction trans)
         {
-            // TODO is this the right path?
-            string script = File.ReadAllText(@"\SQL_Queries\AddWord.sql");
+            string script = "INSERT INTO Words(Word, GameID, Player, Score) VALUES (@Word, @GameID, @Player, @Score)";
 
             using (SqlCommand command = new SqlCommand(script, conn, trans))
             {
@@ -89,11 +88,6 @@ namespace Boggle
                 {
                     throw new ArgumentException();
                 }
-                else
-                {
-                    trans.Commit();
-                }
-                return;
             }
         }
 
@@ -136,9 +130,16 @@ namespace Boggle
         /// </summary>
         /// <param name="gameId">The gameId</param>
         /// <returns></returns>
-        public string GetBoard(string gameId)
+        public string GetBoard(string gameId, SqlConnection conn, SqlTransaction trans)
         {
-            return games[gameId].board;
+            string script = "SELECT Board FROM Games WHERE GameId = @GameId";
+
+            using (SqlCommand command = new SqlCommand(script, conn, trans))
+            {
+                command.Parameters.AddWithValue("@GameId", gameId);
+                SqlDataReader reader = command.ExecuteReader();
+                return reader.GetString(0);
+            }
         }
 
         /// <summary>
@@ -146,17 +147,14 @@ namespace Boggle
         /// </summary>
         /// <param name="userToken">User token of player</param>
         /// <returns></returns>
-        public string GetNickname(string userToken)
+        public string GetNickname(string userToken, SqlConnection conn, SqlTransaction trans)
         {
-            string nickname;
-            if (players.TryGetValue(userToken, out nickname))
+            string script = "SELECT Nickname FROM Users WHERE UserId = @UserId";
+            using (SqlCommand command = new SqlCommand(script, conn, trans))
             {
-                return nickname;
-            }
-            // This will only happen if there is a bug in BoggleService.
-            else
-            {
-                throw new ArgumentException();
+                command.Parameters.AddWithValue("@UserId", userToken);
+                SqlDataReader reader = command.ExecuteReader();
+                return reader.GetString(0);
             }
         }
 
@@ -166,10 +164,17 @@ namespace Boggle
         /// <param name="gameId">The game id</param>
         /// <param name="player1Id">The user token of player 1</param>
         /// <param name="player2Id">The user token of player 2</param>
-        public void GetPlayers(string gameId, out string player1Id, out string player2Id)
+        public void GetPlayers(string gameId, out string player1Id, out string player2Id, SqlConnection conn, SqlTransaction trans)
         {
-            player1Id = games[gameId].player1UserToken;
-            player2Id = games[gameId].player2UserToken;
+            string script = "SELECT Player1, Player2 FROM Games WHERE GameId = @GameId";
+            // Column 0 is player 1
+            using (SqlCommand command = new SqlCommand(script, conn, trans))
+            {
+                command.Parameters.AddWithValue("@GameId", gameId);
+                SqlDataReader reader = command.ExecuteReader();
+                player1Id =  reader.GetString(0);
+                player2Id = reader.GetString(1);
+            }
         }
 
         /// <summary>
@@ -178,31 +183,15 @@ namespace Boggle
         /// <param name="gameId">Id of game</param>
         /// <param name="userToken">User token of player</param>
         /// <returns></returns>
-        public int GetScore(string gameId, string userToken)
+        public int GetScore(string gameId, string userToken, SqlConnection conn, SqlTransaction trans)
         {
-            BoggleGame game;
-            if (games.TryGetValue(gameId, out game))
+            string script = "SELECT SUM(Score) FROM Words WHERE GameID = @GameID AND Player = @UserId";
+            using (SqlCommand command = new SqlCommand(script, conn, trans))
             {
-                // Player 1
-                if (game.player1UserToken == userToken)
-                {
-                    return game.player1Score;
-                }
-                // Player 2
-                else if (game.player2UserToken == userToken)
-                {
-                    return game.player2Score;
-                }
-                // This will only happen if there is a bug in BoggleService.
-                else
-                {
-                    throw new ArgumentException();
-                }
-            }
-            // This will only happen if there is a bug in BoggleService.
-            else
-            {
-                throw new ArgumentException();
+                command.Parameters.AddWithValue("@GameID", gameId);
+                command.Parameters.AddWithValue("@UserId", userToken);
+                SqlDataReader reader = command.ExecuteReader();
+                return reader.GetInt32(0);
             }
         }
 
@@ -234,24 +223,21 @@ namespace Boggle
         /// <param name="gameId">Id of game</param>
         /// <param name="userToken">Token of player</param>
         /// <returns></returns>
-        public List<WordPair> GetWords(string gameId, string userToken)
+        public List<WordPair> GetWords(string gameId, string userToken, SqlConnection conn, SqlTransaction trans)
         {
-            var game = games[gameId];
-            // Player 1
-            if (game.player1UserToken.Equals(userToken))
+            string script = "SELECT Word FROM Words WHERE GameID = @GameID AND Player = @UserId";
+
+            using (SqlCommand command = new SqlCommand(script, conn, trans))
             {
-                return game.player1Words;
+                command.Parameters.AddWithValue("@GameID", gameId);
+                command.Parameters.AddWithValue("@UserId", userToken);
+                SqlDataReader reader = command.ExecuteReader();
+                //string[] words;
+                //reader.GetValues();
+                List<WordPair> templist = new List<WordPair>();
+                return templist;
             }
-            // Player 2
-            else if (game.player2UserToken.Equals(userToken))
-            {
-                return game.player2Words;
-            }
-            // This will only happen if there is a bug in BoggleService.
-            else
-            {
-                throw new ArgumentException();
-            }
+
         }
 
         /// <summary>
@@ -348,15 +334,16 @@ namespace Boggle
         /* Depreciated TODO delete
         public string CreateGame()
         {
-            lastGameId++;
-            string gameId = lastGameId.ToString();
+            //lastGameId++;
+            //string gameId = lastGameId.ToString();
 
-            BoggleGame boggleGame = new BoggleGame();
-            boggleGame.gameId = gameId;
+            //BoggleGame boggleGame = new BoggleGame();
+            //boggleGame.gameId = gameId;
 
-            games[gameId] = boggleGame;
+            //games[gameId] = boggleGame;
 
-            return gameId;
+            //return gameId;
+            return "temp";
         }
         */
 
@@ -370,6 +357,8 @@ namespace Boggle
 
                 return reader.GetString(0);
             }
+            //return lastGameId.ToString();
+            return "123";
         }
     }
 }
