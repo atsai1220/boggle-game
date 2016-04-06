@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data.SqlClient;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -115,14 +116,29 @@ namespace Boggle
         /// <param name="score">Score acquired</param>
         public void AddWord(string gameId, string userToken, string word, int score, SqlConnection conn, SqlTransaction trans)
         {
-            SqlCommand command = new SqlCommand(AddWord, conn, trans));
+            string script = File.ReadAllText(@"\SQL_Queries\GetPlayers.sql");
 
-            BoggleGame game;
-            if (games.TryGetValue(gameId, out game))
+            using (SqlCommand command = new SqlCommand(script, conn, trans))
             {
+                command.Parameters.AddWithValue("@GameId", gameId);
+                if (command.ExecuteNonQuery() == 1)
+                {
+
+                }
+                else
+                {
+                    throw new ArgumentException();
+                }
+                BoggleGame game;
                 WordPair pair = new WordPair();
                 pair.Word = word;
                 pair.Score = score;
+            }
+
+                
+            if (games.TryGetValue(gameId, out game))
+            {
+                
                 // If Player 1 token
                 if (userToken.Equals(game.player1UserToken))
                 {
