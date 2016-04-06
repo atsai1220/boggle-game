@@ -136,8 +136,11 @@
     </Content>
     <Content Include="BoggleService.svc" />
     <Content Include="SQL_Queries\AddWord.sql" />
+    <Content Include="SQL_Queries\CancelGame.sql" />
     <Content Include="SQL_Queries\CreateGame.sql" />
     <Content Include="SQL_Queries\CreateUser.sql" />
+    <Content Include="SQL_Queries\GameExists.sql" />
+    <Content Include="SQL_Queries\GetTime.sql" />
     <Content Include="SQL_Queries\LastGameId.sql" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
