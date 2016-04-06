@@ -294,6 +294,9 @@ namespace Boggle
 
                     game.TimeLeft = timeLeft.ToString();
 
+                    game.Player1 = new Player();
+                    game.Player2 = new Player();
+
                     string player1UserToken, player2UserToken;
                     boggleState.GetPlayers(gameId, out player1UserToken, out player2UserToken);
 

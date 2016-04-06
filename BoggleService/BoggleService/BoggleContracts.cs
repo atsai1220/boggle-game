@@ -21,15 +21,15 @@ namespace Boggle
         [DataMember(EmitDefaultValue = false)]
         public string TimeLeft { get; set; }
 
-        [DataMember]
+        [DataMember(EmitDefaultValue = false)]
         public Player Player1;
 
-        [DataMember]
+        [DataMember(EmitDefaultValue = false)]
         public Player Player2;
     }
 
     [DataContract]
-    public struct Player
+    public class Player
     {
         [DataMember(EmitDefaultValue = false)]
         public string Nickname { get; set; }
