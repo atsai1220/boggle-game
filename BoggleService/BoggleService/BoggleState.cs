@@ -183,31 +183,15 @@ namespace Boggle
         /// <param name="gameId">Id of game</param>
         /// <param name="userToken">User token of player</param>
         /// <returns></returns>
-        public int GetScore(string gameId, string userToken)
+        public int GetScore(string gameId, string userToken, SqlConnection conn, SqlTransaction trans)
         {
-            BoggleGame game;
-            if (games.TryGetValue(gameId, out game))
+            string script = "SELECT SUM(Score) FROM Words WHERE GameID = @GameID AND Player = @UserId";
+            using (SqlCommand command = new SqlCommand(script, conn, trans))
             {
-                // Player 1
-                if (game.player1UserToken == userToken)
-                {
-                    return game.player1Score;
-                }
-                // Player 2
-                else if (game.player2UserToken == userToken)
-                {
-                    return game.player2Score;
-                }
-                // This will only happen if there is a bug in BoggleService.
-                else
-                {
-                    throw new ArgumentException();
-                }
-            }
-            // This will only happen if there is a bug in BoggleService.
-            else
-            {
-                throw new ArgumentException();
+                command.Parameters.AddWithValue("@GameID", gameId);
+                command.Parameters.AddWithValue("@UserId", userToken);
+                SqlDataReader reader = command.ExecuteReader();
+                return reader.GetInt32(0);
             }
         }
 
