@@ -324,6 +324,11 @@ namespace Boggle
             }
         }
 
+        public bool PlayerExists(string userToken)
+        {
+            return players.ContainsKey(userToken);
+        }
+
         public string CreateGame()
         {
             lastGameId++;

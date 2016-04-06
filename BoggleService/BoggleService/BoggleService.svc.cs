@@ -87,12 +87,12 @@ namespace Boggle
         public GameIdContract JoinGame(JoinGameBody body)
         {
 
-            // If UserToken is invalid, TimeLimit < 5, or TimeLimit > 120, responds with status 403 (Forbidden).
-            if (body.TimeLimit < 5 || body.TimeLimit > 120)
-            {
-                SetStatus(Forbidden);
-                return null;
-            }
+                // If UserToken is invalid, TimeLimit < 5, or TimeLimit > 120, responds with status 403 (Forbidden).
+                if (body.TimeLimit < 5 || body.TimeLimit > 120)
+                {
+                    SetStatus(Forbidden);
+                    return null;
+                }
 
             using (SqlConnection conn = new SqlConnection(boggleDB))
             {
@@ -100,45 +100,52 @@ namespace Boggle
 
                 using (SqlTransaction trans = conn.BeginTransaction())
                 {
-                    BoggleState boggleState = BoggleState.getBoggleState();
+                BoggleState boggleState = BoggleState.getBoggleState();
                     string gameId = boggleState.GetLastGameId();
 
 
-                }
-            }
-
-
-            if (getGameState(gameId) == GameState.Pending)
-            {
-                string player1Id;
-                string player2Id;
-
-                boggleState.GetPlayers(gameId, out player1Id, out player2Id);
-
-                // If UserToken is already a player in the pending game
-                if (body.UserToken.Equals(player1Id))
+                if(!boggleState.PlayerExists(body.UserToken))
                 {
-                    SetStatus(Conflict);
+                    SetStatus(Forbidden);
                     return null;
                 }
 
-                BoggleBoard board = new BoggleBoard();
-                long startTime = DateTime.UtcNow.Ticks;
-                boggleState.StartGame(gameId, body.UserToken, body.TimeLimit, startTime, board.ToString());
-
-                SetStatus(Created);
-            }
-            else
-            {
-                gameId = boggleState.CreateGame();
-
-                boggleState.AddGame(gameId, body.UserToken, body.TimeLimit);
-                SetStatus(Accepted);
+                string gameId = boggleState.GetLastGameId();
+                }
             }
 
-            GameIdContract GameIdContract = new GameIdContract();
-            GameIdContract.GameID = gameId;
-            return GameIdContract;
+
+                if (getGameState(gameId) == GameState.Pending)
+                {
+                    string player1Id;
+                    string player2Id;
+
+                    boggleState.GetPlayers(gameId, out player1Id, out player2Id);
+
+                    // If UserToken is already a player in the pending game
+                    if (body.UserToken.Equals(player1Id))
+                    {
+                        SetStatus(Conflict);
+                        return null;
+                    }
+
+                    BoggleBoard board = new BoggleBoard();
+                    long startTime = DateTime.UtcNow.Ticks;
+                    boggleState.StartGame(gameId, body.UserToken, body.TimeLimit, startTime, board.ToString());
+
+                    SetStatus(Created);
+                }
+                else
+                {
+                    gameId = boggleState.CreateGame();
+
+                    boggleState.AddGame(gameId, body.UserToken, body.TimeLimit);
+                    SetStatus(Accepted);
+                }
+
+                GameIdContract GameIdContract = new GameIdContract();
+                GameIdContract.GameID = gameId;
+                return GameIdContract;
 
         }
 
@@ -225,9 +232,20 @@ namespace Boggle
                     SetStatus(Conflict);
                     return null;
                 }
+
+                // Make sure that the player is in the game.
+                string userToken1;
+                string userToken2;
+                _boggleState.GetPlayers(gameId, out userToken1, out userToken2);
+                if (body.UserToken != userToken1 && body.UserToken != userToken2)
+                {
+                    SetStatus(Forbidden);
+                    return null;
+                }
                 // Record trimmed Word by UserToken
                 else
                 {
+
                     WordPair pair = GetScore(body, gameId);
                     // Add to word record
                     _boggleState.AddWord(gameId, body.UserToken, pair.Word, pair.Score);
@@ -279,7 +297,7 @@ namespace Boggle
                     int timeLimit;
                     long startTime;
                     boggleState.GetTime(gameId, out timeLimit, out startTime);
-
+                    
                     int timeLeft = timeLimit - (int)((DateTime.UtcNow.Ticks - startTime) / (long)1e7);
 
                     if (timeLeft < 0)
@@ -288,6 +306,9 @@ namespace Boggle
                     }
 
                     game.TimeLeft = timeLeft.ToString();
+
+                    game.Player1 = new Player();
+                    game.Player2 = new Player();
 
                     string player1UserToken, player2UserToken;
                     boggleState.GetPlayers(gameId, out player1UserToken, out player2UserToken);
@@ -366,11 +387,15 @@ namespace Boggle
                 pair.Word = body.Word.Trim();
                 int wordLength = body.Word.Length;
 
+                if(pairs.Exists(repeatFinder))
+                {
+                    pair.Score = 0;
+                }
                 // Determine word score first!
                 // Determine if word is legal or not
-                if (board.CanBeFormed(pair.Word) && dictionary.Contains(pair.Word.ToUpper()))
+                else if (board.CanBeFormed(pair.Word) && dictionary.Contains(pair.Word.ToUpper()))
                 {
-                    if (wordLength < 3 || pairs.Exists(repeatFinder))
+                    if (wordLength < 3)
                     {
                         pair.Score = 0;
                     }
