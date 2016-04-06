@@ -291,6 +291,11 @@ namespace Boggle
             return games.ContainsKey(gameId);
         }
 
+        public bool PlayerExists(string userToken)
+        {
+            return players.ContainsKey(userToken);
+        }
+
         public string CreateGame()
         {
             lastGameId++;

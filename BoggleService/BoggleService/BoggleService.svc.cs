@@ -94,6 +94,12 @@ namespace Boggle
 
                 BoggleState boggleState = BoggleState.getBoggleState();
 
+                if(!boggleState.PlayerExists(body.UserToken))
+                {
+                    SetStatus(Forbidden);
+                    return null;
+                }
+
                 string gameId = boggleState.GetLastGameId();
 
                 if (getGameState(gameId) == GameState.Pending)
@@ -213,9 +219,20 @@ namespace Boggle
                     SetStatus(Conflict);
                     return null;
                 }
+
+                // Make sure that the player is in the game.
+                string userToken1;
+                string userToken2;
+                _boggleState.GetPlayers(gameId, out userToken1, out userToken2);
+                if (body.UserToken != userToken1 && body.UserToken != userToken2)
+                {
+                    SetStatus(Forbidden);
+                    return null;
+                }
                 // Record trimmed Word by UserToken
                 else
                 {
+
                     WordPair pair = GetScore(body, gameId);
                     // Add to word record
                     _boggleState.AddWord(gameId, body.UserToken, pair.Word, pair.Score);
@@ -353,12 +370,16 @@ namespace Boggle
                 WordPair pair = new WordPair();
                 pair.Word = body.Word.Trim();
                 int wordLength = body.Word.Length;
-
+                
+                if(pairs.Exists(repeatFinder))
+                {
+                    pair.Score = 0;
+                }
                 // Determine word score first!
                 // Determine if word is legal or not
-                if (board.CanBeFormed(pair.Word) && dictionary.Contains(pair.Word.ToUpper()))
+                else if (board.CanBeFormed(pair.Word) && dictionary.Contains(pair.Word.ToUpper()))
                 {
-                    if (wordLength < 3 || pairs.Exists(repeatFinder))
+                    if (wordLength < 3)
                     {
                         pair.Score = 0;
                     }
