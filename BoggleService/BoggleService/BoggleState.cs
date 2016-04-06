@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Data;
 using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
@@ -230,13 +231,22 @@ namespace Boggle
             {
                 command.Parameters.AddWithValue("@GameID", gameId);
                 command.Parameters.AddWithValue("@UserId", userToken);
-                SqlDataReader reader = command.ExecuteReader();
-                //string[] words;
-                //reader.GetValues();
-                List<WordPair> templist = new List<WordPair>();
-                return templist;
+                SqlDataAdapter adapter = new SqlDataAdapter(command);
+                List<WordPair> list = new List<WordPair>();
+                
+                DataTable table = new DataTable();
+                adapter.Fill(table);
+                foreach (DataRow row in table.Rows)
+                {
+                    WordPair pair = new WordPair();
+                    pair.Word = row["Word"].ToString();
+                    int score;
+                    int.TryParse(row["Score"].ToString(), out score);
+                    pair.Score = score;
+                    list.Add(pair);
+                }
+                return list;
             }
-
         }
 
         /// <summary>
@@ -356,8 +366,6 @@ namespace Boggle
 
                 return reader.GetString(0);
             }
-            //return lastGameId.ToString();
-            return "123";
         }
     }
 }
