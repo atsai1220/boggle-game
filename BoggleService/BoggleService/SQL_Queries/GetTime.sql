@@ -1,0 +1,1 @@
+﻿SELECT TimeLimit, StartTime FROM Games WHERE GameID = 4
