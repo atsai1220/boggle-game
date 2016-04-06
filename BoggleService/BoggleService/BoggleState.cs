@@ -164,10 +164,17 @@ namespace Boggle
         /// <param name="gameId">The game id</param>
         /// <param name="player1Id">The user token of player 1</param>
         /// <param name="player2Id">The user token of player 2</param>
-        public void GetPlayers(string gameId, out string player1Id, out string player2Id)
+        public void GetPlayers(string gameId, out string player1Id, out string player2Id, SqlConnection conn, SqlTransaction trans)
         {
-            player1Id = games[gameId].player1UserToken;
-            player2Id = games[gameId].player2UserToken;
+            string script = "SELECT Player1, Player2 FROM Games WHERE GameId = @GameId";
+            // Column 0 is player 1
+            using (SqlCommand command = new SqlCommand(script, conn, trans))
+            {
+                command.Parameters.AddWithValue("@GameId", gameId);
+                SqlDataReader reader = command.ExecuteReader();
+                player1Id =  reader.GetString(0);
+                player2Id = reader.GetString(1);
+            }
         }
 
         /// <summary>
