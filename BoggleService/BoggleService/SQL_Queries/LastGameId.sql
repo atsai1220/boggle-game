@@ -1,2 +1,1 @@
-﻿SELECT MAX(GameId)
-FROM Games
+﻿SELECT MAX(GameId) FROM Games

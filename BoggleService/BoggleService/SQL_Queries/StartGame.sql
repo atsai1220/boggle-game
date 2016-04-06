@@ -7,9 +7,9 @@ public void StartGame(string player2Token, int player2TimeLimit, long startTime,
             game.board = board;
 */
 UPDATE Games
-SET Player2 = '1234-1234-1234-1234',
- TimeLimit = (TimeLimit + @TimeLimit) / 2,
- StartTime = 14:00
+SET Player2 = '1234-1234-1234',
+ TimeLimit = (TimeLimit + 123) / 2,
+ StartTime = '14:00',
  Board = 'abcdabcdabcdabcd'
-WHERE 
-todo boarrd and others
+WHERE GameId = 4
+ 
