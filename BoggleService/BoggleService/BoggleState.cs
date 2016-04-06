@@ -223,24 +223,21 @@ namespace Boggle
         /// <param name="gameId">Id of game</param>
         /// <param name="userToken">Token of player</param>
         /// <returns></returns>
-        public List<WordPair> GetWords(string gameId, string userToken)
+        public List<WordPair> GetWords(string gameId, string userToken, SqlConnection conn, SqlTransaction trans)
         {
-            var game = games[gameId];
-            // Player 1
-            if (game.player1UserToken.Equals(userToken))
+            string script = "SELECT Word FROM Words WHERE GameID = @GameID AND Player = @UserId";
+
+            using (SqlCommand command = new SqlCommand(script, conn, trans))
             {
-                return game.player1Words;
+                command.Parameters.AddWithValue("@GameID", gameId);
+                command.Parameters.AddWithValue("@UserId", userToken);
+                SqlDataReader reader = command.ExecuteReader();
+                //string[] words;
+                //reader.GetValues();
+                List<WordPair> templist = new List<WordPair>();
+                return templist;
             }
-            // Player 2
-            else if (game.player2UserToken.Equals(userToken))
-            {
-                return game.player2Words;
-            }
-            // This will only happen if there is a bug in BoggleService.
-            else
-            {
-                throw new ArgumentException();
-            }
+
         }
 
         /// <summary>
@@ -276,11 +273,11 @@ namespace Boggle
         /// <param name="board">String that rep the board</param>
         public void StartGame(string gameId, string player2Token, int player2TimeLimit, long startTime, string board)
         {
-            BoggleGame game = games[gameId];
-            game.player2UserToken = player2Token;
-            game.timeLimit = (game.timeLimit + player2TimeLimit) / 2;
-            game.startTime = startTime;
-            game.board = board;
+            //BoggleGame game = games[gameId];
+            //game.player2UserToken = player2Token;
+            //game.timeLimit = (game.timeLimit + player2TimeLimit) / 2;
+            //game.startTime = startTime;
+            //game.board = board;
         }
 
         public bool GameExists(string gameId, SqlConnection conn, SqlTransaction trans)
@@ -307,25 +304,28 @@ namespace Boggle
 
         public bool PlayerExists(string userToken)
         {
-            return players.ContainsKey(userToken);
+            //return players.ContainsKey(userToken);
+            return true;
         }
 
         public string CreateGame()
         {
-            lastGameId++;
-            string gameId = lastGameId.ToString();
+            //lastGameId++;
+            //string gameId = lastGameId.ToString();
 
-            BoggleGame boggleGame = new BoggleGame();
-            boggleGame.gameId = gameId;
+            //BoggleGame boggleGame = new BoggleGame();
+            //boggleGame.gameId = gameId;
 
-            games[gameId] = boggleGame;
+            //games[gameId] = boggleGame;
 
-            return gameId;
+            //return gameId;
+            return "temp";
         }
 
         public string GetLastGameId()
         {
-            return lastGameId.ToString();
+            //return lastGameId.ToString();
+            return "123";
         }
     }
 }
