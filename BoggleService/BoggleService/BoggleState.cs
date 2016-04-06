@@ -22,7 +22,7 @@ namespace Boggle
                     _boggleDB = ConfigurationManager.ConnectionStrings["BoggleDB"].ConnectionString;
                 }
 
-                return boggleDB;
+                return _boggleDB;
             }
         }
 
