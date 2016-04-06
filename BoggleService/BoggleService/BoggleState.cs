@@ -76,8 +76,7 @@ namespace Boggle
         /// <param name="score">Score acquired</param>
         public void AddWord(string gameId, string userToken, string word, int score, SqlConnection conn, SqlTransaction trans)
         {
-            // TODO is this the right path?
-            string script = File.ReadAllText(@"\SQL_Queries\AddWord.sql");
+            string script = "INSERT INTO Words(Word, GameID, Player, Score) VALUES (@Word, @GameID, @Player, @Score)";
 
             using (SqlCommand command = new SqlCommand(script, conn, trans))
             {
