@@ -147,17 +147,14 @@ namespace Boggle
         /// </summary>
         /// <param name="userToken">User token of player</param>
         /// <returns></returns>
-        public string GetNickname(string userToken)
+        public string GetNickname(string userToken, SqlConnection conn, SqlTransaction trans)
         {
-            string nickname;
-            if (players.TryGetValue(userToken, out nickname))
+            string script = "SELECT Nickname FROM Users WHERE UserId = @UserId";
+            using (SqlCommand command = new SqlCommand(script, conn, trans))
             {
-                return nickname;
-            }
-            // This will only happen if there is a bug in BoggleService.
-            else
-            {
-                throw new ArgumentException();
+                command.Parameters.AddWithValue("@UserId", userToken);
+                SqlDataReader reader = command.ExecuteReader();
+                return reader.GetString(0);
             }
         }
 
