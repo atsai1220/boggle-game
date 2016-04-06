@@ -88,11 +88,6 @@ namespace Boggle
                 {
                     throw new ArgumentException();
                 }
-                else
-                {
-                    trans.Commit();
-                }
-                return;
             }
         }
 
@@ -135,9 +130,16 @@ namespace Boggle
         /// </summary>
         /// <param name="gameId">The gameId</param>
         /// <returns></returns>
-        public string GetBoard(string gameId)
+        public string GetBoard(string gameId, SqlConnection conn, SqlTransaction trans)
         {
-            return games[gameId].board;
+            string script = "SELECT Board FROM Games WHERE GameId = @GameId";
+
+            using (SqlCommand command = new SqlCommand(script, conn, trans))
+            {
+                command.Parameters.AddWithValue("@GameId", gameId);
+                SqlDataReader reader = command.ExecuteReader();
+                return reader.GetString(0);
+            }
         }
 
         /// <summary>
