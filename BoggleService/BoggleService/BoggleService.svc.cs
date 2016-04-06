@@ -22,11 +22,6 @@ namespace Boggle
         /// </summary>
         private enum GameState { Invalid, Pending, Active, Completed }
 
-        /// <summary>
-        /// Sync object
-        /// </summary>
-        private static readonly object sync = new object();
-
         private static HashSet<string> dictionary = new HashSet<string>(File.ReadAllLines(AppDomain.CurrentDomain.BaseDirectory + "dictionary.txt"));
 
         //private static HashSet<string> dictionary = new HashSet<string>();
@@ -89,68 +84,61 @@ namespace Boggle
         /// <returns></returns>
         public GameIdContract JoinGame(JoinGameBody body)
         {
-            throw new NotImplementedException();
-            /*
-            // If UserToken is invalid, TimeLimit < 5, or TimeLimit > 120, responds with status 403 (Forbidden).
-            if (body.TimeLimit < 5 || body.TimeLimit > 120)
-            {
-                SetStatus(Forbidden);
-                return null;
-            }
-
-            using (SqlConnection conn = new SqlConnection(boggleDB))
+            using (SqlConnection conn = new SqlConnection(BoggleState.boggleDB))
             {
                 conn.Open();
-
                 using (SqlTransaction trans = conn.BeginTransaction())
                 {
+                    // If UserToken is invalid, TimeLimit < 5, or TimeLimit > 120, responds with status 403 (Forbidden).
+                    if (body.TimeLimit < 5 || body.TimeLimit > 120)
+                    {
+                        SetStatus(Forbidden);
+                        return null;
+                    }
                     BoggleState boggleState = BoggleState.getBoggleState();
-                    string gameId = boggleState.GetLastGameId();
 
-
-                    if (!boggleState.PlayerExists(body.UserToken))
+                    if (!boggleState.PlayerExists(body.UserToken, conn, trans))
                     {
                         SetStatus(Forbidden);
                         return null;
                     }
 
-                    string gameId = boggleState.GetLastGameId();
+                    string gameId = boggleState.GetLastGameId(conn, trans);
+
+                    if (getGameState(gameId) == GameState.Pending)
+                    {
+                        string player1Id;
+                        string player2Id;
+
+                        boggleState.GetPlayers(gameId, out player1Id, out player2Id, conn, trans);
+
+                        // If UserToken is already a player in the pending game
+                        if (body.UserToken.Equals(player1Id))
+                        {
+                            SetStatus(Conflict);
+                            return null;
+                        }
+
+                        BoggleBoard board = new BoggleBoard();
+                        long startTime = DateTime.UtcNow.Ticks;
+                        boggleState.StartGame(gameId, body.UserToken, body.TimeLimit, startTime, board.ToString(), conn, trans);
+
+                        SetStatus(Created);
+                    }
+                    else
+                    {
+                        gameId = boggleState.AddGame(body.UserToken, body.TimeLimit, conn, trans);
+
+                        SetStatus(Accepted);
+                    }
+
+                    GameIdContract GameIdContract = new GameIdContract();
+                    GameIdContract.GameID = gameId;
+
+                    trans.Commit();
+                    return GameIdContract;
                 }
             }
-
-
-            if (getGameState(gameId) == GameState.Pending)
-            {
-                string player1Id;
-                string player2Id;
-
-                boggleState.GetPlayers(gameId, out player1Id, out player2Id);
-
-                // If UserToken is already a player in the pending game
-                if (body.UserToken.Equals(player1Id))
-                {
-                    SetStatus(Conflict);
-                    return null;
-                }
-
-                BoggleBoard board = new BoggleBoard();
-                long startTime = DateTime.UtcNow.Ticks;
-                boggleState.StartGame(gameId, body.UserToken, body.TimeLimit, startTime, board.ToString());
-
-                SetStatus(Created);
-            }
-            else
-            {
-                gameId = boggleState.CreateGame();
-
-                boggleState.AddGame(gameId, body.UserToken, body.TimeLimit);
-                SetStatus(Accepted);
-            }
-
-            GameIdContract GameIdContract = new GameIdContract();
-            GameIdContract.GameID = gameId;
-            return GameIdContract;
-            */
         }
 
         public void CancelJoinRequest(CancelJoinRequestBody body)
@@ -274,174 +262,190 @@ namespace Boggle
 
         public BoggleGameContract GameStatus(string gameId, string brief)
         {
-            throw new NotImplementedException();/*
-            lock (sync)
+            using (SqlConnection conn = new SqlConnection(BoggleState.boggleDB))
             {
-                GameState gameState = getGameState(gameId);
-
-                if (gameState == GameState.Invalid)
+                conn.Open();
+                using (SqlTransaction trans = conn.BeginTransaction())
                 {
-                    SetStatus(Forbidden);
-                    return null;
-                }
+                    GameState gameState = getGameState(gameId);
 
-                BoggleState boggleState = BoggleState.getBoggleState();
-
-                BoggleGameContract game = new BoggleGameContract();
-
-                if (gameState == GameState.Pending)
-                {
-                    game.GameState = "pending";
-                }
-                else
-                {
-                    if (gameState == GameState.Active)
+                    if (gameState == GameState.Invalid)
                     {
-                        game.GameState = "active";
-                    }
-                    else if (gameState == GameState.Completed)
-                    {
-                        game.GameState = "completed";
+                        SetStatus(Forbidden);
+                        return null;
                     }
 
-                    int timeLimit;
-                    long startTime;
-                    boggleState.GetTime(gameId, out timeLimit, out startTime);
+                    BoggleState boggleState = BoggleState.getBoggleState();
 
-                    int timeLeft = timeLimit - (int)((DateTime.UtcNow.Ticks - startTime) / (long)1e7);
+                    BoggleGameContract game = new BoggleGameContract();
 
-                    if (timeLeft < 0)
+                    if (gameState == GameState.Pending)
                     {
-                        timeLeft = 0;
+                        game.GameState = "pending";
                     }
-
-                    game.TimeLeft = timeLeft.ToString();
-
-                    game.Player1 = new Player();
-                    game.Player2 = new Player();
-
-                    string player1UserToken, player2UserToken;
-                    boggleState.GetPlayers(gameId, out player1UserToken, out player2UserToken);
-
-                    game.Player1.Score = boggleState.GetScore(gameId, player1UserToken);
-                    game.Player2.Score = boggleState.GetScore(gameId, player2UserToken);
-
-                    if (brief != "yes")
+                    else
                     {
-                        game.Board = boggleState.GetBoard(gameId);
-
-                        game.TimeLimit = timeLimit.ToString();
-
-                        game.Player1.Nickname = boggleState.GetNickname(player1UserToken);
-                        game.Player2.Nickname = boggleState.GetNickname(player2UserToken);
-
-                        if (gameState == GameState.Completed)
+                        if (gameState == GameState.Active)
                         {
-                            game.Player1.WordsPlayed = boggleState.GetWords(gameId, player1UserToken);
-                            game.Player2.WordsPlayed = boggleState.GetWords(gameId, player2UserToken);
+                            game.GameState = "active";
+                        }
+                        else if (gameState == GameState.Completed)
+                        {
+                            game.GameState = "completed";
+                        }
+
+                        int timeLimit;
+                        long startTime;
+                        boggleState.GetTime(gameId, out timeLimit, out startTime, conn, trans);
+
+                        int timeLeft = timeLimit - (int)((DateTime.UtcNow.Ticks - startTime) / (long)1e7);
+
+                        if (timeLeft < 0)
+                        {
+                            timeLeft = 0;
+                        }
+
+                        game.TimeLeft = timeLeft.ToString();
+
+                        game.Player1 = new Player();
+                        game.Player2 = new Player();
+
+                        string player1UserToken, player2UserToken;
+                        boggleState.GetPlayers(gameId, out player1UserToken, out player2UserToken, conn, trans);
+
+                        game.Player1.Score = boggleState.GetScore(gameId, player1UserToken, conn, trans);
+                        game.Player2.Score = boggleState.GetScore(gameId, player2UserToken, conn, trans);
+
+                        if (brief != "yes")
+                        {
+                            game.Board = boggleState.GetBoard(gameId, conn, trans);
+
+                            game.TimeLimit = timeLimit.ToString();
+
+                            game.Player1.Nickname = boggleState.GetNickname(player1UserToken, conn, trans);
+                            game.Player2.Nickname = boggleState.GetNickname(player2UserToken, conn, trans);
+
+                            if (gameState == GameState.Completed)
+                            {
+                                game.Player1.WordsPlayed = boggleState.GetWords(gameId, player1UserToken, conn, trans);
+                                game.Player2.WordsPlayed = boggleState.GetWords(gameId, player2UserToken, conn, trans);
+                            }
                         }
                     }
-                }
 
-                SetStatus(OK);
-                return game;
-            }*/
+                    SetStatus(OK);
+
+                    trans.Commit();
+                    return game;
+                }
+            }
         }
 
         private GameState getGameState(string gameId)
         {
-            throw new NotImplementedException();/*
-            lock (sync)
+            using (SqlConnection conn = new SqlConnection(BoggleState.boggleDB))
             {
-                BoggleState boggleState = BoggleState.getBoggleState();
-
-                if (!boggleState.GameExists(gameId))
+                conn.Open();
+                using (SqlTransaction trans = conn.BeginTransaction())
                 {
-                    return GameState.Invalid;
+                    BoggleState boggleState = BoggleState.getBoggleState();
+
+                    if (!boggleState.GameExists(gameId, conn, trans))
+                    {
+                        trans.Commit();
+                        return GameState.Invalid;
+                    }
+
+                    string player1UserToken, player2UserToken;
+                    boggleState.GetPlayers(gameId, out player1UserToken, out player2UserToken, conn, trans);
+
+                    if (player2UserToken == "")
+                    {
+                        trans.Commit();
+                        return GameState.Pending;
+                    }
+
+                    int timeLimit;
+                    long startTime;
+                    boggleState.GetTime(gameId, out timeLimit, out startTime, conn, trans);
+
+                    long endTime = startTime + timeLimit * (long)1e7;
+
+                    if (DateTime.UtcNow.Ticks < endTime)
+                    {
+                        trans.Commit();
+                        return GameState.Active;
+                    }
+                    else
+                    {
+                        trans.Commit();
+                        return GameState.Completed;
+                    }
                 }
-
-                string player1UserToken, player2UserToken;
-                boggleState.GetPlayers(gameId, out player1UserToken, out player2UserToken);
-
-                if (player2UserToken == "")
-                {
-                    return GameState.Pending;
-                }
-
-                int timeLimit;
-                long startTime;
-                boggleState.GetTime(gameId, out timeLimit, out startTime);
-
-                long endTime = startTime + timeLimit * (long)1e7;
-
-                if (DateTime.UtcNow.Ticks < endTime)
-                {
-                    return GameState.Active;
-                }
-                else
-                {
-                    return GameState.Completed;
-                }
-            }*/
+            }
         }
 
         private WordPair GetScore(PlayWordBody body, string gameId)
         {
-            throw new NotImplementedException();/*
-            lock (sync)
+            using (SqlConnection conn = new SqlConnection(BoggleState.boggleDB))
             {
-                BoggleState _boggleState = BoggleState.getBoggleState();
-                BoggleBoard board = new BoggleBoard(_boggleState.GetBoard(gameId));
-                Predicate<WordPair> repeatFinder = (WordPair p) => { return p.Word == body.Word.Trim(); };
-
-                List<WordPair> pairs = _boggleState.GetWords(gameId, body.UserToken);
-                WordPair pair = new WordPair();
-                pair.Word = body.Word.Trim();
-                int wordLength = body.Word.Length;
-
-                if (pairs.Exists(repeatFinder))
+                conn.Open();
+                using (SqlTransaction trans = conn.BeginTransaction())
                 {
-                    pair.Score = 0;
-                }
-                // Determine word score first!
-                // Determine if word is legal or not
-                else if (board.CanBeFormed(pair.Word) && dictionary.Contains(pair.Word.ToUpper()))
-                {
-                    if (wordLength < 3)
+                    BoggleState _boggleState = BoggleState.getBoggleState();
+                    BoggleBoard board = new BoggleBoard(_boggleState.GetBoard(gameId, conn, trans));
+                    Predicate<WordPair> repeatFinder = (WordPair p) => { return p.Word == body.Word.Trim(); };
+
+                    List<WordPair> pairs = _boggleState.GetWords(gameId, body.UserToken, conn, trans);
+                    WordPair pair = new WordPair();
+                    pair.Word = body.Word.Trim();
+                    int wordLength = body.Word.Length;
+
+                    if (pairs.Exists(repeatFinder))
                     {
                         pair.Score = 0;
                     }
-                    else if (wordLength == 3 || wordLength == 4)
+                    // Determine word score first!
+                    // Determine if word is legal or not
+                    else if (board.CanBeFormed(pair.Word) && dictionary.Contains(pair.Word.ToUpper()))
                     {
-                        pair.Score = 1;
+                        if (wordLength < 3)
+                        {
+                            pair.Score = 0;
+                        }
+                        else if (wordLength == 3 || wordLength == 4)
+                        {
+                            pair.Score = 1;
+                        }
+                        else if (wordLength == 5)
+                        {
+                            pair.Score = 2;
+                        }
+                        else if (wordLength == 6)
+                        {
+                            pair.Score = 3;
+                        }
+                        // SOMETIMES THE BOARD DOES NOT HAVE A WORD THIS LONG
+                        else if (wordLength == 7)
+                        {
+                            pair.Score = 5;
+                        }
+                        // SOMETIMES THE BOARD DOES NOT HAVE A WORD THIS LONG
+                        else if (wordLength > 7)
+                        {
+                            pair.Score = 11;
+                        }
                     }
-                    else if (wordLength == 5)
+                    // Not legal
+                    else
                     {
-                        pair.Score = 2;
+                        pair.Score = -1;
                     }
-                    else if (wordLength == 6)
-                    {
-                        pair.Score = 3;
-                    }
-                    // SOMETIMES THE BOARD DOES NOT HAVE A WORD THIS LONG
-                    else if (wordLength == 7)
-                    {
-                        pair.Score = 5;
-                    }
-                    // SOMETIMES THE BOARD DOES NOT HAVE A WORD THIS LONG
-                    else if (wordLength > 7)
-                    {
-                        pair.Score = 11;
-                    }
-                }
-                // Not legal
-                else
-                {
-                    pair.Score = -1;
-                }
 
-                return pair;
-            }*/
+                    trans.Commit();
+                    return pair;
+                }
+            }
         }
     }
 }
