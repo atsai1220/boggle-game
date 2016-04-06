@@ -367,8 +367,6 @@ namespace Boggle
 
                 return reader.GetString(0);
             }
-            //return lastGameId.ToString();
-            return "123";
         }
     }
 }
