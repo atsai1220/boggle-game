@@ -47,14 +47,13 @@ namespace Boggle
         /// <summary>
         /// Creates a new game
         /// </summary>
-        /// <param name="gameId">Id of game</param>
         /// <param name="player1Token">User token of player 1</param>
         /// <param name="player1TimeLimit">Time limit requested by player 1</param>
-        public void AddGame(string gameId, string player1Token, int player1TimeLimit, SqlConnection conn, SqlTransaction trans)
+        public string AddGame(string player1Token, int player1TimeLimit, SqlConnection conn, SqlTransaction trans)
         {
-            using (SqlCommand command = new SqlCommand("INSERT INTO Games(Player1, Player2, Board, TimeLimit, StartTime) VALUES(@UserToken1, @UserToken2, @Board, @TimeLimit, @StartTime)",
+            using (SqlCommand command = new SqlCommand("INSERT INTO Games(Player1, Player2, Board, TimeLimit, StartTime) VALUES(@UserToken1, @UserToken2, @Board, @TimeLimit, @StartTime); SELECT SCOPE_IDENTITY() AS GameID",
                     conn,
-                    trans))
+                    trans)) 
             {
                 command.Parameters.AddWithValue("@UserToken1", player1Token);
                 command.Parameters.AddWithValue("@UserToken2", "");
@@ -62,7 +61,8 @@ namespace Boggle
                 command.Parameters.AddWithValue("@TimeLimit", player1TimeLimit);
                 command.Parameters.AddWithValue("@StartTime", "");
 
-                command.ExecuteNonQuery();
+                var reader = command.ExecuteReader();
+                return (string)reader["GameID"];
             }
         }
 
@@ -285,18 +285,25 @@ namespace Boggle
         /// <param name="player2TimeLimit">Player 2's specified time limit</param>
         /// <param name="startTime">System start time of game</param>
         /// <param name="board">String that rep the board</param>
-        public void StartGame(string gameId, string player2Token, int player2TimeLimit, long startTime, string board)
+        public void StartGame(string gameId, string player2Token, int player2TimeLimit, long startTime, string board, SqlConnection conn, SqlTransaction trans)
         {
-            BoggleGame game = games[gameId];
-            game.player2UserToken = player2Token;
-            game.timeLimit = (game.timeLimit + player2TimeLimit) / 2;
-            game.startTime = startTime;
-            game.board = board;
+            using (SqlCommand command = new SqlCommand("UPDATE Games SET Player2 = @Player2, TimeLimit = (TimeLimit + @Player2TimeLimit) / 2, StartTime = @StartTime, Board = @Board WHERE GameId = @GameID",
+                    conn,
+                    trans))
+            {
+                command.Parameters.AddWithValue("@GameID", gameId);
+                command.Parameters.AddWithValue("@Player2", player2Token);
+                command.Parameters.AddWithValue("@Player2TimeLimit", player2TimeLimit);
+                command.Parameters.AddWithValue("@StartTime", startTime);
+                command.Parameters.AddWithValue("@Board", board);
+
+                command.ExecuteNonQuery();
+            }
         }
 
         public bool GameExists(string gameId, SqlConnection conn, SqlTransaction trans)
         {
-            using (SqlCommand command = new SqlCommand("SELECT TimeLimit, StartTime FROM Games WHERE GameID = @GameID",
+            using (SqlCommand command = new SqlCommand("SELECT GameID FROM Games WHERE GameID = @GameID",
                     conn,
                     trans))
             {
@@ -316,11 +323,29 @@ namespace Boggle
             }
         }
 
-        public bool PlayerExists(string userToken)
+        public bool PlayerExists(string userToken, SqlConnection conn, SqlTransaction trans)
         {
-            return players.ContainsKey(userToken);
+            using (SqlCommand command = new SqlCommand("SELECT UserID FROM Users WHERE UserID = @UserToken",
+                       conn,
+                       trans))
+            {
+                command.Parameters.AddWithValue("@UserToken", userToken);
+
+                using (SqlDataReader reader = command.ExecuteReader())
+                {
+                    if (reader.HasRows)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+            }
         }
 
+        /* Depreciated TODO delete
         public string CreateGame()
         {
             lastGameId++;
@@ -333,10 +358,18 @@ namespace Boggle
 
             return gameId;
         }
+        */
 
-        public string GetLastGameId()
+        public string GetLastGameId(SqlConnection conn, SqlTransaction trans)
         {
-            return lastGameId.ToString();
+            using (SqlCommand command = new SqlCommand("SELECT MAX(GameId) FROM Games",
+                conn,
+                trans))
+            {
+                var reader = command.ExecuteReader();
+
+                return reader.GetString(0);
+            }
         }
     }
 }
