@@ -68,7 +68,7 @@ namespace Boggle
 
         /// <summary>
         /// Adds a word to a specific game for a specific player
-        /// then sets the score.
+        /// and sets score of player in table
         /// </summary>
         /// <param name="gameId">Id of game</param>
         /// <param name="userToken">User token of player in action</param>
@@ -76,48 +76,24 @@ namespace Boggle
         /// <param name="score">Score acquired</param>
         public void AddWord(string gameId, string userToken, string word, int score, SqlConnection conn, SqlTransaction trans)
         {
-            string script = File.ReadAllText(@"\SQL_Queries\GetPlayers.sql");
+            // TODO is this the right path?
+            string script = File.ReadAllText(@"\SQL_Queries\AddWord.sql");
 
             using (SqlCommand command = new SqlCommand(script, conn, trans))
             {
-                command.Parameters.AddWithValue("@GameId", gameId);
-                if (command.ExecuteNonQuery() == 1)
-                {
-
-                }
-                else
-                {
-                    throw new ArgumentException();
-                }
-                BoggleGame game;
-                WordPair pair = new WordPair();
-                pair.Word = word;
-                pair.Score = score;
-            }
-
-                
-            if (games.TryGetValue(gameId, out game))
-            {
-                
-                // If Player 1 token
-                if (userToken.Equals(game.player1UserToken))
-                {
-                    game.player1Words.Add(pair);
-                }
-                // If Player 2 token
-                else if (userToken.Equals(game.player2UserToken))
-                {
-                    game.player2Words.Add(pair);
-                }
-                // This will only happen if there is a bug in BoggleService.
-                else
+                command.Parameters.AddWithValue("@Word", word);
+                command.Parameters.AddWithValue("@GameID", gameId);
+                command.Parameters.AddWithValue("@Player", userToken);
+                command.Parameters.AddWithValue("@Score", score);
+                if (command.ExecuteNonQuery() != 1)
                 {
                     throw new ArgumentException();
                 }
-            }
-            else
-            {
-                throw new ArgumentException();
+                else
+                {
+                    trans.Commit();
+                }
+                return;
             }
         }
 
