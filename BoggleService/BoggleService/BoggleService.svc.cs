@@ -155,36 +155,37 @@ namespace Boggle
 
         public void CancelJoinRequest(CancelJoinRequestBody body)
         {
-            throw new NotImplementedException();
-            /*
-            lock (sync)
+            using (SqlConnection conn = new SqlConnection(BoggleState.boggleDB))
             {
-                BoggleState boggleState = BoggleState.getBoggleState();
-
-                string gameId = boggleState.GetLastGameId();
-
-                if (getGameState(gameId) == GameState.Pending)
+                conn.Open();
+                using (SqlTransaction trans = conn.BeginTransaction())
                 {
-                    string player1UserToken, player2UserToken;
-                    boggleState.GetPlayers(gameId, out player1UserToken, out player2UserToken);
+                    BoggleState boggleState = BoggleState.getBoggleState();
 
-                    if (player1UserToken == body.UserToken)
+                    string gameId = boggleState.GetLastGameId(conn, trans);
+
+                    if (getGameState(gameId) == GameState.Pending)
                     {
-                        boggleState.CancelGame(gameId);
+                        string player1UserToken, player2UserToken;
+                        boggleState.GetPlayers(gameId, out player1UserToken, out player2UserToken, conn, trans);
 
-                        SetStatus(OK);
+                        if (player1UserToken == body.UserToken)
+                        {
+                            boggleState.CancelGame(gameId, conn, trans);
 
-                        return;
+                            SetStatus(OK);
+                            trans.Commit();
+                            return;
+                        }
                     }
+                    SetStatus(Forbidden);
+                    trans.Commit();
+                    return;
                 }
-
-                SetStatus(Forbidden);
-
-                return;
             }
-            */
         }
 
+        // Andrew
         /// <summary>
         /// Plays a word
         /// </summary>
@@ -193,83 +194,92 @@ namespace Boggle
         /// <returns></returns>
         public PlayWordContract PlayWord(PlayWordBody body, string gameId)
         {
-            throw new NotImplementedException();
-            /*
-            lock (sync)
+            using (SqlConnection conn = new SqlConnection(BoggleState.boggleDB))
             {
-                BoggleState _boggleState = BoggleState.getBoggleState();
-                int tmp;
+                conn.Open();
+                using (SqlTransaction trans = conn.BeginTransaction())
+                {
+                    BoggleState _boggleState = BoggleState.getBoggleState();
+                    int tmp;
 
-                // if Word is null or empty when trimmed
-                if (body.Word == null || body.Word.Trim().Equals(""))
-                {
-                    SetStatus(Forbidden);
-                    return null;
-                }
-                // if  UserToken is null or empty
-                else if (body.UserToken == null || body.UserToken.Trim().Equals(""))
-                {
-                    SetStatus(Forbidden);
-                    return null;
-                }
-                // if gameId is missing
-                else if (gameId == null)
-                {
-                    SetStatus(Forbidden);
-                    return null;
-                }
-                else if (gameId.Trim() == "")
-                {
-                    SetStatus(Forbidden);
-                    return null;
-                }
-                // If gameId is invalid
-                else if (!int.TryParse(gameId, out tmp))
-                {
-                    SetStatus(Forbidden);
-                    return null;
-                }
-                else if (!_boggleState.GameExists(gameId))
-                {
-                    SetStatus(Forbidden);
-                    return null;
-                }
-                // If game state is anything other than "active" -> 409 (Conflict)
-                // TODO does this work? (GameState.Active)
-                else if (getGameState(gameId) != GameState.Active)
-                {
-                    SetStatus(Conflict);
-                    return null;
-                }
+                    // if Word is null or empty when trimmed
+                    if (body.Word == null || body.Word.Trim().Equals(""))
+                    {
+                        SetStatus(Forbidden);
+                        trans.Commit();
+                        return null;
+                    }
+                    // if  UserToken is null or empty
+                    else if (body.UserToken == null || body.UserToken.Trim().Equals(""))
+                    {
+                        SetStatus(Forbidden);
+                        trans.Commit();
+                        return null;
+                    }
+                    // if gameId is missing
+                    else if (gameId == null)
+                    {
+                        SetStatus(Forbidden);
+                        trans.Commit();
+                        return null;
+                    }
+                    else if (gameId.Trim() == "")
+                    {
+                        SetStatus(Forbidden);
+                        trans.Commit();
+                        return null;
+                    }
+                    // If gameId is invalid
+                    else if (!int.TryParse(gameId, out tmp))
+                    {
+                        SetStatus(Forbidden);
+                        trans.Commit();
+                        return null;
+                    }
+                    else if (!_boggleState.GameExists(gameId, conn, trans))
+                    {
+                        SetStatus(Forbidden);
+                        trans.Commit();
+                        return null;
+                    }
+                    // If game state is anything other than "active" -> 409 (Conflict)
+                    else if (getGameState(gameId) != GameState.Active)
+                    {
+                        SetStatus(Conflict);
+                        trans.Commit();
+                        return null;
+                    }
 
-                // Make sure that the player is in the game.
-                string userToken1;
-                string userToken2;
-                _boggleState.GetPlayers(gameId, out userToken1, out userToken2);
-                if (body.UserToken != userToken1 && body.UserToken != userToken2)
-                {
-                    SetStatus(Forbidden);
-                    return null;
+                    // Make sure that the player is in the game.
+                    string userToken1;
+                    string userToken2;
+                    _boggleState.GetPlayers(gameId, out userToken1, out userToken2, conn, trans);
+                    if (body.UserToken != userToken1 && body.UserToken != userToken2)
+                    {
+                        SetStatus(Forbidden);
+                        trans.Commit();
+                        return null;
+                    }
+                    // Record trimmed Word by UserToken
+                    else
+                    {
+                        WordPair pair = GetScore(body, gameId);
+                        // Add to word record
+                        _boggleState.AddWord(gameId, body.UserToken, pair.Word, pair.Score, conn, trans);
+                        // Update player total score
+                        int currentScore = _boggleState.GetScore(gameId, body.UserToken, conn, trans);
+                        currentScore += pair.Score;
+                        _boggleState.SetScore(gameId, body.UserToken, currentScore);
+
+                        SetStatus(OK);
+                        PlayWordContract PlayWordContract = new PlayWordContract();
+                        PlayWordContract.Score = pair.Score.ToString();
+
+                        trans.Commit();
+                        return PlayWordContract;
+                    }
                 }
-                // Record trimmed Word by UserToken
-                else
-                {
-
-                    WordPair pair = GetScore(body, gameId);
-                    // Add to word record
-                    _boggleState.AddWord(gameId, body.UserToken, pair.Word, pair.Score);
-                    // Update player total score
-                    int currentScore = _boggleState.GetScore(gameId, body.UserToken);
-                    currentScore += pair.Score;
-                    _boggleState.SetScore(gameId, body.UserToken, currentScore);
-
-                    SetStatus(OK);
-                    PlayWordContract PlayWordContract = new PlayWordContract();
-                    PlayWordContract.Score = pair.Score.ToString();
-
-                    return PlayWordContract;
-                }
-            }*/
+            }
         }
 
         public BoggleGameContract GameStatus(string gameId, string brief)

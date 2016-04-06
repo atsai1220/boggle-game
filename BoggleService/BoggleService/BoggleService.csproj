@@ -142,7 +142,7 @@
     <Content Include="SQL_Queries\GetBoard.sql" />
     <Content Include="SQL_Queries\GetNickname.sql" />
     <Content Include="SQL_Queries\GetPlayers.sql" />
-    <Content Include="SQL_Queries\GetScore.sql" />
+    <Content Include="GetScore.sql" />
     <Content Include="SQL_Queries\GetWords.sql" />
     <Content Include="SQL_Queries\GameExists.sql" />
     <Content Include="SQL_Queries\GetTime.sql" />
