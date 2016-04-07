@@ -63,9 +63,9 @@ namespace Boggle
 
                 using (SqlDataReader reader = command.ExecuteReader())
                 {
-                    return (string)reader["GameID"];
-                }
+                return (string)reader["GameID"];
             }
+        }
         }
 
         /// <summary>
@@ -142,9 +142,9 @@ namespace Boggle
 
                 using (SqlDataReader reader = command.ExecuteReader())
                 {
-                    return reader.GetString(0);
-                }
+                return reader.GetString(0);
             }
+        }
         }
 
         /// <summary>
@@ -160,9 +160,9 @@ namespace Boggle
                 command.Parameters.AddWithValue("@UserId", userToken);
                 using (SqlDataReader reader = command.ExecuteReader())
                 {
-                    return reader.GetString(0);
-                }       
+                return reader.GetString(0);
             }
+        }
         }
 
         /// <summary>
@@ -182,9 +182,9 @@ namespace Boggle
                 using (SqlDataReader reader = command.ExecuteReader())
                 {
                     player1Id = reader.GetString(0);
-                    player2Id = reader.GetString(1);
-                }
+                player2Id = reader.GetString(1);
             }
+        }
         }
 
         /// <summary>
@@ -202,9 +202,9 @@ namespace Boggle
                 command.Parameters.AddWithValue("@UserId", userToken);
                 using (SqlDataReader reader = command.ExecuteReader())
                 {
-                    return reader.GetInt32(0);
-                }
+                return reader.GetInt32(0);
             }
+        }
         }
 
         /// <summary>
@@ -246,22 +246,22 @@ namespace Boggle
 
                 using (SqlDataAdapter adapter = new SqlDataAdapter(command))
                 {
-                    List<WordPair> list = new List<WordPair>();
-
-                    DataTable table = new DataTable();
-                    adapter.Fill(table);
-                    foreach (DataRow row in table.Rows)
-                    {
-                        WordPair pair = new WordPair();
-                        pair.Word = row["Word"].ToString();
-                        int score;
-                        int.TryParse(row["Score"].ToString(), out score);
-                        pair.Score = score;
-                        list.Add(pair);
-                    }
-                    return list;
+                List<WordPair> list = new List<WordPair>();
+                
+                DataTable table = new DataTable();
+                adapter.Fill(table);
+                foreach (DataRow row in table.Rows)
+                {
+                    WordPair pair = new WordPair();
+                    pair.Word = row["Word"].ToString();
+                    int score;
+                    int.TryParse(row["Score"].ToString(), out score);
+                    pair.Score = score;
+                    list.Add(pair);
                 }
+                return list;
             }
+        }
         }
 
         /// <summary>
@@ -377,9 +377,17 @@ namespace Boggle
                 conn,
                 trans))
             {
-                var reader = command.ExecuteReader();
-
-                return reader.GetString(0);
+                using (var reader = command.ExecuteReader())
+                {
+                    if (reader.Read())
+                    {
+                        return reader.GetValue(0).ToString();
+                    }
+                    else
+                    {
+                        throw new Exception("Sql query returned no results");
+                    }
+                }
             }
         }
     }
