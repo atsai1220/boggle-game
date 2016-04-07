@@ -61,8 +61,10 @@ namespace Boggle
                 command.Parameters.AddWithValue("@TimeLimit", player1TimeLimit);
                 command.Parameters.AddWithValue("@StartTime", "");
 
-                var reader = command.ExecuteReader();
-                return (string)reader["GameID"];
+                using (SqlDataReader reader = command.ExecuteReader())
+                {
+                    return (string)reader["GameID"];
+                }
             }
         }
 
@@ -137,8 +139,11 @@ namespace Boggle
             using (SqlCommand command = new SqlCommand(script, conn, trans))
             {
                 command.Parameters.AddWithValue("@GameId", gameId);
-                SqlDataReader reader = command.ExecuteReader();
-                return reader.GetString(0);
+
+                using (SqlDataReader reader = command.ExecuteReader())
+                {
+                    return reader.GetString(0);
+                }
             }
         }
 
@@ -153,8 +158,10 @@ namespace Boggle
             using (SqlCommand command = new SqlCommand(script, conn, trans))
             {
                 command.Parameters.AddWithValue("@UserId", userToken);
-                SqlDataReader reader = command.ExecuteReader();
-                return reader.GetString(0);
+                using (SqlDataReader reader = command.ExecuteReader())
+                {
+                    return reader.GetString(0);
+                }       
             }
         }
 
@@ -171,9 +178,12 @@ namespace Boggle
             using (SqlCommand command = new SqlCommand(script, conn, trans))
             {
                 command.Parameters.AddWithValue("@GameId", gameId);
-                SqlDataReader reader = command.ExecuteReader();
-                player1Id =  reader.GetString(0);
-                player2Id = reader.GetString(1);
+
+                using (SqlDataReader reader = command.ExecuteReader())
+                {
+                    player1Id = reader.GetString(0);
+                    player2Id = reader.GetString(1);
+                }
             }
         }
 
@@ -190,8 +200,10 @@ namespace Boggle
             {
                 command.Parameters.AddWithValue("@GameID", gameId);
                 command.Parameters.AddWithValue("@UserId", userToken);
-                SqlDataReader reader = command.ExecuteReader();
-                return reader.GetInt32(0);
+                using (SqlDataReader reader = command.ExecuteReader())
+                {
+                    return reader.GetInt32(0);
+                }
             }
         }
 
@@ -231,21 +243,24 @@ namespace Boggle
             {
                 command.Parameters.AddWithValue("@GameID", gameId);
                 command.Parameters.AddWithValue("@UserId", userToken);
-                SqlDataAdapter adapter = new SqlDataAdapter(command);
-                List<WordPair> list = new List<WordPair>();
-                
-                DataTable table = new DataTable();
-                adapter.Fill(table);
-                foreach (DataRow row in table.Rows)
+
+                using (SqlDataAdapter adapter = new SqlDataAdapter(command))
                 {
-                    WordPair pair = new WordPair();
-                    pair.Word = row["Word"].ToString();
-                    int score;
-                    int.TryParse(row["Score"].ToString(), out score);
-                    pair.Score = score;
-                    list.Add(pair);
+                    List<WordPair> list = new List<WordPair>();
+
+                    DataTable table = new DataTable();
+                    adapter.Fill(table);
+                    foreach (DataRow row in table.Rows)
+                    {
+                        WordPair pair = new WordPair();
+                        pair.Word = row["Word"].ToString();
+                        int score;
+                        int.TryParse(row["Score"].ToString(), out score);
+                        pair.Score = score;
+                        list.Add(pair);
+                    }
+                    return list;
                 }
-                return list;
             }
         }
 
