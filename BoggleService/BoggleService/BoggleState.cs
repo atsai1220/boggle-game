@@ -271,7 +271,7 @@ namespace Boggle
         /// <returns></returns>
         public List<WordPair> GetWords(string gameId, string userToken, SqlConnection conn, SqlTransaction trans)
         {
-            string script = "SELECT Word FROM Words WHERE GameID = @GameID AND Player = @UserId";
+            string script = "SELECT Word, Score FROM Words WHERE GameID = @GameID AND Player = @UserId";
 
             using (SqlCommand command = new SqlCommand(script, conn, trans))
             {
@@ -293,29 +293,6 @@ namespace Boggle
                     return list;
                 }
             }
-        }
-
-        /// <summary>
-        /// Set the score of the player refered to by usertoken.
-        /// 
-        /// User token should refer to a user in the game.
-        /// </summary>
-        /// <param name="gameId">The id of the game queried</param>
-        /// <param name="userToken">The user token of the user getting their score changed</param>
-        /// <param name="score">The score</param>
-        public void SetScore(string gameId, string userToken, int score)
-        {
-            //var game = games[gameId];
-
-            //if (userToken == game.player1UserToken)
-            //{
-            //    game.player1Score = score;
-            //}
-            //else if (userToken == game.player2UserToken)
-            //{
-            //    game.player2Score = score;
-            //}
-            // No longer necessary because of new database!
         }
 
         /// <summary>
@@ -385,22 +362,6 @@ namespace Boggle
                 }
             }
         }
-
-        /* Depreciated TODO delete
-        public string CreateGame()
-        {
-            //lastGameId++;
-            //string gameId = lastGameId.ToString();
-
-            //BoggleGame boggleGame = new BoggleGame();
-            //boggleGame.gameId = gameId;
-
-            //games[gameId] = boggleGame;
-
-            //return gameId;
-            return "temp";
-        }
-        */
 
         public string GetLastGameId(SqlConnection conn, SqlTransaction trans)
         {

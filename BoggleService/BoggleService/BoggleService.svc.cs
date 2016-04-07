@@ -249,7 +249,6 @@ namespace Boggle
                         // Update player total score
                         int currentScore = _boggleState.GetScore(gameId, body.UserToken, conn, trans);
                         currentScore += pair.Score;
-                        _boggleState.SetScore(gameId, body.UserToken, currentScore);
 
                         SetStatus(OK);
                         PlayWordContract PlayWordContract = new PlayWordContract();
@@ -354,7 +353,6 @@ namespace Boggle
 
                     if (!boggleState.GameExists(gameId, conn, trans))
                     {
-                        trans.Commit();
                         return GameState.Invalid;
                     }
 
@@ -363,7 +361,6 @@ namespace Boggle
 
                     if (player2UserToken == "")
                     {
-                        trans.Commit();
                         return GameState.Pending;
                     }
 
@@ -375,12 +372,10 @@ namespace Boggle
 
                     if (DateTime.UtcNow.Ticks < endTime)
                     {
-                        trans.Commit();
                         return GameState.Active;
                     }
                     else
                     {
-                        trans.Commit();
                         return GameState.Completed;
                     }
                 }
