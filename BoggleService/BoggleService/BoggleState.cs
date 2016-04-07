@@ -53,7 +53,7 @@ namespace Boggle
         {
             using (SqlCommand command = new SqlCommand("INSERT INTO Games(Player1, Player2, Board, TimeLimit, StartTime) VALUES(@UserToken1, @UserToken2, @Board, @TimeLimit, @StartTime); SELECT SCOPE_IDENTITY() AS GameID",
                     conn,
-                    trans))
+                    trans)) 
             {
                 command.Parameters.AddWithValue("@UserToken1", player1Token);
                 command.Parameters.AddWithValue("@UserToken2", "");
@@ -61,9 +61,11 @@ namespace Boggle
                 command.Parameters.AddWithValue("@TimeLimit", player1TimeLimit);
                 command.Parameters.AddWithValue("@StartTime", "");
 
-                var reader = command.ExecuteReader();
+                using (SqlDataReader reader = command.ExecuteReader())
+                {
                 return (string)reader["GameID"];
             }
+        }
         }
 
         /// <summary>
@@ -137,9 +139,12 @@ namespace Boggle
             using (SqlCommand command = new SqlCommand(script, conn, trans))
             {
                 command.Parameters.AddWithValue("@GameId", gameId);
-                SqlDataReader reader = command.ExecuteReader();
+
+                using (SqlDataReader reader = command.ExecuteReader())
+                {
                 return reader.GetString(0);
             }
+        }
         }
 
         /// <summary>
@@ -153,9 +158,11 @@ namespace Boggle
             using (SqlCommand command = new SqlCommand(script, conn, trans))
             {
                 command.Parameters.AddWithValue("@UserId", userToken);
-                SqlDataReader reader = command.ExecuteReader();
+                using (SqlDataReader reader = command.ExecuteReader())
+                {
                 return reader.GetString(0);
             }
+        }
         }
 
         /// <summary>
@@ -171,10 +178,13 @@ namespace Boggle
             using (SqlCommand command = new SqlCommand(script, conn, trans))
             {
                 command.Parameters.AddWithValue("@GameId", gameId);
-                SqlDataReader reader = command.ExecuteReader();
-                player1Id = reader.GetString(0);
+
+                using (SqlDataReader reader = command.ExecuteReader())
+                {
+                    player1Id = reader.GetString(0);
                 player2Id = reader.GetString(1);
             }
+        }
         }
 
         /// <summary>
@@ -190,9 +200,11 @@ namespace Boggle
             {
                 command.Parameters.AddWithValue("@GameID", gameId);
                 command.Parameters.AddWithValue("@UserId", userToken);
-                SqlDataReader reader = command.ExecuteReader();
+                using (SqlDataReader reader = command.ExecuteReader())
+                {
                 return reader.GetInt32(0);
             }
+        }
         }
 
         /// <summary>
@@ -231,9 +243,11 @@ namespace Boggle
             {
                 command.Parameters.AddWithValue("@GameID", gameId);
                 command.Parameters.AddWithValue("@UserId", userToken);
-                SqlDataAdapter adapter = new SqlDataAdapter(command);
-                List<WordPair> list = new List<WordPair>();
 
+                using (SqlDataAdapter adapter = new SqlDataAdapter(command))
+                {
+                List<WordPair> list = new List<WordPair>();
+                
                 DataTable table = new DataTable();
                 adapter.Fill(table);
                 foreach (DataRow row in table.Rows)
@@ -247,6 +261,7 @@ namespace Boggle
                 }
                 return list;
             }
+        }
         }
 
         /// <summary>
