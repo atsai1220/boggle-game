@@ -53,19 +53,21 @@ namespace Boggle
         {
             using (SqlCommand command = new SqlCommand("INSERT INTO Games(Player1, Player2, Board, TimeLimit, StartTime) VALUES(@UserToken1, @UserToken2, @Board, @TimeLimit, @StartTime); SELECT SCOPE_IDENTITY() AS GameID",
                     conn,
-                    trans)) 
+                    trans))
             {
                 command.Parameters.AddWithValue("@UserToken1", player1Token);
-                command.Parameters.AddWithValue("@UserToken2", "");
+                command.Parameters.AddWithValue("@UserToken2", DBNull.Value);
                 command.Parameters.AddWithValue("@Board", "");
                 command.Parameters.AddWithValue("@TimeLimit", player1TimeLimit);
-                command.Parameters.AddWithValue("@StartTime", "");
+                command.Parameters.AddWithValue("@StartTime", DBNull.Value);
 
                 using (SqlDataReader reader = command.ExecuteReader())
                 {
-                return (string)reader["GameID"];
+                    reader.Read();
+
+                    return reader["GameID"].ToString();
+                }
             }
-        }
         }
 
         /// <summary>
@@ -142,9 +144,11 @@ namespace Boggle
 
                 using (SqlDataReader reader = command.ExecuteReader())
                 {
-                return reader.GetString(0);
+                    reader.Read();
+
+                    return reader.GetString(0);
+                }
             }
-        }
         }
 
         /// <summary>
@@ -160,9 +164,11 @@ namespace Boggle
                 command.Parameters.AddWithValue("@UserId", userToken);
                 using (SqlDataReader reader = command.ExecuteReader())
                 {
-                return reader.GetString(0);
+                    reader.Read();
+
+                    return reader.GetString(0);
+                }
             }
-        }
         }
 
         /// <summary>
@@ -181,10 +187,25 @@ namespace Boggle
 
                 using (SqlDataReader reader = command.ExecuteReader())
                 {
-                    player1Id = reader.GetString(0);
-                player2Id = reader.GetString(1);
+                    if (reader.Read())
+                    {
+                        player1Id = reader.GetString(0);
+
+                        if (reader.IsDBNull(1))
+                        {
+                            player2Id = "";
+                        }
+                        else
+                        {
+                            player2Id = reader.GetString(1);
+                        }
+                    }
+                    else
+                    {
+                        throw new Exception("This will happen if gameId does not exist. This should not happen if service is correct");
+                    }
+                }
             }
-        }
         }
 
         /// <summary>
@@ -202,9 +223,17 @@ namespace Boggle
                 command.Parameters.AddWithValue("@UserId", userToken);
                 using (SqlDataReader reader = command.ExecuteReader())
                 {
-                return reader.GetInt32(0);
+                    reader.Read();
+
+                    // If there are no words sum is null
+                    if(reader.IsDBNull(0))
+                    {
+                        return 0;
+                    }
+
+                    return reader.GetInt32(0);
+                }
             }
-        }
         }
 
         /// <summary>
@@ -223,8 +252,13 @@ namespace Boggle
 
                 using (SqlDataReader reader = command.ExecuteReader())
                 {
+                    reader.Read();
+
                     timeLimit = (int)reader["TimeLimit"];
-                    startTime = (long)reader["StartTime"];
+
+                    DateTime time = (DateTime)reader["StartTime"];
+
+                    startTime = time.Ticks;
                 }
             }
         }
@@ -237,54 +271,28 @@ namespace Boggle
         /// <returns></returns>
         public List<WordPair> GetWords(string gameId, string userToken, SqlConnection conn, SqlTransaction trans)
         {
-            string script = "SELECT Word FROM Words WHERE GameID = @GameID AND Player = @UserId";
+            string script = "SELECT Word, Score FROM Words WHERE GameID = @GameID AND Player = @UserId";
 
             using (SqlCommand command = new SqlCommand(script, conn, trans))
             {
                 command.Parameters.AddWithValue("@GameID", gameId);
                 command.Parameters.AddWithValue("@UserId", userToken);
 
-                using (SqlDataAdapter adapter = new SqlDataAdapter(command))
+                using (SqlDataReader reader = command.ExecuteReader())
                 {
-                List<WordPair> list = new List<WordPair>();
-                
-                DataTable table = new DataTable();
-                adapter.Fill(table);
-                foreach (DataRow row in table.Rows)
-                {
-                    WordPair pair = new WordPair();
-                    pair.Word = row["Word"].ToString();
-                    int score;
-                    int.TryParse(row["Score"].ToString(), out score);
-                    pair.Score = score;
-                    list.Add(pair);
+                    List<WordPair> list = new List<WordPair>();
+
+                    while (reader.Read())
+                    {
+                        WordPair pair = new WordPair();
+                        pair.Word = (string)reader["Word"];
+                        pair.Score = (int)reader["Score"];
+                        list.Add(pair);
+                    }
+
+                    return list;
                 }
-                return list;
             }
-        }
-        }
-
-        /// <summary>
-        /// Set the score of the player refered to by usertoken.
-        /// 
-        /// User token should refer to a user in the game.
-        /// </summary>
-        /// <param name="gameId">The id of the game queried</param>
-        /// <param name="userToken">The user token of the user getting their score changed</param>
-        /// <param name="score">The score</param>
-        public void SetScore(string gameId, string userToken, int score)
-        {
-            //var game = games[gameId];
-
-            //if (userToken == game.player1UserToken)
-            //{
-            //    game.player1Score = score;
-            //}
-            //else if (userToken == game.player2UserToken)
-            //{
-            //    game.player2Score = score;
-            //}
-            // No longer necessary because of new database!
         }
 
         /// <summary>
@@ -304,7 +312,7 @@ namespace Boggle
                 command.Parameters.AddWithValue("@GameID", gameId);
                 command.Parameters.AddWithValue("@Player2", player2Token);
                 command.Parameters.AddWithValue("@Player2TimeLimit", player2TimeLimit);
-                command.Parameters.AddWithValue("@StartTime", startTime);
+                command.Parameters.AddWithValue("@StartTime", new DateTime(startTime));
                 command.Parameters.AddWithValue("@Board", board);
 
                 command.ExecuteNonQuery();
@@ -354,22 +362,6 @@ namespace Boggle
                 }
             }
         }
-
-        /* Depreciated TODO delete
-        public string CreateGame()
-        {
-            //lastGameId++;
-            //string gameId = lastGameId.ToString();
-
-            //BoggleGame boggleGame = new BoggleGame();
-            //boggleGame.gameId = gameId;
-
-            //games[gameId] = boggleGame;
-
-            //return gameId;
-            return "temp";
-        }
-        */
 
         public string GetLastGameId(SqlConnection conn, SqlTransaction trans)
         {

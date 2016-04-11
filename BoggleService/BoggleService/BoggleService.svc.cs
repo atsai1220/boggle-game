@@ -194,47 +194,40 @@ namespace Boggle
                     if (body.Word == null || body.Word.Trim().Equals(""))
                     {
                         SetStatus(Forbidden);
-                        trans.Commit();
                         return null;
                     }
                     // if  UserToken is null or empty
                     else if (body.UserToken == null || body.UserToken.Trim().Equals(""))
                     {
                         SetStatus(Forbidden);
-                        trans.Commit();
                         return null;
                     }
                     // if gameId is missing
                     else if (gameId == null)
                     {
                         SetStatus(Forbidden);
-                        trans.Commit();
                         return null;
                     }
                     else if (gameId.Trim() == "")
                     {
                         SetStatus(Forbidden);
-                        trans.Commit();
                         return null;
                     }
                     // If gameId is invalid
                     else if (!int.TryParse(gameId, out tmp))
                     {
                         SetStatus(Forbidden);
-                        trans.Commit();
                         return null;
                     }
                     else if (!_boggleState.GameExists(gameId, conn, trans))
                     {
                         SetStatus(Forbidden);
-                        trans.Commit();
                         return null;
                     }
                     // If game state is anything other than "active" -> 409 (Conflict)
                     else if (getGameState(gameId) != GameState.Active)
                     {
                         SetStatus(Conflict);
-                        trans.Commit();
                         return null;
                     }
 
@@ -245,7 +238,6 @@ namespace Boggle
                     if (body.UserToken != userToken1 && body.UserToken != userToken2)
                     {
                         SetStatus(Forbidden);
-                        trans.Commit();
                         return null;
                     }
                     // Record trimmed Word by UserToken
@@ -257,7 +249,6 @@ namespace Boggle
                         // Update player total score
                         int currentScore = _boggleState.GetScore(gameId, body.UserToken, conn, trans);
                         currentScore += pair.Score;
-                        _boggleState.SetScore(gameId, body.UserToken, currentScore);
 
                         SetStatus(OK);
                         PlayWordContract PlayWordContract = new PlayWordContract();
@@ -362,7 +353,6 @@ namespace Boggle
 
                     if (!boggleState.GameExists(gameId, conn, trans))
                     {
-                        trans.Commit();
                         return GameState.Invalid;
                     }
 
@@ -371,7 +361,6 @@ namespace Boggle
 
                     if (player2UserToken == "")
                     {
-                        trans.Commit();
                         return GameState.Pending;
                     }
 
@@ -383,12 +372,10 @@ namespace Boggle
 
                     if (DateTime.UtcNow.Ticks < endTime)
                     {
-                        trans.Commit();
                         return GameState.Active;
                     }
                     else
                     {
-                        trans.Commit();
                         return GameState.Completed;
                     }
                 }
