@@ -78,9 +78,13 @@
       <HintPath>..\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.6.0.4\lib\net45\Newtonsoft.Json.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="StringSocket, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\StringSocket.dll</HintPath>
     </Reference>
     <Reference Include="Swashbuckle.Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=cd1bb07a5ac7c7bc, processorArchitecture=MSIL">
       <HintPath>..\packages\Swashbuckle.Core.5.0.0\lib\net40\Swashbuckle.Core.dll</HintPath>
@@ -134,7 +138,6 @@
     <Content Include="dictionary.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="BoggleService.svc" />
     <Content Include="SQL_Queries\AddWord.sql" />
     <Content Include="SQL_Queries\CancelGame.sql" />
     <Content Include="SQL_Queries\CreateGame.sql" />
@@ -154,9 +157,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BoggleBoard.cs" />
-    <Compile Include="BoggleService.svc.cs">
-      <DependentUpon>BoggleService.svc</DependentUpon>
-    </Compile>
+    <Compile Include="BoggleServer.cs" />
+    <Compile Include="BoggleService.cs" />
     <Compile Include="BoggleState.cs" />
     <Compile Include="BoggleContracts.cs" />
     <Compile Include="DataModels.cs" />
