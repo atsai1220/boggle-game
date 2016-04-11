@@ -22,7 +22,7 @@ namespace Boggle
         /// </summary>
         private enum GameState { Invalid, Pending, Active, Completed }
 
-        private static HashSet<string> dictionary = new HashSet<string>(File.ReadAllLines(AppDomain.CurrentDomain.BaseDirectory + @"..\dictionary.txt"));
+        private static HashSet<string> dictionary = new HashSet<string>(File.ReadAllLines(AppDomain.CurrentDomain.BaseDirectory + "dictionary.txt"));
 
         //private static HashSet<string> dictionary = new HashSet<string>();
 
