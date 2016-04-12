@@ -56,6 +56,8 @@ namespace SimpleWebServer
         private string method;
         private string url;
 
+        private const string gameStatusRegex = @"BoggleService\.svc\/games\/([^\/?]+)(?:\?(?:(?:Brief=)?(.*)))?";
+
         public HttpRequest(StringSocket stringSocket)
         {
             this.ss = stringSocket;
@@ -102,18 +104,20 @@ namespace SimpleWebServer
                     {
                         
                     }
-                    else if(false) //Cancel Join
+                    else if(method == "PUT" && url == "/BoggleService.svc/games")
                     {
-
+                        apiCall = HandleCancelJoinRequest;
                     }
                     else if(method == "POST" && url == "/BoggleService.svc/games") //Play word
                     {
                         apiPayload = url;
                         apiCall = HandleJoinGame;
                     }
-                    else if(false) //Game status
+                    else if(method == "GET" && Regex.IsMatch(url, gameStatusRegex))
                     {
-
+                        // There is no additional content to recieve.
+                        HandleGameStatus(url);
+                        return;
                     }
                     else
                     {
@@ -131,8 +135,6 @@ namespace SimpleWebServer
 
         private void HandleCreateUser(string content, Exception e, object payload)
         {
-            Console.WriteLine("Create User:");
-
             CreateUserBody body = JsonConvert.DeserializeObject<CreateUserBody>(content);
 
             BoggleService boggleService = new BoggleService();
@@ -171,10 +173,19 @@ namespace SimpleWebServer
 
         }
 
-        //Sam
+        /// <summary>
+        /// Callback to handle JoinRequest api call
+        /// </summary>
         private void HandleCancelJoinRequest(string content, Exception e, object payload)
         {
+            CancelJoinRequestBody body = JsonConvert.DeserializeObject<CancelJoinRequestBody>(content);
 
+            BoggleService boggleService = new BoggleService();
+            boggleService.CancelJoinRequest(body);
+
+            string result = "";
+
+            sendResult(boggleService.GetHttpStatus(), result);
         }
 
         //Andrew
@@ -199,9 +210,19 @@ namespace SimpleWebServer
         }
 
         //SAm
-        private void HandleGameStatus(string content, Exception e, object payload)
+        private void HandleGameStatus(string url)
         {
+            Match match = Regex.Match(url, gameStatusRegex);
 
+            string gameId = match.Groups[1].Value;
+            string queryString = match.Groups[2].Value;
+
+            BoggleService boggleService = new BoggleService();
+            var contract = boggleService.GameStatus(gameId, queryString);
+
+            string result = JsonConvert.SerializeObject(contract);
+
+            sendResult(boggleService.GetHttpStatus(), result);
         }
 
         //Amdrew
