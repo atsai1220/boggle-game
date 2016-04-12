@@ -22,7 +22,7 @@ namespace SimpleWebServer
 
         public WebServer()
         {
-            server = new TcpListener(IPAddress.Any, 54321);
+            server = new TcpListener(IPAddress.Any, 60000);
             server.Start();
             server.BeginAcceptSocket(ConnectionRequested, null);
         }
@@ -79,9 +79,25 @@ namespace SimpleWebServer
                     {
                         apiCall = HandleCreateUser;
                     }
+                    else if(false) //Join game
+                    {
+
+                    }
+                    else if(false) //Cancel Join
+                    {
+
+                    }
+                    else if(false) //Play word
+                    {
+                        
+                    }
+                    else if(false) //Game status
+                    {
+
+                    }
                     else
                     {
-                        apiCall = ContentReceived;
+                        apiCall = BadRequest;
                     }
 
                     ss.BeginReceive(apiCall, null, contentLength);
@@ -107,6 +123,36 @@ namespace SimpleWebServer
             sendResult(boggleService.GetHttpStatus(), result);
         }
 
+        // Andrew
+        private void HandleJoinGame(string content, Exception e, object payload)
+        {
+
+        }
+
+        //Sam
+        private void HandleCancelJoinRequest(string content, Exception e, object payload)
+        {
+
+        }
+
+        //Andrew
+        private void HandlePlayWord(string content, Exception e, object payload)
+        {
+
+        }
+
+        //SAm
+        private void HandleGameStatus(string content, Exception e, object payload)
+        {
+
+        }
+
+        //Amdrew
+        private void HandleBadRequest(string s, Exception e, object payload)
+        {
+
+        }
+
         private void sendResult(HttpStatusCode status, string result)
         {
             ss.BeginSend(String.Format("HTTP/1.1 {0} {1}\n", (int)status, status.ToString()), Ignore, null);
@@ -116,39 +162,8 @@ namespace SimpleWebServer
             ss.BeginSend(result, (ex, py) => { ss.Shutdown(); }, null);
         }
 
-        private void ContentReceived(string s, Exception e, object payload)
-        {
-            Console.WriteLine(payload.ToString());
-            if (s != null)
-            {
-                Console.WriteLine(s);
-
-                //Person p = JsonConvert.DeserializeObject<Person>(s);
-                //Console.WriteLine(p.Name + " " + p.Eyes);
-
-                // Call service method
-
-                string result =
-                    JsonConvert.SerializeObject(
-                            new Person { Name = "June", Eyes = "Blue" },
-                            new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
-
-                ss.BeginSend("HTTP/1.1 200 OK\n", Ignore, null);
-                ss.BeginSend("Content-Type: application/json\n", Ignore, null);
-                ss.BeginSend("Content-Length: " + result.Length + "\n", Ignore, null);
-                ss.BeginSend("\r\n", Ignore, null);
-                ss.BeginSend(result, (ex, py) => { ss.Shutdown(); }, null);
-            }
-        }
-
         private void Ignore(Exception e, object payload)
         {
         }
-    }
-
-    public class Person
-    {
-        public String Name { get; set; }
-        public String Eyes { get; set; }
     }
 }
