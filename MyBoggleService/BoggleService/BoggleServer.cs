@@ -20,6 +20,9 @@ namespace SimpleWebServer
 
         private TcpListener server;
 
+        /// <summary>
+        /// Create server and being accepting
+        /// </summary>
         public WebServer()
         {
             server = new TcpListener(IPAddress.Any, 60000);
@@ -27,6 +30,11 @@ namespace SimpleWebServer
             server.BeginAcceptSocket(ConnectionRequested, null);
         }
 
+        /// <summary>
+        /// Create a socket for this connection
+        /// And begin accepting another connection
+        /// </summary>
+        /// <param name="ar"></param>
         private void ConnectionRequested(IAsyncResult ar)
         {
             Socket s = server.EndAcceptSocket(ar);
@@ -36,6 +44,9 @@ namespace SimpleWebServer
 
     }
 
+    /// <summary>
+    /// Class that handles a connection's actual request through a StringSocket
+    /// </summary>
     class HttpRequest
     {
         private StringSocket ss;
@@ -48,9 +59,15 @@ namespace SimpleWebServer
         public HttpRequest(StringSocket stringSocket)
         {
             this.ss = stringSocket;
-            ss.BeginReceive(LineReceived, null);
+            ss.BeginReceive(LineReceived, null);    // where we start reading the content of the request
         }
 
+        /// <summary>
+        /// Determines which Callback method to call
+        /// </summary>
+        /// <param name="s"></param>
+        /// <param name="e"></param>
+        /// <param name="payload"></param>
         private void LineReceived(string s, Exception e, object payload)
         {
             lineCount++;
@@ -75,21 +92,24 @@ namespace SimpleWebServer
                 {
                     StringSocket.ReceiveCallback apiCall;
 
+                    Object apiPayload = null;
+
                     if(method == "POST" && url == "/BoggleService.svc/users")
                     {
                         apiCall = HandleCreateUser;
                     }
-                    else if(false) //Join game
+                    else if(false) // Join game
                     {
-
+                        
                     }
                     else if(false) //Cancel Join
                     {
 
                     }
-                    else if(false) //Play word
+                    else if(method == "POST" && url == "/BoggleService.svc/games") //Play word
                     {
-                        
+                        apiPayload = url;
+                        apiCall = HandleJoinGame;
                     }
                     else if(false) //Game status
                     {
@@ -97,10 +117,10 @@ namespace SimpleWebServer
                     }
                     else
                     {
-                        apiCall = BadRequest;
+                        apiCall = HandleBadRequest;
                     }
 
-                    ss.BeginReceive(apiCall, null, contentLength);
+                    ss.BeginReceive(apiCall, apiPayload, contentLength);
                 }
                 else
                 {
@@ -119,13 +139,35 @@ namespace SimpleWebServer
             var contract = boggleService.CreateUser(body);
 
             string result = JsonConvert.SerializeObject(contract);
-
+            Console.Write(result);
             sendResult(boggleService.GetHttpStatus(), result);
         }
 
         // Andrew
+        /// <summary>
+        /// Callback method for joining a game
+        /// </summary>
+        /// <param name="content"></param>
+        /// <param name="e"></param>
+        /// <param name="payload"></param>
         private void HandleJoinGame(string content, Exception e, object payload)
         {
+            // If the Exception is non-null, it is the Exception that caused the receive attempt to fail.
+            if (e == null)
+            {
+                Console.Write("Join Game:");
+
+                JoinGameBody body = JsonConvert.DeserializeObject<JoinGameBody>(content);
+
+                BoggleService boggleService = new BoggleService();
+                var contract = boggleService.JoinGame(body);
+
+                string result = JsonConvert.SerializeObject(contract);
+
+
+
+                sendResult(boggleService.GetHttpStatus(), result);
+            }
 
         }
 
@@ -136,9 +178,24 @@ namespace SimpleWebServer
         }
 
         //Andrew
+        /// <summary>
+        /// Callback method for playing a word
+        /// </summary>
+        /// <param name="content">UserToken and Word; need to JsonConvert.Deserialize</param>
+        /// <param name="e"></param>
+        /// <param name="payload">Contains the gameId</param>
         private void HandlePlayWord(string content, Exception e, object payload)
         {
+            // If the Exception is non-null, it is the Exception that caused the receive attempt to fail
+            if (e == null)
+            {
+                Console.Write("Player Word: ");
+                PlayWordBody body = JsonConvert.DeserializeObject<PlayWordBody>(content);
+                Console.Write(body.Word);
 
+                BoggleService boggleService = new BoggleService();
+                var contract = boggleService.PlayWord(body, "123");
+            }
         }
 
         //SAm
