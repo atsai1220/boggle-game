@@ -1,4 +1,5 @@
-﻿using CustomNetworking;
+﻿using Boggle;
+using CustomNetworking;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -32,6 +33,7 @@ namespace SimpleWebServer
             server.BeginAcceptSocket(ConnectionRequested, null);
             new HttpRequest(new StringSocket(s, new UTF8Encoding()));
         }
+
     }
 
     class HttpRequest
@@ -39,6 +41,9 @@ namespace SimpleWebServer
         private StringSocket ss;
         private int lineCount;
         private int contentLength;
+
+        private string method;
+        private string url;
 
         public HttpRequest(StringSocket stringSocket)
         {
@@ -58,6 +63,9 @@ namespace SimpleWebServer
                     Match m = r.Match(s);
                     Console.WriteLine("Method: " + m.Groups[1].Value);
                     Console.WriteLine("URL: " + m.Groups[2].Value);
+
+                    method = m.Groups[1].Value;
+                    url = m.Groups[2].Value;
                 }
                 if (s.StartsWith("Content-Length:"))
                 {
@@ -65,7 +73,18 @@ namespace SimpleWebServer
                 }
                 if (s == "\r")
                 {
-                    ss.BeginReceive(ContentReceived, null, contentLength);
+                    StringSocket.ReceiveCallback apiCall;
+
+                    if(method == "POST" && url == "/BoggleService.svc/users")
+                    {
+                        apiCall = HandleCreateUser;
+                    }
+                    else
+                    {
+                        apiCall = ContentReceived;
+                    }
+
+                    ss.BeginReceive(apiCall, null, contentLength);
                 }
                 else
                 {
@@ -74,12 +93,38 @@ namespace SimpleWebServer
             }
         }
 
+        private void HandleCreateUser(string content, Exception e, object payload)
+        {
+            Console.WriteLine("Create User:");
+
+            CreateUserBody body = JsonConvert.DeserializeObject<CreateUserBody>(content);
+
+            BoggleService boggleService = new BoggleService();
+            var contract = boggleService.CreateUser(body);
+
+            string result = JsonConvert.SerializeObject(contract);
+
+            sendResult(boggleService.GetHttpStatus(), result);
+        }
+
+        private void sendResult(HttpStatusCode status, string result)
+        {
+            ss.BeginSend(String.Format("HTTP/1.1 {0} {1}\n", (int)status, status.ToString()), Ignore, null);
+            ss.BeginSend("Content-Type: application/json\n", Ignore, null);
+            ss.BeginSend("Content-Length: " + result.Length + "\n", Ignore, null);
+            ss.BeginSend("\r\n", Ignore, null);
+            ss.BeginSend(result, (ex, py) => { ss.Shutdown(); }, null);
+        }
+
         private void ContentReceived(string s, Exception e, object payload)
         {
+            Console.WriteLine(payload.ToString());
             if (s != null)
             {
-                Person p = JsonConvert.DeserializeObject<Person>(s);
-                Console.WriteLine(p.Name + " " + p.Eyes);
+                Console.WriteLine(s);
+
+                //Person p = JsonConvert.DeserializeObject<Person>(s);
+                //Console.WriteLine(p.Name + " " + p.Eyes);
 
                 // Call service method
 

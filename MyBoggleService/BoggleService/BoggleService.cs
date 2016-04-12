@@ -24,16 +24,28 @@ namespace Boggle
 
         private static HashSet<string> dictionary = new HashSet<string>(File.ReadAllLines(AppDomain.CurrentDomain.BaseDirectory + @"..\dictionary.txt"));
 
-        //private static HashSet<string> dictionary = new HashSet<string>();
+        /// <summary>
+        /// The status code of the method call, obtainable with GetStatus
+        /// </summary>
+        private HttpStatusCode _status;
 
         /// <summary>
-        /// The most recent call to SetStatus determines the response code used when
-        /// an http response is sent.
+        /// Modified SetStatus to store the status as an instance variable.
         /// </summary>
-        /// <param name="status"></param>
-        private static void SetStatus(HttpStatusCode status)
+        private void SetStatus(HttpStatusCode status)
         {
-            WebOperationContext.Current.OutgoingResponse.StatusCode = status;
+            //WebOperationContext.Current.OutgoingResponse.StatusCode = status;
+
+            _status = status;
+        }
+
+        /// <summary>
+        /// This should be used to get the status of an api call.
+        /// </summary>
+        /// <returns></returns>
+        public HttpStatusCode GetHttpStatus()
+        {
+            return _status;
         }
 
         /// <summary>
