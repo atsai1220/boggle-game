@@ -22,6 +22,9 @@ namespace Boggle
         /// </summary>
         private enum GameState { Invalid, Pending, Active, Completed }
 
+        /// <summary>
+        /// Stores the set of legal words for boggle.
+        /// </summary>
         private static HashSet<string> dictionary = new HashSet<string>(File.ReadAllLines(AppDomain.CurrentDomain.BaseDirectory + @"..\dictionary.txt"));
 
         /// <summary>
@@ -34,8 +37,6 @@ namespace Boggle
         /// </summary>
         private void SetStatus(HttpStatusCode status)
         {
-            //WebOperationContext.Current.OutgoingResponse.StatusCode = status;
-
             _status = status;
         }
 

@@ -87,7 +87,12 @@ namespace SimpleWebServer
         /// <summary>
         /// Regex for matching the url for a gameStatus request.
         /// </summary>
-        private const string gameStatusRegex = @"BoggleService\.svc\/games\/([^\/?]+)(?:\?(?:(?:Brief=)?(.*)))?";
+        private const string gameStatusRegex = @"BoggleService\.svc\/games\/([^\/?]+)(?:\?(?:(?:[Bb]rief=)?(.*)))?";
+
+        /// <summary>
+        /// Regex for matching the url for a playWord request.
+        /// </summary>
+        private const string playWordRegex = @"BoggleService\.svc\/games\/([^\/]+)";
 
         /// <summary>
         /// Constructor for HttpRequest
@@ -127,29 +132,29 @@ namespace SimpleWebServer
 
                     Object apiPayload = null;
 
-                    if(method == "POST" && url == "/BoggleService.svc/users")
+                    if (method == "POST" && url == "/BoggleService.svc/users")
                     {
                         apiCall = HandleCreateUser;
                     }
-                    else if(method == "POST" && url == "/BoggleService.svc/games")
+                    else if (method == "POST" && url == "/BoggleService.svc/games")
                     {
                         apiCall = HandleJoinGame;
                     }
-                    else if(method == "PUT" && url == "/BoggleService.svc/games")
+                    else if (method == "PUT" && url == "/BoggleService.svc/games")
                     {
                         apiCall = HandleCancelJoinRequest;
                     }
-                    else if(method == "POST" && Regex.IsMatch(url, gameStatusRegex))
+                    else if (method == "PUT" && Regex.IsMatch(url, playWordRegex))
                     {
-                        Regex r = new Regex(@"BoggleService\.svc\/games\/(\d+)");
+                        Regex r = new Regex(playWordRegex);
                         Match m = r.Match(url);
 
                         string gameId = m.Groups[1].Value;
 
                         apiPayload = gameId;
-                        apiCall = HandleJoinGame;
+                        apiCall = HandlePlayWord;
                     }
-                    else if(method == "GET" && Regex.IsMatch(url, gameStatusRegex))
+                    else if (method == "GET" && Regex.IsMatch(url, gameStatusRegex))
                     {
                         // There is no additional content to recieve.
                         HandleGameStatus(url);
@@ -157,7 +162,8 @@ namespace SimpleWebServer
                     }
                     else
                     {
-                        apiCall = HandleBadRequest;
+                        HandleBadRequest();
+                        return;
                     }
 
                     ss.BeginReceive(apiCall, apiPayload, contentLength);
@@ -174,14 +180,17 @@ namespace SimpleWebServer
         /// </summary>
         private void HandleCreateUser(string content, Exception e, object payload)
         {
-            CreateUserBody body = JsonConvert.DeserializeObject<CreateUserBody>(content);
+            if (e == null)
+            {
+                CreateUserBody body = JsonConvert.DeserializeObject<CreateUserBody>(content);
 
-            BoggleService boggleService = new BoggleService();
-            var contract = boggleService.CreateUser(body);
+                BoggleService boggleService = new BoggleService();
+                var contract = boggleService.CreateUser(body);
 
-            string result = JsonConvert.SerializeObject(contract);
-            Console.Write(result);
-            sendResult(boggleService.GetHttpStatus(), result);
+                string result = JsonConvert.SerializeObject(contract);
+                Console.Write(result);
+                sendResult(boggleService.GetHttpStatus(), result);
+            }
         }
 
         /// <summary>
@@ -195,7 +204,7 @@ namespace SimpleWebServer
             // If the Exception is non-null, it is the Exception that caused the receive attempt to fail.
             if (e == null)
             {
-                Console.Write("Join Game:");
+                //Console.Write("Join Game:");
 
                 JoinGameBody body = JsonConvert.DeserializeObject<JoinGameBody>(content);
 
@@ -203,10 +212,9 @@ namespace SimpleWebServer
                 var contract = boggleService.JoinGame(body);
 
                 string result = JsonConvert.SerializeObject(contract);
-=
+
                 sendResult(boggleService.GetHttpStatus(), result);
             }
-
         }
 
         /// <summary>
@@ -214,14 +222,17 @@ namespace SimpleWebServer
         /// </summary>
         private void HandleCancelJoinRequest(string content, Exception e, object payload)
         {
-            CancelJoinRequestBody body = JsonConvert.DeserializeObject<CancelJoinRequestBody>(content);
+            if (e == null)
+            {
+                CancelJoinRequestBody body = JsonConvert.DeserializeObject<CancelJoinRequestBody>(content);
 
-            BoggleService boggleService = new BoggleService();
-            boggleService.CancelJoinRequest(body);
+                BoggleService boggleService = new BoggleService();
+                boggleService.CancelJoinRequest(body);
 
-            string result = "";
+                string result = "";
 
-            sendResult(boggleService.GetHttpStatus(), result);
+                sendResult(boggleService.GetHttpStatus(), result);
+            }
         }
 
         /// <summary>
@@ -261,7 +272,11 @@ namespace SimpleWebServer
             BoggleService boggleService = new BoggleService();
             var contract = boggleService.GameStatus(gameId, queryString);
 
-            string result = JsonConvert.SerializeObject(contract);
+            JsonSerializerSettings settings = new JsonSerializerSettings();
+            // This ignores null fields in The game status contract.
+            settings.NullValueHandling = NullValueHandling.Ignore;
+
+            string result = JsonConvert.SerializeObject(contract, settings);
 
             sendResult(boggleService.GetHttpStatus(), result);
         }
@@ -271,7 +286,7 @@ namespace SimpleWebServer
         /// 
         /// Called if request doesn't match any of the api calls.
         /// </summary>
-        private void HandleBadRequest(string s, Exception e, object payload)
+        private void HandleBadRequest()
         {
             sendResult(HttpStatusCode.BadRequest, "");
         }

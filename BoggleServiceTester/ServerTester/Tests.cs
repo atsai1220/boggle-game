@@ -179,6 +179,7 @@ namespace ServerGrader
                 if (response.IsSuccessStatusCode)
                 {
                     String result = await response.Content.ReadAsStringAsync();
+                    Console.WriteLine(result);
                     return JsonConvert.DeserializeObject(result);
                 }
                 else
