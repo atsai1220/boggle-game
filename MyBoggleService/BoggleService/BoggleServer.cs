@@ -100,9 +100,9 @@ namespace SimpleWebServer
                     {
                         apiCall = HandleCreateUser;
                     }
-                    else if(false) // Join game
+                    else if(method == "POST" && url == "/BoggleService.svc/games") // Join game
                     {
-                        
+                        apiCall = HandleJoinGame;
                     }
                     else if(method == "PUT" && url == "/BoggleService.svc/games")
                     {
@@ -170,9 +170,7 @@ namespace SimpleWebServer
                 var contract = boggleService.JoinGame(body);
 
                 string result = JsonConvert.SerializeObject(contract);
-
-
-
+=
                 sendResult(boggleService.GetHttpStatus(), result);
             }
 
