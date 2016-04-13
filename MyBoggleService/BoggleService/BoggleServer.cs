@@ -10,16 +10,30 @@ using System.Text.RegularExpressions;
 
 namespace SimpleWebServer
 {
+    /// <summary>
+    /// Server for boggle service.
+    /// </summary>
     public class WebServer
     {
+        /// <summary>
+        /// Entry point for boggle service.
+        /// </summary>
         public static void Main()
         {
             new WebServer();
             Console.Read();
         }
 
+        /// <summary>
+        /// Listens for new connections
+        /// </summary>
         private TcpListener server;
 
+        /// <summary>
+        /// Constructor for web server.
+        /// 
+        /// Binds a TcpListener on port 60000
+        /// </summary>
         public WebServer()
         {
             server = new TcpListener(IPAddress.Any, 60000);
@@ -27,32 +41,65 @@ namespace SimpleWebServer
             server.BeginAcceptSocket(ConnectionRequested, null);
         }
 
+        /// <summary>
+        /// Called by server when a connection is requested.
+        /// </summary>
         private void ConnectionRequested(IAsyncResult ar)
         {
             Socket s = server.EndAcceptSocket(ar);
             server.BeginAcceptSocket(ConnectionRequested, null);
             new HttpRequest(new StringSocket(s, new UTF8Encoding()));
         }
-
     }
 
+    /// <summary>
+    /// Class to process a request on the server.
+    /// </summary>
     class HttpRequest
     {
+        /// <summary>
+        /// String socket connection for the request
+        /// </summary>
         private StringSocket ss;
+
+        /// <summary>
+        /// How many lines have been sent so far.
+        /// Used to get the url and method from the first line.
+        /// </summary>
         private int lineCount;
+
+        /// <summary>
+        /// The length of the content of the request.
+        /// </summary>
         private int contentLength;
 
+        /// <summary>
+        /// The method of the HttpRequest
+        /// </summary>
         private string method;
+
+        /// <summary>
+        /// The url of the HttpRequest.
+        /// </summary>
         private string url;
 
+        /// <summary>
+        /// Regex for matching the url for a gameStatus request.
+        /// </summary>
         private const string gameStatusRegex = @"BoggleService\.svc\/games\/([^\/?]+)(?:\?(?:(?:Brief=)?(.*)))?";
 
+        /// <summary>
+        /// Constructor for HttpRequest
+        /// </summary>
         public HttpRequest(StringSocket stringSocket)
         {
             this.ss = stringSocket;
             ss.BeginReceive(LineReceived, null);
         }
 
+        /// <summary>
+        /// Called whenever the string socket for this request recieves a line.
+        /// </summary>
         private void LineReceived(string s, Exception e, object payload)
         {
             lineCount++;
@@ -115,6 +162,9 @@ namespace SimpleWebServer
             }
         }
 
+        /// <summary>
+        /// Callback to handle CreateUser api call
+        /// </summary>
         private void HandleCreateUser(string content, Exception e, object payload)
         {
             CreateUserBody body = JsonConvert.DeserializeObject<CreateUserBody>(content);
@@ -154,7 +204,10 @@ namespace SimpleWebServer
 
         }
 
-        //SAm
+        /// <summary>
+        /// Callback to handle GameStatus api call
+        /// </summary>
+        /// <param name="url"></param>
         private void HandleGameStatus(string url)
         {
             Match match = Regex.Match(url, gameStatusRegex);
@@ -169,22 +222,32 @@ namespace SimpleWebServer
 
             sendResult(boggleService.GetHttpStatus(), result);
         }
-
-        //Amdrew
+        
+        /// <summary>
+        /// Callback to handle bad requests
+        /// 
+        /// Called if request doesn't match any of the api calls.
+        /// </summary>
         private void HandleBadRequest(string s, Exception e, object payload)
         {
-
+            sendResult(HttpStatusCode.BadRequest, "");
         }
 
+        /// <summary>
+        /// Helper method to send the result of a request.
+        /// </summary>
         private void sendResult(HttpStatusCode status, string result)
         {
-            ss.BeginSend(String.Format("HTTP/1.1 {0} {1}\n", (int)status, status.ToString()), Ignore, null);
-            ss.BeginSend("Content-Type: application/json\n", Ignore, null);
-            ss.BeginSend("Content-Length: " + result.Length + "\n", Ignore, null);
+            ss.BeginSend(String.Format("HTTP/1.1 {0} {1}\r\n", (int)status, status.ToString()), Ignore, null);
+            ss.BeginSend("Content-Type: application/json\r\n", Ignore, null);
+            ss.BeginSend("Content-Length: " + result.Length + "\r\n", Ignore, null);
             ss.BeginSend("\r\n", Ignore, null);
             ss.BeginSend(result, (ex, py) => { ss.Shutdown(); }, null);
         }
 
+        /// <summary>
+        /// Dummy method
+        /// </summary>
         private void Ignore(Exception e, object payload)
         {
         }
