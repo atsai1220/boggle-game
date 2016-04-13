@@ -42,7 +42,8 @@ namespace SimpleWebServer
         }
 
         /// <summary>
-        /// Called by server when a connection is requested.
+        /// Create a socket for this connection
+        /// And begin accepting another connection
         /// </summary>
         private void ConnectionRequested(IAsyncResult ar)
         {
@@ -53,7 +54,7 @@ namespace SimpleWebServer
     }
 
     /// <summary>
-    /// Class to process a request on the server.
+    /// Class that handles a connection's actual request through a StringSocket
     /// </summary>
     class HttpRequest
     {
@@ -94,7 +95,7 @@ namespace SimpleWebServer
         public HttpRequest(StringSocket stringSocket)
         {
             this.ss = stringSocket;
-            ss.BeginReceive(LineReceived, null);
+            ss.BeginReceive(LineReceived, null);    // where we start reading the content of the request
         }
 
         /// <summary>
@@ -130,7 +131,7 @@ namespace SimpleWebServer
                     {
                         apiCall = HandleCreateUser;
                     }
-                    else if(false) //Join game
+                    else if(false) // Join game
                     {
 
                     }
@@ -138,9 +139,15 @@ namespace SimpleWebServer
                     {
                         apiCall = HandleCancelJoinRequest;
                     }
-                    else if(false) //Play word
+                    else if(method == "POST" && Regex.IsMatch(url, gameStatusRegex))
                     {
+                        Regex r = new Regex(@"BoggleService\.svc\/games\/(\d+)");
+                        Match m = r.Match(url);
                         
+                        string gameId = m.Groups[1].Value;
+
+                        apiPayload = gameId;
+                        apiCall = HandleJoinGame;
                     }
                     else if(method == "GET" && Regex.IsMatch(url, gameStatusRegex))
                     {
@@ -173,13 +180,34 @@ namespace SimpleWebServer
             var contract = boggleService.CreateUser(body);
 
             string result = JsonConvert.SerializeObject(contract);
-
+            Console.Write(result);
             sendResult(boggleService.GetHttpStatus(), result);
         }
-
-        // Andrew
+        
+        /// <summary>
+        /// Callback method for joining a game
+        /// </summary>
+        /// <param name="content"></param>
+        /// <param name="e"></param>
+        /// <param name="payload"></param>
         private void HandleJoinGame(string content, Exception e, object payload)
         {
+            // If the Exception is non-null, it is the Exception that caused the receive attempt to fail.
+            if (e == null)
+            {
+                Console.Write("Join Game:");
+
+                JoinGameBody body = JsonConvert.DeserializeObject<JoinGameBody>(content);
+
+                BoggleService boggleService = new BoggleService();
+                var contract = boggleService.JoinGame(body);
+
+                string result = JsonConvert.SerializeObject(contract);
+
+
+
+                sendResult(boggleService.GetHttpStatus(), result);
+            }
 
         }
 
@@ -197,11 +225,28 @@ namespace SimpleWebServer
 
             sendResult(boggleService.GetHttpStatus(), result);
         }
-
-        //Andrew
+        
+        /// <summary>
+        /// Callback method for playing a word
+        /// </summary>
+        /// <param name="content">UserToken and Word; need to JsonConvert.Deserialize</param>
+        /// <param name="e"></param>
+        /// <param name="payload">Contains the gameId</param>
         private void HandlePlayWord(string content, Exception e, object payload)
         {
+            // If the Exception is non-null, it is the Exception that caused the receive attempt to fail
+            if (e == null)
+            {
+                Console.Write("Player Word: ");
+                PlayWordBody body = JsonConvert.DeserializeObject<PlayWordBody>(content);
+                Console.Write(body.Word);
 
+                BoggleService boggleService = new BoggleService();
+                var contract = boggleService.PlayWord(body, payload.ToString());
+
+                string result = JsonConvert.SerializeObject(contract);
+                sendResult(boggleService.GetHttpStatus(), result);
+            }
         }
 
         /// <summary>
@@ -222,7 +267,7 @@ namespace SimpleWebServer
 
             sendResult(boggleService.GetHttpStatus(), result);
         }
-        
+
         /// <summary>
         /// Callback to handle bad requests
         /// 
