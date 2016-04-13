@@ -108,9 +108,14 @@ namespace SimpleWebServer
                     {
                         apiCall = HandleCancelJoinRequest;
                     }
-                    else if(method == "POST" && url == "/BoggleService.svc/games") //Play word
+                    else if(method == "POST" && Regex.IsMatch(url, gameStatusRegex)) //Play word
                     {
-                        apiPayload = url;
+                        Regex r = new Regex(@"BoggleService\.svc\/games\/(\d+)");
+                        Match m = r.Match(url);
+
+                        string gameId = m.Groups[1].Value;
+
+                        apiPayload = gameId;
                         apiCall = HandleJoinGame;
                     }
                     else if(method == "GET" && Regex.IsMatch(url, gameStatusRegex))
@@ -205,7 +210,10 @@ namespace SimpleWebServer
                 Console.Write(body.Word);
 
                 BoggleService boggleService = new BoggleService();
-                var contract = boggleService.PlayWord(body, "123");
+                var contract = boggleService.PlayWord(body, payload.ToString());
+
+                string result = JsonConvert.SerializeObject(contract);
+                sendResult(boggleService.GetHttpStatus(), result);
             }
         }
 
