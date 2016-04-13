@@ -100,7 +100,7 @@ namespace SimpleWebServer
                     {
                         apiCall = HandleCreateUser;
                     }
-                    else if(method == "POST" && url == "/BoggleService.svc/games") // Join game
+                    else if(method == "POST" && url == "/BoggleService.svc/games")
                     {
                         apiCall = HandleJoinGame;
                     }
@@ -108,7 +108,7 @@ namespace SimpleWebServer
                     {
                         apiCall = HandleCancelJoinRequest;
                     }
-                    else if(method == "POST" && Regex.IsMatch(url, gameStatusRegex)) //Play word
+                    else if(method == "POST" && Regex.IsMatch(url, gameStatusRegex))
                     {
                         Regex r = new Regex(@"BoggleService\.svc\/games\/(\d+)");
                         Match m = r.Match(url);
