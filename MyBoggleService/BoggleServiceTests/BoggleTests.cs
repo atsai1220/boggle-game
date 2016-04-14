@@ -58,7 +58,7 @@ namespace Boggle
         [ClassInitialize()]
         public static void StartIIS(TestContext testContext)
         {
-            IISAgent.Start(@"/site:""BoggleService"" /apppool:""Clr4IntegratedAppPool"" /config:""..\..\..\.vs\config\applicationhost.config""");
+            //IISAgent.Start(@"/site:""BoggleService"" /apppool:""Clr4IntegratedAppPool"" /config:""..\..\..\.vs\config\applicationhost.config""");
         }
 
         /// <summary>
@@ -67,10 +67,10 @@ namespace Boggle
         [ClassCleanup()]
         public static void StopIIS()
         {
-            IISAgent.Stop();
+            //IISAgent.Stop();
         }
 
-        private RestTestClient client = new RestTestClient("http://localhost:60000/");
+        private RestTestClient client = new RestTestClient("http://localhost:60000/BoggleService.svc");
 
         /// <summary>
         /// Tests CreateUser
@@ -80,7 +80,7 @@ namespace Boggle
         {
             dynamic player = new ExpandoObject();
             player.Nickname = "Andrew";
-            Response r = client.DoPostAsync("/users", player).Result;
+            Response r = client.DoPostAsync("users", player).Result;
             Assert.AreEqual(Created, r.Status);
         }
 
@@ -92,7 +92,7 @@ namespace Boggle
         {
             dynamic player = new ExpandoObject();
             player.Nickname = "";
-            Response r = client.DoPostAsync("/users", player).Result;
+            Response r = client.DoPostAsync("users", player).Result;
             Assert.AreEqual(Forbidden, r.Status);
         }
 
@@ -104,7 +104,7 @@ namespace Boggle
         {
             dynamic player = new ExpandoObject();
             player.Nickname = null;
-            Response r = client.DoPostAsync("/users", player).Result;
+            Response r = client.DoPostAsync("users", player).Result;
             Assert.AreEqual(Forbidden, r.Status);
         }
 
@@ -116,7 +116,7 @@ namespace Boggle
         {
             dynamic player = new ExpandoObject();
             player.Nickname = "Andrew";
-            Response response = client.DoPostAsync("/users", player).Result;
+            Response response = client.DoPostAsync("users", player).Result;
 
             string userToken = response.Data.UserToken;
 
@@ -124,7 +124,7 @@ namespace Boggle
             data.UserToken = response.Data.UserToken;
             data.TimeLimit = 25;
 
-            Response dataR = client.DoPostAsync("/games", data).Result;
+            Response dataR = client.DoPostAsync("games", data).Result;
             Assert.AreEqual(Accepted, dataR.Status);
 
             CancelGameTest1((String)data.UserToken);
@@ -142,11 +142,11 @@ namespace Boggle
             data.UserToken = userToken;
             data.TimeLimit = 0;
 
-            Response response = client.DoPostAsync("/games", data).Result;
+            Response response = client.DoPostAsync("games", data).Result;
             Assert.AreEqual(Forbidden, response);
 
             data.TimeLimit = 121;
-            response = client.DoPostAsync("/games", data).Result;
+            response = client.DoPostAsync("games", data).Result;
             Assert.AreEqual(Forbidden, response);
         }
 
@@ -162,8 +162,8 @@ namespace Boggle
             data.UserToken = userToken;
             data.TimeLimit = 60;
 
-            client.DoPostAsync("/games", data);
-            Response response = client.DoPostAsync("/games", data).Result;
+            client.DoPostAsync("games", data);
+            Response response = client.DoPostAsync("games", data).Result;
 
             Assert.AreEqual(Conflict, response);
         }
@@ -175,11 +175,11 @@ namespace Boggle
             dynamic data = new ExpandoObject();
             data.UserToken = "thisSHOULDNTwork";
 
-            Response dataR = client.DoPutAsync(data, "/games").Result;
+            Response dataR = client.DoPutAsync(data, "games").Result;
             Assert.AreEqual(Forbidden, dataR);
 
             data.UserToken = userToken;
-            dataR = client.DoPutAsync(data, "/games").Result;
+            dataR = client.DoPutAsync(data, "games").Result;
             Assert.AreEqual(OK, dataR);
         }
 
@@ -194,27 +194,27 @@ namespace Boggle
             // Player 1
             dynamic player1 = new ExpandoObject();
             player1.Nickname = "Andrew";
-            Response response = client.DoPostAsync("/users", player1).Result;
+            Response response = client.DoPostAsync("users", player1).Result;
             string userToken1 = response.Data.UserToken;
 
             dynamic data1 = new ExpandoObject();
             data1.UserToken = userToken1;
             data1.TimeLimit = 5;
 
-            Response data1R = client.DoPostAsync("/games", data1).Result;
+            Response data1R = client.DoPostAsync("games", data1).Result;
             Assert.AreEqual(Accepted, data1R.Status);
 
             // Player 2
             dynamic player2 = new ExpandoObject();
             player2.Nickname = "Sam";
-            Response player2R = client.DoPostAsync("/users", player2).Result;
+            Response player2R = client.DoPostAsync("users", player2).Result;
             string userToken2 = player2R.Data.UserToken;
 
             dynamic data2 = new ExpandoObject();
             data2.UserToken = userToken2;
             data2.TimeLimit = 5;
 
-            Response dataR = client.DoPostAsync("/games", data2).Result;
+            Response dataR = client.DoPostAsync("games", data2).Result;
             Assert.AreEqual(Created, dataR.Status);
         }
 
