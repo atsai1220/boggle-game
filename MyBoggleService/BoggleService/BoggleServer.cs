@@ -3,10 +3,12 @@ using CustomNetworking;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 
 namespace SimpleWebServer
 {
@@ -93,6 +95,27 @@ namespace SimpleWebServer
         /// Regex for matching the url for a playWord request.
         /// </summary>
         private const string playWordRegex = @"BoggleService\.svc\/games\/([^\/]+)";
+
+        /// <summary>
+        /// How many times to retry a sql transaction.
+        /// </summary>
+        private const int sqlAttempts = 4;
+
+        /// <summary>
+        /// Random object to add noise to wait times.
+        /// </summary>
+        private Random rnd = new Random();
+
+        /// <summary>
+        /// How long to wait to try again after a failed sql transaction.
+        /// </summary>
+        private int sleepTime
+        {
+            get
+            {
+                return 10 + rnd.Next(10);
+            }
+        }
 
         /// <summary>
         /// Constructor for HttpRequest
@@ -185,7 +208,24 @@ namespace SimpleWebServer
                 CreateUserBody body = JsonConvert.DeserializeObject<CreateUserBody>(content);
 
                 BoggleService boggleService = new BoggleService();
-                var contract = boggleService.CreateUser(body);
+                UserTokenContract contract = null;
+                for (int i = 0; i < sqlAttempts; i++)
+                {
+                    try
+                    {
+                        contract = boggleService.CreateUser(body);
+                        break;
+                    }
+                    catch (SqlException)
+                    {
+                        Thread.Sleep(sleepTime);
+                        if (i == sqlAttempts - 1)
+                        {
+                            HandleBadRequest();
+                            return;
+                        }
+                    }
+                }
 
                 string result = JsonConvert.SerializeObject(contract);
                 Console.Write(result);
@@ -209,7 +249,24 @@ namespace SimpleWebServer
                 JoinGameBody body = JsonConvert.DeserializeObject<JoinGameBody>(content);
 
                 BoggleService boggleService = new BoggleService();
-                var contract = boggleService.JoinGame(body);
+                GameIdContract contract = null;
+                for (int i = 0; i < sqlAttempts; i++)
+                {
+                    try
+                    {
+                        contract = boggleService.JoinGame(body);
+                        break;
+                    }
+                    catch (SqlException)
+                    {
+                        Thread.Sleep(sleepTime);
+                        if (i == sqlAttempts - 1)
+                        {
+                            HandleBadRequest();
+                            return;
+                        }
+                    }
+                }
 
                 string result = JsonConvert.SerializeObject(contract);
 
@@ -227,7 +284,24 @@ namespace SimpleWebServer
                 CancelJoinRequestBody body = JsonConvert.DeserializeObject<CancelJoinRequestBody>(content);
 
                 BoggleService boggleService = new BoggleService();
-                boggleService.CancelJoinRequest(body);
+
+                for (int i = 0; i < sqlAttempts; i++)
+                {
+                    try
+                    {
+                        boggleService.CancelJoinRequest(body);
+                        break;
+                    }
+                    catch (SqlException)
+                    {
+                        Thread.Sleep(sleepTime);
+                        if (i == sqlAttempts - 1)
+                        {
+                            HandleBadRequest();
+                            return;
+                        }
+                    }
+                }
 
                 string result = "";
 
@@ -251,7 +325,24 @@ namespace SimpleWebServer
                 Console.Write(body.Word);
 
                 BoggleService boggleService = new BoggleService();
-                var contract = boggleService.PlayWord(body, payload.ToString());
+                PlayWordContract contract = null;
+                for (int i = 0; i < sqlAttempts; i++)
+                {
+                    try
+                    {
+                        contract = boggleService.PlayWord(body, payload.ToString());
+                        break;
+                    }
+                    catch (SqlException)
+                    {
+                        Thread.Sleep(sleepTime);
+                        if (i == sqlAttempts - 1)
+                        {
+                            HandleBadRequest();
+                            return;
+                        }
+                    }
+                }
 
                 string result = JsonConvert.SerializeObject(contract);
                 sendResult(boggleService.GetHttpStatus(), result);
@@ -270,7 +361,24 @@ namespace SimpleWebServer
             string queryString = match.Groups[2].Value;
 
             BoggleService boggleService = new BoggleService();
-            var contract = boggleService.GameStatus(gameId, queryString);
+            BoggleGameContract contract = null;
+            for (int i = 0; i < sqlAttempts; i++)
+            {
+                try
+                {
+                    contract = boggleService.GameStatus(gameId, queryString);
+                    break;
+                }
+                catch (SqlException)
+                {
+                    Thread.Sleep(sleepTime);
+                    if (i == sqlAttempts - 1)
+                    {
+                        HandleBadRequest();
+                        return;
+                    }
+                }
+            }
 
             JsonSerializerSettings settings = new JsonSerializerSettings();
             // This ignores null fields in The game status contract.

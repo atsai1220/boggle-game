@@ -260,8 +260,8 @@ namespace Boggle
                         // Add to word record
                         _boggleState.AddWord(gameId, body.UserToken, pair.Word, pair.Score, conn, trans);
                         // Update player total score
-                        int currentScore = _boggleState.GetScore(gameId, body.UserToken, conn, trans);
-                        currentScore += pair.Score;
+                        //int currentScore = _boggleState.GetScore(gameId, body.UserToken, conn, trans);
+                        //currentScore += pair.Score;
 
                         SetStatus(OK);
                         PlayWordContract PlayWordContract = new PlayWordContract();
