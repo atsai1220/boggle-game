@@ -272,7 +272,7 @@ namespace BoggleClient
                 //  Request the short version
                 if (previousGameState.Equals("active"))
                 {
-                    url += "?yes";
+                    url += "?Brief=yes";
                 }
 
                 HttpResponseMessage response = await client.GetAsync(url);
@@ -399,7 +399,7 @@ otherwise, -1 pt");
             boggleModel.wordsPlayed = 0;
             
 
-            HttpResponseMessage response = await client.GetAsync("/BoggleService.svc/games/" + boggleModel.GameId + "?yes");
+            HttpResponseMessage response = await client.GetAsync("/BoggleService.svc/games/" + boggleModel.GameId);
             String result = response.Content.ReadAsStringAsync().Result;
             dynamic serverResponse = JsonConvert.DeserializeObject(result);
 
