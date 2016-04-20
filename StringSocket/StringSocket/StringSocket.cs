@@ -67,6 +67,34 @@ namespace CustomNetworking
         // Underlying socket
         private Socket socket;
 
+        // Whether an asynchronous send is going on
+        private bool sendOnGoing;
+
+        // Synchronizes sends
+        private readonly object sendSync = new object();
+
+        // StringBuilder for out going string
+        StringBuilder outGoingString;
+
+        // Array of bytes for sending with socket
+        private byte[] outBytes;
+
+        // The number of bytes that have been sent for this socket
+        // Keeps track of where in outBytes the socket is at
+        private int bytesSent;
+
+        // Where is the socket during send
+        private int byteIndex;
+
+        // Holds the encoding type
+        private Encoding encodingType;
+
+        // Holds the payload
+        string payloadSend;
+
+        // Holds callback method
+        private Queue<SendCallback> sendCallBacks;
+
         /// <summary>
         /// Creates a StringSocket from a regular Socket, which should already be connected.  
         /// The read and write methods of the regular Socket must not be called after the
@@ -76,12 +104,18 @@ namespace CustomNetworking
         public StringSocket(Socket s, Encoding e)
         {
             socket = s;
+            sendOnGoing = false;
+            outGoingString = new StringBuilder();
+            outBytes = new byte[0];
+            byteIndex = 0;
+            encodingType = e;
+            sendCallBacks = new Queue<SendCallback>();
         }
 
         /// <summary>
         /// Shuts down and closes the socket.  No need to change this.
         /// </summary>
-        public void Shutdown  ()
+        public void Shutdown()
         {
             try
             {
@@ -118,6 +152,74 @@ namespace CustomNetworking
         /// </summary>
         public void BeginSend(String s, SendCallback callback, object payload)
         {
+            lock (sendSync)
+            {
+                outGoingString.Append(s);
+                // If send is not on going, start one
+                if (!sendOnGoing)
+                {
+                    // Arranges for the string to be sent, then returns
+                    sendCallBacks.Enqueue(callback);
+                    sendOnGoing = true;
+                    payloadSend = (string)payload;
+                    SendBytes();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Method to actually send via socket with bytes
+        /// </summary>
+        private void SendBytes()
+        {
+            // If currently dealing with sending bytes
+            if (byteIndex < outBytes.Length)
+            {
+                socket.BeginSend(outBytes, byteIndex, outBytes.Length - byteIndex, SocketFlags.None, SentCallBack, payloadSend);
+            }
+            // Not currently dealing with bytes, make another one
+            else if (outGoingString.Length > 0)
+            {
+                // Started from the bottom
+                byteIndex = 0;
+
+
+                outBytes = Encoding.UTF8.GetBytes(outGoingString.ToString());
+                outGoingString.Clear();
+                socket.BeginSend(outBytes, 0, outBytes.Length, SocketFlags.None, SentCallBack, payloadSend);
+            }
+            // Now we're here.
+            else
+            {
+                sendOnGoing = false;
+                SendCallback callbackMethod = sendCallBacks.Dequeue();
+                callbackMethod(null, payloadSend);
+            }
+        }
+
+        /// <summary>
+        /// Callback method for when socket has successfully sent
+        /// </summary>
+        /// <param name="result"></param>
+        private void SentCallBack(IAsyncResult result)
+        {
+
+            bytesSent = socket.EndSend(result);
+
+            lock (sendSync)
+            {
+                // Nothing was sent
+                if (bytesSent == 0)
+                {
+                    socket.Close();
+                }
+                // Update index and try to send the rest
+                else
+                {
+                    byteIndex += bytesSent;
+                    SendBytes();
+                }
+            }
         }
 
         /// <summary>
