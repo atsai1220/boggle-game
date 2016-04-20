@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Net.Sockets;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace CustomNetworking
 {
@@ -67,6 +68,19 @@ namespace CustomNetworking
         // Underlying socket
         private Socket socket;
 
+        private System.Text.UTF8Encoding encoding = new System.Text.UTF8Encoding();
+
+        private const int BUFFER_SIZE = 1024;
+
+        private bool recieveIsOngoing;
+        private readonly object recieveSync = new object();
+        private StringBuilder incoming;
+        private byte[] incomingBytes;
+        private char[] incomingChars;
+        private Decoder decoder;
+        private Queue<Action<string, Exception>> recieveCallbackQueue;
+        private Queue<int> recieveLengthQueue;
+
         /// <summary>
         /// Creates a StringSocket from a regular Socket, which should already be connected.  
         /// The read and write methods of the regular Socket must not be called after the
@@ -76,12 +90,20 @@ namespace CustomNetworking
         public StringSocket(Socket s, Encoding e)
         {
             socket = s;
+
+            recieveIsOngoing = false;
+            incoming = new StringBuilder();
+            incomingBytes = new byte[BUFFER_SIZE];
+            incomingChars = new char[BUFFER_SIZE];
+            decoder = encoding.GetDecoder();
+            recieveCallbackQueue = new Queue<Action<string, Exception>>();
+            recieveLengthQueue = new Queue<int>();
         }
 
         /// <summary>
         /// Shuts down and closes the socket.  No need to change this.
         /// </summary>
-        public void Shutdown  ()
+        public void Shutdown()
         {
             try
             {
@@ -153,6 +175,99 @@ namespace CustomNetworking
         /// </summary>
         public void BeginReceive(ReceiveCallback callback, object payload, int length = 0)
         {
+            lock (recieveSync)
+            {
+                recieveCallbackQueue.Enqueue((s, e) => callback(s, e, payload));
+                recieveLengthQueue.Enqueue(length);
+
+                if (!recieveIsOngoing)
+                {
+                    recieveIsOngoing = true;
+
+                    socket.BeginReceive(incomingBytes, 0, incomingBytes.Length, SocketFlags.None, BytesRecieved, null);
+                }
+            }
+        }
+
+        private void BytesRecieved(IAsyncResult result)
+        {
+            int bytesRead = 0;
+            try
+            {
+                bytesRead = socket.EndReceive(result);
+            }
+            catch (ObjectDisposedException)
+            {
+                Console.WriteLine("ERROR!!!");
+            }
+
+            // bytesRead will be zero if the connection was closed on the other end and all bytes
+            // have been read.
+            if (bytesRead == 0)
+            {
+                socket.Close();
+            }
+            else
+            {
+                lock (recieveSync)
+                {
+                    int charsRead = encoding.GetDecoder().GetChars(incomingBytes, 0, bytesRead, incomingChars, 0, false);
+                    incoming.Append(incomingChars, 0, charsRead);
+
+                    int start = incoming.Length - charsRead;
+                    start = 0;
+
+                    while (recieveCallbackQueue.Count > 0)
+                    {
+                        string s = null;
+
+                        int length = recieveLengthQueue.First();
+                        if (length == 0)
+                        {
+                            for (int i = start; i < incoming.Length; i++)
+                            {
+                                if (incoming[i] == '\n')
+                                {
+                                    s = incoming.ToString(0, i);
+                                    // Remove the new line character too
+                                    incoming.Remove(0, i + 1);
+                                    break;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            if (incoming.Length >= length)
+                            {
+                                s = incoming.ToString(0, length);
+                                s.Remove(0, length);
+                            }
+                        }
+
+                        if (s == null)
+                        {
+                            break;
+                        }
+                        else
+                        {
+                            var callback = recieveCallbackQueue.Dequeue();
+                            recieveLengthQueue.Dequeue();
+
+                            new Task(() => callback(s, null)).Start();
+                        }
+
+                        start = 0;
+                    }
+                    if (recieveCallbackQueue.Count > 0)
+                    {
+                        socket.BeginReceive(incomingBytes, 0, incomingBytes.Length, SocketFlags.None, BytesRecieved, null);
+                    }
+                    else
+                    {
+                        recieveIsOngoing = false;
+                    }
+                }
+            }
         }
     }
 }
