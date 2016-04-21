@@ -792,6 +792,10 @@ namespace GradingTester
 
                     for (int i = 0; i < LIMIT; i++)
                     {
+                        if (Thread.CurrentThread.Name == null)
+                        {
+                            Thread.CurrentThread.Name = i.ToString();
+                        }
                         sender.BeginSend("Hello\n", (e, p) => { Interlocked.Decrement(ref count1); while (true) ; }, null);
                     }
 

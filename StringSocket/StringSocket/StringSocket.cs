@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Net.Sockets;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace CustomNetworking
 {
@@ -155,16 +156,19 @@ namespace CustomNetworking
             lock (sendSync)
             {
                 outGoingString.Append(s);
+                sendCallBacks.Enqueue(callback);
                 // If send is not on going, start one
                 if (!sendOnGoing)
                 {
                     // Arranges for the string to be sent, then returns
-                    sendCallBacks.Enqueue(callback);
+
                     sendOnGoing = true;
                     payloadSend = (string)payload;
                     SendBytes();
                 }
+                
             }
+            
         }
 
         /// <summary>
@@ -172,6 +176,7 @@ namespace CustomNetworking
         /// </summary>
         private void SendBytes()
         {
+            
             // If currently dealing with sending bytes
             if (byteIndex < outBytes.Length)
             {
@@ -192,9 +197,17 @@ namespace CustomNetworking
             else
             {
                 sendOnGoing = false;
-                SendCallback callbackMethod = sendCallBacks.Dequeue();
-                callbackMethod(null, payloadSend);
+                Task.Run(() => OriginalCallBack());
+                //
+
             }
+        }
+
+        private void OriginalCallBack()
+        {
+            //socket.Close();
+            SendCallback callbackMethod = sendCallBacks.Dequeue();
+            callbackMethod(null, payloadSend);
         }
 
         /// <summary>
@@ -208,13 +221,8 @@ namespace CustomNetworking
 
             lock (sendSync)
             {
-                // Nothing was sent
-                if (bytesSent == 0)
-                {
-                    socket.Close();
-                }
                 // Update index and try to send the rest
-                else
+                if (bytesSent > 0)
                 {
                     byteIndex += bytesSent;
                     SendBytes();
