@@ -165,6 +165,7 @@ namespace CustomNetworking
                     sendOnGoing = true;
                     payloadSend = (string)payload;
                     SendBytes();
+                    
                 }
                 
             }
@@ -197,6 +198,7 @@ namespace CustomNetworking
             else
             {
                 sendOnGoing = false;
+                
                 Task.Run(() => OriginalCallBack());
                 //
 
@@ -205,9 +207,9 @@ namespace CustomNetworking
 
         private void OriginalCallBack()
         {
-            //socket.Close();
             SendCallback callbackMethod = sendCallBacks.Dequeue();
             callbackMethod(null, payloadSend);
+            //socket.Close();
         }
 
         /// <summary>
@@ -226,6 +228,7 @@ namespace CustomNetworking
                 {
                     byteIndex += bytesSent;
                     SendBytes();
+                    
                 }
             }
         }
