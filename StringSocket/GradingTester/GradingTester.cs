@@ -402,7 +402,7 @@ namespace GradingTester
                     {
                         sender.BeginSend(i.ToString() + "\n", (e, p) => { }, null);
                     }
-                    if (!SpinWait.SpinUntil(() => count == LIMIT, 5000))
+                    if (!SpinWait.SpinUntil(() => count == LIMIT, 10000))
                     {
                         Assert.Fail();
                     }
@@ -638,6 +638,11 @@ namespace GradingTester
                         Assert.AreEqual(i, lines[i]);
                     }
                 }
+                catch(Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                    Assert.Fail();
+                }
                 finally
                 {
                     CloseSockets(server, receiver, sender);
@@ -708,6 +713,11 @@ namespace GradingTester
                         Assert.AreEqual(i, lines[i]);
                     }
                 }
+                catch(Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                    Assert.Fail();
+                }
                 finally
                 {
                     CloseSockets(server, sender, receiver);
@@ -715,12 +725,15 @@ namespace GradingTester
             }
         }
 
+        public static bool test15 = false;
+
         /// <summary>
         /// Blocks the receive callbacks, makes sure receiving keeps working.
         /// </summary>
         [TestMethod()]
         public void Test15()
         {
+            test15 = true;
             new Test15Class().run(4015);
         }
 
@@ -743,15 +756,15 @@ namespace GradingTester
 
                     for (int i = 0; i < LIMIT; i++)
                     {
-                        sender.BeginSend("Hello\n", (e, p) => { }, null);
+                        sender.BeginSend(i + " Hello\n", (e, p) => { }, null);
                     }
 
                     for (int i = 0; i < LIMIT; i++)
                     {
                         Task.Run(
-                            () => receiver.BeginReceive((s, e, p) => { Interlocked.Decrement(ref count); while (true) ; }, null));
+                            () => receiver.BeginReceive((s, e, p) => { Console.WriteLine(s); Interlocked.Decrement(ref count); while (true) ; }, null));
                     }
-                    if (!SpinWait.SpinUntil(() => count == 0, 5000))
+                    if (!SpinWait.SpinUntil(() => count == 0, 50000))
                     {
                         Assert.Fail();
                     }
