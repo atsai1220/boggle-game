@@ -75,14 +75,10 @@ namespace CustomNetworking
         private readonly object sendSync = new object();
 
         // StringBuilder for out going string
-        StringBuilder outGoingString;
+//        StringBuilder outGoingString;
 
         // Array of bytes for sending with socket
         private byte[] outBytes;
-
-        // The number of bytes that have been sent for this socket
-        // Keeps track of where in outBytes the socket is at
-        private int bytesSent;
 
         // Where is the socket during send
         private int byteIndex;
@@ -90,11 +86,14 @@ namespace CustomNetworking
         // Holds the encoding type
         private Encoding encodingType;
 
-        // Holds the payload
-        string payloadSend;
-
         // Holds callback method
-        private Queue<SendCallback> sendCallBacks;
+        private Queue<Action<Exception>> sendCallBackQueue;
+
+        // Store the messages to be sent.
+        private Queue<string> messageQueue;
+
+        // Determine if first time sending message from group.
+        bool isStartOfGroup;
 
         /// <summary>
         /// Creates a StringSocket from a regular Socket, which should already be connected.  
@@ -106,11 +105,12 @@ namespace CustomNetworking
         {
             socket = s;
             sendOnGoing = false;
-            outGoingString = new StringBuilder();
+           // outGoingString = new StringBuilder();
             outBytes = new byte[0];
             byteIndex = 0;
             encodingType = e;
-            sendCallBacks = new Queue<SendCallback>();
+            sendCallBackQueue = new Queue<Action<Exception>>();
+            messageQueue = new Queue<string>();
         }
 
         /// <summary>
@@ -155,21 +155,19 @@ namespace CustomNetworking
         {
             lock (sendSync)
             {
-                outGoingString.Append(s);
-                sendCallBacks.Enqueue(callback);
+                messageQueue.Enqueue(s);
+                //outGoingString.Append(s);
+
+                sendCallBackQueue.Enqueue((e) => callback(e, payload));
                 // If send is not on going, start one
                 if (!sendOnGoing)
                 {
                     // Arranges for the string to be sent, then returns
-
+                    isStartOfGroup = true;
                     sendOnGoing = true;
-                    payloadSend = (string)payload;
                     SendBytes();
-                    
                 }
-                
             }
-            
         }
 
         /// <summary>
@@ -177,39 +175,38 @@ namespace CustomNetworking
         /// </summary>
         private void SendBytes()
         {
-            
             // If currently dealing with sending bytes
             if (byteIndex < outBytes.Length)
             {
-                socket.BeginSend(outBytes, byteIndex, outBytes.Length - byteIndex, SocketFlags.None, SentCallBack, payloadSend);
+                socket.BeginSend(outBytes, byteIndex, outBytes.Length - byteIndex, SocketFlags.None, SentCallBack, null);
             }
             // Not currently dealing with bytes, make another one
-            else if (outGoingString.Length > 0)
+            else if (messageQueue.Count > 0)
             {
+                if(isStartOfGroup)
+                {
+                    isStartOfGroup = false;
+                }
+                else
+                {
+                    var callbackMethod = sendCallBackQueue.Dequeue();
+                    Task.Run(() => callbackMethod(null));
+                }
+
                 // Started from the bottom
                 byteIndex = 0;
-
-
-                outBytes = Encoding.UTF8.GetBytes(outGoingString.ToString());
-                outGoingString.Clear();
-                socket.BeginSend(outBytes, 0, outBytes.Length, SocketFlags.None, SentCallBack, payloadSend);
+                outBytes = encodingType.GetBytes(messageQueue.Dequeue());
+                //outGoingString.Clear();
+                socket.BeginSend(outBytes, 0, outBytes.Length, SocketFlags.None, SentCallBack, null);
             }
-            // Now we're here.
             else
             {
+                var callbackMethod = sendCallBackQueue.Dequeue();
+                Task.Run(() => callbackMethod(null));
+
                 sendOnGoing = false;
-                
-                Task.Run(() => OriginalCallBack());
-                //
-
             }
-        }
 
-        private void OriginalCallBack()
-        {
-            SendCallback callbackMethod = sendCallBacks.Dequeue();
-            callbackMethod(null, payloadSend);
-            //socket.Close();
         }
 
         /// <summary>
@@ -218,9 +215,7 @@ namespace CustomNetworking
         /// <param name="result"></param>
         private void SentCallBack(IAsyncResult result)
         {
-
-            bytesSent = socket.EndSend(result);
-
+            int bytesSent = socket.EndSend(result);
             lock (sendSync)
             {
                 // Update index and try to send the rest
@@ -228,7 +223,6 @@ namespace CustomNetworking
                 {
                     byteIndex += bytesSent;
                     SendBytes();
-                    
                 }
             }
         }
