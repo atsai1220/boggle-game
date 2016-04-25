@@ -70,16 +70,55 @@ namespace CustomNetworking
 
         private System.Text.UTF8Encoding encoding = new System.Text.UTF8Encoding();
 
+        /// <summary>
+        /// The buffer size for the char and byte buffers.
+        /// </summary>
         private const int BUFFER_SIZE = 1024;
 
+        /// <summary>
+        /// True if there is a pending recieve socket callback. False otherwise.
+        /// </summary>
         private bool recieveIsOngoing;
+
+        /// <summary>
+        /// Object used to synchronize access to membervariables related to recieving from the socket.
+        /// </summary>
         private readonly object recieveSync = new object();
+
+        /// <summary>
+        /// Stores the incoming chars that haven't been processed yet.
+        /// </summary>
         private StringBuilder incoming;
+
+        /// <summary>
+        /// Buffer to store the incomingBytes
+        /// </summary>
         private byte[] incomingBytes;
+
+        /// <summary>
+        /// Buffer to store the incomingChars
+        /// </summary>
         private char[] incomingChars;
+
+        /// <summary>
+        /// Object that is used to decode the incomingBytes into incomingChars.
+        /// </summary>
         private Decoder decoder;
+
+        /// <summary>
+        /// Queue to store the callbacks for BeginRecieve in.
+        /// </summary>
         private Queue<Action<string, Exception>> recieveCallbackQueue;
+
+        /// <summary>
+        /// Queue to store the requested lengths for BeginRecieve in.
+        /// </summary>
         private Queue<int> recieveLengthQueue;
+
+        /// <summary>
+        /// The position in incoming to start searching for new line characters.
+        /// </summary>
+        private int start;
 
         /// <summary>
         /// Creates a StringSocket from a regular Socket, which should already be connected.  
@@ -98,6 +137,7 @@ namespace CustomNetworking
             decoder = encoding.GetDecoder();
             recieveCallbackQueue = new Queue<Action<string, Exception>>();
             recieveLengthQueue = new Queue<int>();
+            start = 0;
         }
 
         /// <summary>
@@ -184,22 +224,82 @@ namespace CustomNetworking
                 {
                     recieveIsOngoing = true;
 
-                    socket.BeginReceive(incomingBytes, 0, incomingBytes.Length, SocketFlags.None, BytesRecieved, null);
+                    ProcessInput();
                 }
             }
         }
 
+        /// <summary>
+        /// This method reads new input and breaks it up into the requests created.
+        /// </summary>
+        private void ProcessInput()
+        {
+            while (recieveCallbackQueue.Count > 0)
+            {
+                string s = null;
+
+                int length = recieveLengthQueue.First();
+                if (length == 0)
+                {
+                    for (int i = start; i < incoming.Length; i++)
+                    {
+                        if (incoming[i] == '\n')
+                        {
+                            s = incoming.ToString(0, i);
+                            if (s.Contains("\n"))
+                            {
+                                Console.WriteLine(s);
+                            }
+                            // Remove the new line character too
+                            incoming.Remove(0, i + 1);
+                            break;
+                        }
+                    }
+                }
+                else
+                {
+                    if (incoming.Length >= length)
+                    {
+                        s = incoming.ToString(0, length);
+                        s.Remove(0, length);
+                    }
+                }
+
+                if (s == null)
+                {
+                    start = incoming.Length;
+
+                    break;
+                }
+                else
+                {
+                    var callback = recieveCallbackQueue.Dequeue();
+                    recieveLengthQueue.Dequeue();
+                    
+                    Task.Run(() => callback(s, null));
+
+                    start = 0;
+                }
+            }
+
+            if (recieveCallbackQueue.Count > 0)
+            {
+                socket.BeginReceive(incomingBytes, 0, incomingBytes.Length, SocketFlags.None, BytesRecieved, null);
+            }
+            else
+            {
+                recieveIsOngoing = false;
+            }
+        }
+
+        /// <summary>
+        /// Callback called by socket. Converts bytes read into chars and appends them to incoming.
+        /// Then calls ProcessInput to process them.
+        /// </summary>
+        /// <param name="result"></param>
         private void BytesRecieved(IAsyncResult result)
         {
-            int bytesRead = 0;
-            try
-            {
-                bytesRead = socket.EndReceive(result);
-            }
-            catch (ObjectDisposedException)
-            {
-                Console.WriteLine("ERROR!!!");
-            }
+            int bytesRead = socket.EndReceive(result);
 
             // bytesRead will be zero if the connection was closed on the other end and all bytes
             // have been read.
@@ -214,58 +314,7 @@ namespace CustomNetworking
                     int charsRead = encoding.GetDecoder().GetChars(incomingBytes, 0, bytesRead, incomingChars, 0, false);
                     incoming.Append(incomingChars, 0, charsRead);
 
-                    int start = incoming.Length - charsRead;
-                    start = 0;
-
-                    while (recieveCallbackQueue.Count > 0)
-                    {
-                        string s = null;
-
-                        int length = recieveLengthQueue.First();
-                        if (length == 0)
-                        {
-                            for (int i = start; i < incoming.Length; i++)
-                            {
-                                if (incoming[i] == '\n')
-                                {
-                                    s = incoming.ToString(0, i);
-                                    // Remove the new line character too
-                                    incoming.Remove(0, i + 1);
-                                    break;
-                                }
-                            }
-                        }
-                        else
-                        {
-                            if (incoming.Length >= length)
-                            {
-                                s = incoming.ToString(0, length);
-                                s.Remove(0, length);
-                            }
-                        }
-
-                        if (s == null)
-                        {
-                            break;
-                        }
-                        else
-                        {
-                            var callback = recieveCallbackQueue.Dequeue();
-                            recieveLengthQueue.Dequeue();
-
-                            new Task(() => callback(s, null)).Start();
-                        }
-
-                        start = 0;
-                    }
-                    if (recieveCallbackQueue.Count > 0)
-                    {
-                        socket.BeginReceive(incomingBytes, 0, incomingBytes.Length, SocketFlags.None, BytesRecieved, null);
-                    }
-                    else
-                    {
-                        recieveIsOngoing = false;
-                    }
+                    ProcessInput();
                 }
             }
         }
