@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Net.Sockets;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace CustomNetworking
 {
@@ -67,6 +68,33 @@ namespace CustomNetworking
         // Underlying socket
         private Socket socket;
 
+        // Whether an asynchronous send is going on
+        private bool sendOnGoing;
+
+        // Synchronizes sends
+        private readonly object sendSync = new object();
+
+        // StringBuilder for out going string
+//        StringBuilder outGoingString;
+
+        // Array of bytes for sending with socket
+        private byte[] outBytes;
+
+        // Where is the socket during send
+        private int byteIndex;
+
+        // Holds the encoding type
+        private Encoding encodingType;
+
+        // Holds callback method
+        private Queue<Action<Exception>> sendCallBackQueue;
+
+        // Store the messages to be sent.
+        private Queue<string> messageQueue;
+
+        // Determine if first time sending message from group.
+        bool isStartOfGroup;
+
         /// <summary>
         /// Creates a StringSocket from a regular Socket, which should already be connected.  
         /// The read and write methods of the regular Socket must not be called after the
@@ -76,12 +104,19 @@ namespace CustomNetworking
         public StringSocket(Socket s, Encoding e)
         {
             socket = s;
+            sendOnGoing = false;
+           // outGoingString = new StringBuilder();
+            outBytes = new byte[0];
+            byteIndex = 0;
+            encodingType = e;
+            sendCallBackQueue = new Queue<Action<Exception>>();
+            messageQueue = new Queue<string>();
         }
 
         /// <summary>
         /// Shuts down and closes the socket.  No need to change this.
         /// </summary>
-        public void Shutdown  ()
+        public void Shutdown()
         {
             try
             {
@@ -118,6 +153,78 @@ namespace CustomNetworking
         /// </summary>
         public void BeginSend(String s, SendCallback callback, object payload)
         {
+            lock (sendSync)
+            {
+                messageQueue.Enqueue(s);
+                //outGoingString.Append(s);
+
+                sendCallBackQueue.Enqueue((e) => callback(e, payload));
+                // If send is not on going, start one
+                if (!sendOnGoing)
+                {
+                    // Arranges for the string to be sent, then returns
+                    isStartOfGroup = true;
+                    sendOnGoing = true;
+                    SendBytes();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Method to actually send via socket with bytes
+        /// </summary>
+        private void SendBytes()
+        {
+            // If currently dealing with sending bytes
+            if (byteIndex < outBytes.Length)
+            {
+                socket.BeginSend(outBytes, byteIndex, outBytes.Length - byteIndex, SocketFlags.None, SentCallBack, null);
+            }
+            // Not currently dealing with bytes, make another one
+            else if (messageQueue.Count > 0)
+            {
+                if(isStartOfGroup)
+                {
+                    isStartOfGroup = false;
+                }
+                else
+                {
+                    var callbackMethod = sendCallBackQueue.Dequeue();
+                    Task.Run(() => callbackMethod(null));
+                }
+
+                // Started from the bottom
+                byteIndex = 0;
+                outBytes = encodingType.GetBytes(messageQueue.Dequeue());
+                //outGoingString.Clear();
+                socket.BeginSend(outBytes, 0, outBytes.Length, SocketFlags.None, SentCallBack, null);
+            }
+            else
+            {
+                var callbackMethod = sendCallBackQueue.Dequeue();
+                Task.Run(() => callbackMethod(null));
+
+                sendOnGoing = false;
+            }
+
+        }
+
+        /// <summary>
+        /// Callback method for when socket has successfully sent
+        /// </summary>
+        /// <param name="result"></param>
+        private void SentCallBack(IAsyncResult result)
+        {
+            int bytesSent = socket.EndSend(result);
+            lock (sendSync)
+            {
+                // Update index and try to send the rest
+                if (bytesSent > 0)
+                {
+                    byteIndex += bytesSent;
+                    SendBytes();
+                }
+            }
         }
 
         /// <summary>
